@@ -1,0 +1,1680 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/enums.schema.json",
+  "title": "Enums",
+  "description": "GENERATED from packages/contracts/enums.yaml by `inspector-contracts gen`. Do not edit. Contract version 0.1.0.",
+  "$defs": {
+    "ViolationLabel": {
+      "description": "Owner: AG-04. Source: submission_schema.json; 97 §2.6.",
+      "enum": [
+        "VIOLATION_PRESENT",
+        "NO_VIOLATION",
+        "MISSING_DOCUMENT",
+        "COMPARISON_IMPOSSIBLE"
+      ]
+    },
+    "ProtocolParamStatus": {
+      "description": "Per-parameter protocol status. PARTIALLY_LOADED is display-only and never exported. Owner: AG-04. Source: submission_schema.json; ТЗ v1.0 §9.2 status table (93 §3.4); 97 §2.6.",
+      "enum": [
+        "OK",
+        "WARNING",
+        "CRITICAL",
+        "ID_MISSING",
+        "RD_MISSING",
+        "PD_MISSING",
+        "PARTIALLY_LOADED",
+        "COMPARISON_IMPOSSIBLE"
+      ]
+    },
+    "CriticalityLevel": {
+      "description": "`catalog_string` is the exact string exported as submission `criticality`. Owner: AG-03. Source: parameter_catalog_132.jsonl `criticality`; 97 §2.7–2.8 (restored next to review_priority).",
+      "enum": [
+        "CRITICAL_SUSPEND",
+        "SUBSTANTIAL_ORDER",
+        "INFORMATIONAL"
+      ]
+    },
+    "ParameterMappingStatus": {
+      "description": "Owner: AG-03. Source: parameter_catalog_132.jsonl `mapping_status`; public_train_finding_groups.jsonl; 97 §2.7, §2.10.",
+      "enum": [
+        "SOURCE_MATRIX",
+        "PROVISIONAL_DOMAIN_MAPPING",
+        "MATRIX_GAP_CONFIRMED"
+      ]
+    },
+    "ComparisonResult": {
+      "description": "Owner: AG-04. Source: public_train_checks.jsonl `comparison_result`; 93 §3.5; 97 §2.7 (mapped from DiscrepancyType).",
+      "enum": [
+        "CONFIGURATION_MISMATCH",
+        "MISSING_DESIGN_ELEMENT",
+        "VALUE_MISMATCH",
+        "MATERIAL_SUBSTITUTION",
+        "EXTRA_ELEMENT",
+        "TOLERANCE_EXCEEDED"
+      ]
+    },
+    "LocationType": {
+      "description": "Owner: AG-04. Source: public_train_checks.jsonl `location_type`; 93 §2.7; 97 §2.7.",
+      "enum": [
+        "ROOM",
+        "FLOOR",
+        "BUILDING",
+        "AXES",
+        "ELEMENT",
+        "OBJECT"
+      ]
+    },
+    "MatrixScope": {
+      "description": "Owner: AG-04. Source: public_train_checks.jsonl `matrix_scope`; 97 §2.7.",
+      "enum": [
+        "MATRIX",
+        "FREE_SEARCH"
+      ]
+    },
+    "DocumentStatus": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Stage availability for one check. Grammar: <stages>_AVAILABLE[_<stages>_MISSING | _<stage>_NOT_REQUIRED_FOR_PAIRWISE_CHECK]. Only PD_RD_AVAILABLE_ID_NOT_REQUIRED_FOR_PAIRWISE_CHECK is observed in the gold; the rest are proposed. Owner: AG-04. Source: public_train_checks.jsonl `document_status` (gold vocabulary); 93 §3.9; 97 §2.7.",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "PD_RD_AVAILABLE_ID_NOT_REQUIRED_FOR_PAIRWISE_CHECK",
+        "PD_ID_AVAILABLE_RD_NOT_REQUIRED_FOR_PAIRWISE_CHECK",
+        "RD_ID_AVAILABLE_PD_NOT_REQUIRED_FOR_PAIRWISE_CHECK",
+        "PD_RD_ID_AVAILABLE",
+        "PD_RD_AVAILABLE_ID_MISSING",
+        "PD_ID_AVAILABLE_RD_MISSING",
+        "RD_ID_AVAILABLE_PD_MISSING",
+        "PD_AVAILABLE_RD_ID_MISSING",
+        "RD_AVAILABLE_PD_ID_MISSING",
+        "ID_AVAILABLE_PD_RD_MISSING",
+        "PD_RD_ID_MISSING"
+      ]
+    },
+    "FreeTopic": {
+      "description": "TOPIC of a FREE-<TOPIC>-<NNN> code. NNN is numbered per finding group within object and topic. Owner: AG-07. Source: 93 §3.7; 97 §2.9 (FREE-<TOPIC>-<NNN>, fixed topic vocabulary).",
+      "enum": [
+        "HEATING",
+        "VENTILATION",
+        "WATER",
+        "SEWER",
+        "ELECTRICAL",
+        "LIGHTING",
+        "FIRE",
+        "EVACUATION",
+        "ACCESSIBILITY",
+        "ARCHITECTURE",
+        "STRUCTURE",
+        "SITE",
+        "ROOF",
+        "FACADE",
+        "LIFT",
+        "ENERGY",
+        "OTHER"
+      ]
+    },
+    "SubmissionVariant": {
+      "description": "Owner: AG-04. Source: 97 §2.5, §2.14 (GET /processes/{id}/submission?variant=full|strict).",
+      "enum": [
+        "full",
+        "strict"
+      ]
+    },
+    "ManifestStage": {
+      "description": "Owner: AG-01. Source: document_manifest.jsonl `stage`; 97 §2.7 (kept raw next to the resolved DocStage).",
+      "enum": [
+        "PD",
+        "RD",
+        "ID",
+        "RD_ID_MIXED",
+        "UNKNOWN"
+      ]
+    },
+    "ManifestSplit": {
+      "description": "Owner: AG-10. Source: document_manifest.jsonl `split`; split_policy.json; 97 §2.7 (mapping to Split).",
+      "enum": [
+        "TRAIN_PUBLIC",
+        "TEST_HIDDEN"
+      ]
+    },
+    "ManifestSection": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Owner: AG-01. Source: document_manifest.jsonl `section` (observed values); labels are the usual discipline abbreviations.",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "OTHER",
+        "AR",
+        "KR",
+        "POS",
+        "GP",
+        "EOM",
+        "VK",
+        "OV",
+        "SS",
+        "PB"
+      ]
+    },
+    "DatasetRole": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Owner: AG-10. Source: document_manifest.jsonl `dataset_role` (observed values).",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "GOLD_SEED",
+        "UNLABELED_POOL"
+      ]
+    },
+    "AnnotationStatus": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Owner: AG-01. Source: document_manifest.jsonl `annotation_status` (observed values); GROUND_TRUTH_INDEX files are never evidence (97 §2.5).",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "UNLABELED",
+        "POSITIVE_EVIDENCE_SOURCE",
+        "GROUND_TRUTH_INDEX"
+      ]
+    },
+    "DistributionStatus": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Owner: AG-01. Source: document_manifest.jsonl `distribution_status` (observed values).",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "INCLUDE"
+      ]
+    },
+    "LabelVisibility": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Owner: AG-10. Source: document_manifest.jsonl `label_visibility` (observed values).",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "PUBLIC_TRAIN",
+        "ORGANIZER_ONLY"
+      ]
+    },
+    "GoldStatus": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Owner: AG-10. Source: public_train_checks.jsonl `gold_status` (observed values); TEAM_LABEL_FROZEN for our own frozen dev labels (95 §5, N-GOLD).",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "FINAL_GOLD_EXISTENCE",
+        "TEAM_LABEL_FROZEN"
+      ]
+    },
+    "EvidenceLocalization": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Owner: AG-10. Source: public_train_checks.jsonl evidence[].localization (observed values).",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "PAGE_LEVEL_VISUALLY_VERIFIED"
+      ]
+    },
+    "LocalFileStatus": {
+      "description": "Owner: AG-01. Source: 97 §2.7, §2.12 (never MISSING_DOCUMENT).",
+      "enum": [
+        "PRESENT",
+        "RECOVERED",
+        "MISSING_ON_DISK"
+      ]
+    },
+    "ArchiveMemberRole": {
+      "description": "Owner: AG-01. Source: 97 §2.7, §2.12 (archive members are never citable).",
+      "enum": [
+        "PDF_TWIN_SOURCE",
+        "CONTEXT_ONLY",
+        "FOREIGN_OBJECT",
+        "DUPLICATE",
+        "IGNORED"
+      ]
+    },
+    "PageBasis": {
+      "description": "Owner: AG-02A. Source: 97 §2.5, §2.7 (DOCX evidence only with RENDERED_LIBREOFFICE).",
+      "enum": [
+        "PDF_NATIVE",
+        "RENDERED_LIBREOFFICE"
+      ]
+    },
+    "TextSource": {
+      "description": "Owner: AG-02A. Source: 97 §2.7, §2.13.",
+      "enum": [
+        "TEXT_LAYER",
+        "TEXT_LAYER_REPAIRED",
+        "OCR",
+        "OCR_LAYER_ISOLATED"
+      ]
+    },
+    "ProcessStatus": {
+      "description": "Owner: AG-00. Source: ТЗ §9.1; 90 §3.2.2.",
+      "enum": [
+        "PENDING",
+        "PARSING",
+        "READY",
+        "VERIFYING",
+        "COMPLETED",
+        "FINALIZED",
+        "FAILED"
+      ]
+    },
+    "ProcessStage": {
+      "description": "Owner: AG-00. Source: 90 §3.2.1 (informational).",
+      "enum": [
+        "QUEUED",
+        "VALIDATING",
+        "META",
+        "PARSING",
+        "OCR",
+        "EXTRACTING",
+        "COMPARING",
+        "HYPOTHESIS",
+        "PROTOCOL_BUILDING",
+        "RENDERING",
+        "DONE",
+        "FAILED"
+      ]
+    },
+    "RecheckState": {
+      "description": "Owner: AG-00. Source: 90 §3.2.1.",
+      "enum": [
+        "IDLE",
+        "RUNNING",
+        "FAILED"
+      ]
+    },
+    "ProcessPurpose": {
+      "description": "Owner: AG-10. Source: 90 §3.2.1.",
+      "enum": [
+        "INSPECTION",
+        "EVALUATION",
+        "SELFTEST"
+      ]
+    },
+    "ProcessSource": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1; BATCH_IMPORT (proposed, AG-00 M1) = created by POST /api/v1/admin/batch-runs/import from an inspector-batch run (97 §1.4, §2.14).",
+      "enum": [
+        "UI",
+        "API",
+        "RIN",
+        "BATCH_IMPORT"
+      ]
+    },
+    "FileSource": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1; BATCH_IMPORT = registered by POST /api/v1/admin/batch-runs/import from an inspector-batch run (97 §2.14).",
+      "enum": [
+        "UI",
+        "API",
+        "RIN",
+        "BATCH_IMPORT"
+      ]
+    },
+    "ProtocolStatus": {
+      "description": "Owner: AG-04. Source: ТЗ §9.3; 90 §3.2.3.",
+      "enum": [
+        "IN_VERIFICATION",
+        "VERIFICATION_COMPLETED",
+        "PROTOCOL_FINALIZED",
+        "SUPERSEDED"
+      ]
+    },
+    "ProtocolVersionReason": {
+      "description": "Owner: AG-04. Source: 90 §3.2.1.",
+      "enum": [
+        "INITIAL",
+        "INCREMENTAL_UPDATE",
+        "RECHECK",
+        "FINALIZATION",
+        "UNFINALIZATION"
+      ]
+    },
+    "RecheckReason": {
+      "description": "Owner: AG-04. Source: 90 §3.2.1.",
+      "enum": [
+        "REVISION_RESOLVED",
+        "FACT_OVERRIDE",
+        "COMPLETENESS_OVERRIDE",
+        "MATRIX_RECHECK",
+        "MANUAL"
+      ]
+    },
+    "IncrementalTrigger": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1.",
+      "enum": [
+        "UPLOAD",
+        "REUPLOAD",
+        "REGISTRY_UPDATE",
+        "RIN_PULL"
+      ]
+    },
+    "StageUploadStatus": {
+      "description": "Owner: AG-01. Source: ТЗ §9.1; 90 §3.2.7.",
+      "enum": [
+        "PD_UPLOADED",
+        "PD_PARTIAL",
+        "PD_MISSING",
+        "RD_UPLOADED",
+        "RD_PARTIAL",
+        "RD_MISSING",
+        "ID_UPLOADED",
+        "ID_PARTIAL",
+        "ID_MISSING"
+      ]
+    },
+    "LoadScenario": {
+      "description": "Owner: AG-01. Source: ТЗ §9.2; 90 §3.2.7.",
+      "enum": [
+        "FULL",
+        "PD_RD_ONLY",
+        "PD_ID_ONLY",
+        "RD_ID_ONLY",
+        "SINGLE_ONLY",
+        "PARTIALLY_LOADED"
+      ]
+    },
+    "ScenarioBase": {
+      "description": "Owner: AG-01. Source: 90 §3.2.7.",
+      "enum": [
+        "FULL",
+        "PD_RD_ONLY",
+        "PD_ID_ONLY",
+        "RD_ID_ONLY",
+        "SINGLE_ONLY",
+        "NONE"
+      ]
+    },
+    "JobStatus": {
+      "description": "Owner: AG-00. Source: 90 §3.2.6.",
+      "enum": [
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "RETRY_SCHEDULED",
+        "FAILED",
+        "DEAD_LETTERED",
+        "CANCELLED"
+      ]
+    },
+    "RunMode": {
+      "description": "Owner: AG-00. Source: 90 §3.2.6.",
+      "enum": [
+        "INITIAL",
+        "INCREMENTAL",
+        "RECHECK"
+      ]
+    },
+    "RunStatus": {
+      "description": "Owner: AG-00. Source: 90 §3.2.6.",
+      "enum": [
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "PARTIAL",
+        "FAILED"
+      ]
+    },
+    "EngineStatus": {
+      "description": "Owner: AG-00. Source: 90 §3.2.1.",
+      "enum": [
+        "QUEUED",
+        "RUNNING",
+        "OK",
+        "PARTIAL",
+        "TIMEOUT",
+        "FAILED"
+      ]
+    },
+    "DocStage": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1; submission_schema.json evidence[].stage.",
+      "enum": [
+        "PD",
+        "RD",
+        "ID"
+      ]
+    },
+    "ApprovalStatus": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1.",
+      "enum": [
+        "DRAFT",
+        "APPROVED",
+        "FOR_CONSTRUCTION",
+        "SUPERSEDED",
+        "CANCELLED",
+        "UNKNOWN"
+      ]
+    },
+    "SignatureStatus": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1.",
+      "enum": [
+        "UKEP",
+        "UNEP",
+        "WET_SCAN",
+        "ABSENT",
+        "NOT_REQUIRED",
+        "UNKNOWN"
+      ]
+    },
+    "RegistryStatus": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1; 97 §2.12 (the manifest is the registry, VALID_WITH_WARNINGS).",
+      "enum": [
+        "MISSING",
+        "INVALID",
+        "VALID_WITH_WARNINGS",
+        "VALID",
+        "DRAFT_UNCONFIRMED"
+      ]
+    },
+    "PackageStatus": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1.",
+      "enum": [
+        "ACCEPTED",
+        "ACCEPTED_WITH_REJECTIONS",
+        "CLARIFICATION_REQUIRED",
+        "REJECTED_PACKAGE_LIMIT"
+      ]
+    },
+    "FileIntakeStatus": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1, §3.2.6.",
+      "enum": [
+        "RECEIVED",
+        "STORED",
+        "VALIDATED",
+        "META_EXTRACTED",
+        "PARSE_QUEUED",
+        "PARSED",
+        "REJECTED_FORMAT",
+        "REJECTED_SIZE",
+        "REJECTED_EMPTY",
+        "REJECTED_CORRUPTED",
+        "REJECTED_ENCRYPTED",
+        "REJECTED_INFECTED",
+        "REJECTED_MISMATCH",
+        "FAILED_TIMEOUT"
+      ]
+    },
+    "FileIntegrityStatus": {
+      "description": "Owner: AG-00. Source: ТЗ §13.8; 90 §3.2.1.",
+      "enum": [
+        "OK",
+        "CORRUPTED",
+        "MISSING"
+      ]
+    },
+    "MetaSource": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1; 97 §2.8.",
+      "enum": [
+        "REGISTRY",
+        "DRAFT_CONFIRMED",
+        "EXTRACTED_UNCONFIRMED"
+      ]
+    },
+    "MetaStatus": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1.",
+      "enum": [
+        "OK",
+        "CLARIFICATION_REQUIRED",
+        "NOT_COMPARABLE"
+      ]
+    },
+    "SelectionBasis": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1.",
+      "enum": [
+        "SINGLE_APPROVED",
+        "EXPLICIT_CHAIN",
+        "SUPERSEDED_STATUS",
+        "INSPECTOR_DECISION",
+        "INFERRED_ORDER"
+      ]
+    },
+    "CompletenessItemStatus": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1.",
+      "enum": [
+        "PRESENT",
+        "MISSING_EVIDENCE",
+        "DECLARED_NOT_RECEIVED",
+        "NOT_APPLICABLE",
+        "CLARIFICATION_REQUIRED",
+        "NOT_COMPARABLE"
+      ]
+    },
+    "ChecklistLevel": {
+      "description": "Owner: AG-01. Source: 90 §3.2.1.",
+      "enum": [
+        "CORE",
+        "EXPECTED",
+        "OPTIONAL"
+      ]
+    },
+    "PageClass": {
+      "description": "Owner: AG-02A. Source: 90 §3.2.1; 97 §2.7 (STAMP_PAGE added; BROKEN_ENCODING = mojibake/lexicon/mixed-script; TEXT_UNDER/OVER_IMAGE → RASTER_HIDDEN_OCR).",
+      "enum": [
+        "VECTOR",
+        "HYBRID",
+        "RASTER_SCAN",
+        "RASTER_HIDDEN_OCR",
+        "VECTOR_OUTLINED_TEXT",
+        "BROKEN_ENCODING",
+        "STAMP_PAGE",
+        "EMPTY"
+      ]
+    },
+    "QualityFlag": {
+      "description": "Owner: AG-02A. Source: ТЗ §9.1; 90 §3.2.1; 97 §2.13 (OK ≥ 0.85 / LOW_QUALITY ≥ 0.6 / ABSTAIN).",
+      "enum": [
+        "OK",
+        "LOW_QUALITY",
+        "ABSTAIN"
+      ]
+    },
+    "ZoneSource": {
+      "description": "Owner: AG-02A. Source: 90 §3.2.1.",
+      "enum": [
+        "AUTO",
+        "PREMARKED",
+        "INSPECTOR"
+      ]
+    },
+    "ZoneKind": {
+      "description": "OPEN vocabulary (unknown values allowed and kept raw). Owner: AG-02A. Source: 97 §2.13 (seal, stamp, QR, handwriting zones; title-block cells; revision clouds); page_zones.zone_type.",
+      "type": "string",
+      "minLength": 1,
+      "examples": [
+        "TITLE_BLOCK",
+        "STAMP",
+        "SEAL",
+        "QR",
+        "HANDWRITING",
+        "TABLE",
+        "REVISION_CLOUD",
+        "PREMARKED_UNREADABLE",
+        "OTHER"
+      ]
+    },
+    "ExtractionMethod": {
+      "description": "Owner: AG-02C. Source: 90 §3.2.1.",
+      "enum": [
+        "TEXT_LAYER",
+        "OCR",
+        "TABLE",
+        "REGEX",
+        "TOKEN_GRAMMAR",
+        "SEMANTIC",
+        "CV_MEASURE",
+        "XML_XPATH",
+        "DOCX",
+        "MANUAL",
+        "VLM_ASSIST"
+      ]
+    },
+    "ParamExtractionStatus": {
+      "description": "Owner: AG-02C. Source: 90 §3.2.1.",
+      "enum": [
+        "FOUND",
+        "NOT_FOUND",
+        "OUT_OF_SCOPE",
+        "LOW_QUALITY_ONLY",
+        "AMBIGUOUS"
+      ]
+    },
+    "ExtractionRunStatus": {
+      "description": "Owner: AG-02A. Source: 90 §3.2.1, §3.2.6.",
+      "enum": [
+        "QUEUED",
+        "RUNNING",
+        "CACHE_HIT",
+        "COMPLETED",
+        "REJECTED",
+        "FAILED_RETRYABLE",
+        "FAILED_FINAL"
+      ]
+    },
+    "DataType": {
+      "description": "Owner: AG-03. Source: ТЗ §8.1; 90 §3.2.1 (lowercase per ТЗ).",
+      "enum": [
+        "number",
+        "string",
+        "boolean",
+        "coordinate",
+        "enum"
+      ]
+    },
+    "ReviewPriority": {
+      "description": "Owner: AG-03. Source: ТЗ §8.1, §9.2; 90 §3.2.1.",
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "RiskLevel": {
+      "description": "Owner: AG-04. Source: ТЗ §9.2; 90 §3.2.1.",
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "RuleType": {
+      "description": "Owner: AG-03. Source: 90 §3.2.1.",
+      "enum": [
+        "PAIRWISE_DELTA",
+        "NORMATIVE_BOUND",
+        "ORDINAL_COMPARE",
+        "ENUM_CHANGE",
+        "SET_DIFF",
+        "LAYER_STACK",
+        "PRESENCE",
+        "TOLERANCE_CHECK",
+        "GEOMETRY_OFFSET",
+        "GEOMETRY_CONTAINMENT",
+        "RATIO_BOUND",
+        "EXTERNAL_STATUS",
+        "SEMANTIC_DIFF"
+      ]
+    },
+    "CandidatePolicy": {
+      "description": "Owner: AG-03. Source: 90 §3.2.1.",
+      "enum": [
+        "TRIGGER",
+        "DEVIATION"
+      ]
+    },
+    "ViolationType": {
+      "description": "Owner: AG-03. Source: ТЗ §14.3; 90 §3.2.1.",
+      "enum": [
+        "NUMERIC_DECREASE",
+        "NORM_BOUND_VIOLATION",
+        "NUMERIC_DEVIATION",
+        "CONFIG_CHANGE",
+        "ELEMENT_REMOVED",
+        "NUMERIC_INCREASE",
+        "CLASS_DOWNGRADE",
+        "COUNT_DECREASE",
+        "MATERIAL_SUBSTITUTION",
+        "ZONE_INTRUSION",
+        "EXTERNAL_NONCOMPLIANCE",
+        "TOLERANCE_EXCEEDED",
+        "INTERNAL_INCONSISTENCY",
+        "LAYER_CHANGE",
+        "GEOMETRY_OFFSET",
+        "RATIO_VIOLATION"
+      ]
+    },
+    "RuleDirection": {
+      "description": "Owner: AG-03. Source: seed/schemas/comparison_rule.schema.json $defs.RuleDirection; 97 §2.10 (directional triggers).",
+      "enum": [
+        "ANY",
+        "DECREASE",
+        "INCREASE",
+        "DOWNGRADE"
+      ]
+    },
+    "RuleOperator": {
+      "description": "Owner: AG-03. Source: seed/schemas/comparison_rule.schema.json $defs.RuleOperator.",
+      "enum": [
+        "ABS_DELTA_GT",
+        "REL_DELTA_GT",
+        "OUTSIDE_BOUNDS",
+        "ORDINAL_LOWER",
+        "ORDINAL_NE",
+        "NE",
+        "SET_DIFF",
+        "LAYER_DIFF",
+        "PRESENT_IN_EXPECTED_ABSENT_IN_ACTUAL",
+        "ABS_DEVIATION_GT_TOLERANCE",
+        "DIST_GT",
+        "INTERSECTS_FORBIDDEN_ZONE",
+        "RATIO_LT",
+        "STATUS_NOT_OK",
+        "SEMANTIC_CONTRADICTION"
+      ]
+    },
+    "DetectKind": {
+      "description": "Owner: AG-03. Source: seed/schemas/comparison_rule.schema.json $defs.DetectKind (SET_DIFF / LAYER_DIFF).",
+      "enum": [
+        "MISSING",
+        "ADDED",
+        "CHANGED",
+        "LAYER_REMOVED",
+        "THICKNESS_DECREASED",
+        "MATERIAL_CHANGED",
+        "LAYER_ADDED"
+      ]
+    },
+    "AbstainReason": {
+      "description": "Owner: AG-03. Source: seed/schemas/comparison_rule.schema.json $defs.AbstainReason (a rule abstains instead of emitting SUSPICION, 90 C-53).",
+      "enum": [
+        "UNIT_MISMATCH",
+        "VALUE_NOT_FOUND",
+        "AMBIGUOUS_VALUE",
+        "UNKNOWN_SCALE_VALUE",
+        "ELEMENT_KEY_UNRESOLVED",
+        "SHEETS_NOT_MATCHED",
+        "ASSEMBLY_NOT_MATCHED",
+        "TOLERANCE_NOT_FOUND",
+        "CRS_MISMATCH",
+        "HEIGHT_SYSTEM_MISMATCH",
+        "PRICE_LEVEL_MISMATCH",
+        "VAT_BASIS_MISMATCH",
+        "METHOD_MISMATCH",
+        "GEOMETRY_NOT_EXTRACTED",
+        "EXTERNAL_DATA_UNAVAILABLE",
+        "TEXT_NOT_FOUND"
+      ]
+    },
+    "OrdinalScale": {
+      "description": "Owner: AG-03. Source: seed/schemas/comparison_rule.schema.json $defs.OrdinalScale.",
+      "enum": [
+        "CONCRETE_B",
+        "STEEL_GRADE",
+        "REBAR_CLASS",
+        "FIRE_RESISTANCE_DEGREE",
+        "CONSTRUCTIVE_FIRE_HAZARD_CLASS",
+        "KM_CLASS",
+        "ENERGY_CLASS",
+        "RELIABILITY_CATEGORY",
+        "EI_LIMIT",
+        "FIRE_RESISTANCE_LIMIT_R",
+        "CABLE_FIRE_INDEX",
+        "WASTE_HAZARD_CLASS"
+      ]
+    },
+    "ParamExtractionStrategy": {
+      "description": "Owner: AG-03. Source: seed/schemas/params.schema.json $defs.ExtractionStrategy — the planned strategy per parameter (not ExtractionMethod, which records how a value was actually extracted).",
+      "enum": [
+        "TABLE_TEXT",
+        "FREE_TEXT_REGEX",
+        "SPEC_TABLE",
+        "DRAWING_GEOMETRY",
+        "SEMANTIC",
+        "EXTERNAL_SYSTEM",
+        "MANUAL"
+      ]
+    },
+    "ThresholdSource": {
+      "description": "Owner: AG-03. Source: seed/schemas/params.schema.json Param.threshold_source.",
+      "enum": [
+        "MATRIX_TRIGGER",
+        "NONE",
+        "NORMATIVE",
+        "PD_VALUE",
+        "OBJECT_GPZU",
+        "ADMIN_REQUIRED",
+        "SHEET_OR_NORMATIVE",
+        "NORMATIVE_OVERRIDE"
+      ]
+    },
+    "FeasibilityTier": {
+      "description": "Owner: AG-03. Source: seed/schemas/params.schema.json Param.feasibility_tier; definitions from 03 §3.7.",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "HedgeKind": {
+      "description": "Owner: AG-03. Source: seed/schemas/params.schema.json hedge_groups[].kind; 97 §2.10 (top-2 code hedge over matrix near-duplicates).",
+      "enum": [
+        "SAME_SYSTEM",
+        "DUPLICATE",
+        "PARTIAL_DUPLICATE"
+      ]
+    },
+    "TextOrigin": {
+      "description": "Owner: AG-03. Source: seed/schemas/params.schema.json $defs.TextOrigin (protocol texts: verbatim from Приложение 2 or AG-03 draft awaiting expert review).",
+      "enum": [
+        "APPENDIX2",
+        "AG03_DRAFT"
+      ]
+    },
+    "ObjectPhase": {
+      "description": "Owner: AG-03. Source: 90 §3.2.1.",
+      "enum": [
+        "DESIGN",
+        "CONSTRUCTION",
+        "COMPLETED"
+      ]
+    },
+    "FactSetBy": {
+      "description": "Owner: AG-03. Source: 90 §3.2.1.",
+      "enum": [
+        "SYSTEM",
+        "INSPECTOR"
+      ]
+    },
+    "MatrixVersionStatus": {
+      "description": "Owner: AG-03. Source: 90 §3.2.10.",
+      "enum": [
+        "DRAFT",
+        "PUBLISHED",
+        "RETIRED"
+      ]
+    },
+    "ReferenceConfidence": {
+      "description": "Owner: AG-03. Source: 90 §3.2.1.",
+      "enum": [
+        "HIGH",
+        "MEDIUM",
+        "LOW"
+      ]
+    },
+    "NormativeDocType": {
+      "description": "Owner: AG-08. Source: 90 §3.2.1.",
+      "enum": [
+        "SP",
+        "GOST",
+        "FZ",
+        "SANPIN",
+        "PP",
+        "GPZU",
+        "LOCAL",
+        "OTHER"
+      ]
+    },
+    "DiscrepancyType": {
+      "description": "Owner: AG-04. Source: 90 §3.2.1 (mapped to ComparisonResult, see mappings.discrepancy_to_comparison_result).",
+      "enum": [
+        "VALUE_DECREASED",
+        "VALUE_INCREASED",
+        "VALUE_CHANGED",
+        "THRESHOLD_BELOW_MIN",
+        "THRESHOLD_ABOVE_MAX",
+        "TOLERANCE_EXCEEDED",
+        "CLASS_DOWNGRADED",
+        "MATERIAL_SUBSTITUTED",
+        "ELEMENT_MISSING",
+        "ELEMENT_ADDED",
+        "FUNCTION_CHANGED",
+        "LAYER_REMOVED",
+        "LAYER_CHANGED",
+        "POSITION_SHIFTED",
+        "CONFIGURATION_CHANGED",
+        "COUNT_CHANGED",
+        "TOTAL_CHANGED",
+        "UNDOCUMENTED_WORK"
+      ]
+    },
+    "ComparisonAxis": {
+      "description": "Owner: AG-04. Source: 90 §3.2.1.",
+      "enum": [
+        "PD_RD",
+        "RD_ID",
+        "PD_ID",
+        "NORM_PD",
+        "NORM_RD",
+        "NORM_ID"
+      ]
+    },
+    "CompletenessStatus": {
+      "description": "Owner: AG-04. Source: СХЕМА GOLD; ТЗ §9.2; 90 §3.2.4 axis B.",
+      "enum": [
+        "COMPLETE",
+        "MISSING_EVIDENCE",
+        "NOT_APPLICABLE",
+        "NOT_COMPARABLE",
+        "CLARIFICATION_REQUIRED"
+      ]
+    },
+    "CompletenessBasis": {
+      "description": "Basis codes printed in protocol table (1) «Причина / основание». `maps_to` is the CompletenessStatus. Owner: AG-04. Source: 10 §3.7.2; 90 §3.2.4 (+ LOW_CONFIDENCE_SEMANTIC, PARAM_DEACTIVATED).",
+      "enum": [
+        "REGISTRY_MISSING",
+        "REGISTRY_ROW_INVALID",
+        "REGISTRY_HASH_MISMATCH",
+        "FILE_NOT_LISTED",
+        "OBJECT_MISMATCH",
+        "REVISION_UNRESOLVED",
+        "APPROVAL_MISSING",
+        "SUPERSEDED_ONLY",
+        "MANDATORY_SOURCE_MISSING",
+        "DECLARED_NOT_RECEIVED",
+        "CURRENT_REVISION_NOT_UPLOADED",
+        "FILE_REJECTED",
+        "SOURCE_UNREADABLE",
+        "FILE_NOT_PROCESSED",
+        "VALUE_ABSTAINED",
+        "UNIT_INCOMPATIBLE",
+        "VALUE_UNPARSEABLE",
+        "VALUE_IMPLAUSIBLE",
+        "SCOPE_MISMATCH",
+        "SHEETS_NOT_MATCHED",
+        "EVIDENCE_NOT_LOCALIZABLE",
+        "ENGINE_ERROR",
+        "LOW_CONFIDENCE_SEMANTIC",
+        "STAGE_NOT_APPLICABLE",
+        "PARAM_NOT_APPLICABLE_TO_OBJECT",
+        "PARAM_DEACTIVATED"
+      ]
+    },
+    "FindingStatus": {
+      "description": "Owner: AG-04. Source: СХЕМА GOLD; 90 §3.2.4 axis A (SUSPICION only on suspicions).",
+      "enum": [
+        "CANDIDATE",
+        "NEGATIVE_VERIFIED",
+        "CONFIRMED_VIOLATION",
+        "SUSPICION"
+      ]
+    },
+    "DecidedBy": {
+      "description": "Owner: AG-04. Source: 90 §3.2.1.",
+      "enum": [
+        "SYSTEM",
+        "INSPECTOR"
+      ]
+    },
+    "CheckKind": {
+      "description": "Owner: AG-04. Source: 90 §3.2.1.",
+      "enum": [
+        "MATRIX",
+        "RULE",
+        "SUSPICION_CONVERTED",
+        "SPLIT_CHILD"
+      ]
+    },
+    "CheckLifecycle": {
+      "description": "Owner: AG-05. Source: 90 §3.2.1, §3.2.4 axis D.",
+      "enum": [
+        "ACTIVE",
+        "SPLIT",
+        "SUPERSEDED"
+      ]
+    },
+    "ReviewRequiredReason": {
+      "description": "Owner: AG-05. Source: 90 §3.2.1.",
+      "enum": [
+        "SOURCE_SUPERSEDED",
+        "VALUE_CHANGED",
+        "APPROVED_CHANGE_FOUND",
+        "OUTCOME_CHANGED"
+      ]
+    },
+    "EvidenceRole": {
+      "description": "Owner: AG-04. Source: ТЗ §10 #14; 90 §3.2.1.",
+      "enum": [
+        "EXPECTED",
+        "ACTUAL",
+        "SUPPORTING_EXPECTED",
+        "SUPPORTING_ACTUAL",
+        "APPROVED_CHANGE",
+        "NORMATIVE",
+        "CONTEXT"
+      ]
+    },
+    "FragmentOrigin": {
+      "description": "Owner: AG-05. Source: 90 §3.2.1.",
+      "enum": [
+        "SYSTEM",
+        "INSPECTOR",
+        "SPLIT_COPY"
+      ]
+    },
+    "InspectorStatus": {
+      "description": "Owner: AG-05. Source: ТЗ §9.3; 90 §3.2.4 axis C; 97 §2.6 (v1.0 API aliases CONFIRMED, REJECTED).",
+      "enum": [
+        "PENDING",
+        "CONFIRMED_VIOLATION",
+        "NEGATIVE_VERIFIED",
+        "CLARIFICATION_REQUIRED"
+      ]
+    },
+    "DecisionType": {
+      "description": "Owner: AG-05. Source: ТЗ §9.3; 90 §3.2.1.",
+      "enum": [
+        "CONFIRMED_VIOLATION",
+        "NEGATIVE_VERIFIED",
+        "CLARIFICATION_REQUIRED",
+        "REVERT_TO_PENDING"
+      ]
+    },
+    "DecisionCodeKind": {
+      "description": "Owner: AG-05. Source: 90 §3.2.1.",
+      "enum": [
+        "REJECT",
+        "CONFIRM",
+        "CLARIFY",
+        "REVISION_BASIS",
+        "SUSPICION_DISMISS",
+        "UNFINALIZE"
+      ]
+    },
+    "AiVerdict": {
+      "description": "Owner: AG-05. Source: ТЗ §10 #6; 90 §3.2.1.",
+      "enum": [
+        "AGREE",
+        "UNCERTAIN",
+        "DISAGREE"
+      ]
+    },
+    "DisputeResolutionStatus": {
+      "description": "Owner: AG-05. Source: 90 §3.2.1.",
+      "enum": [
+        "OPEN",
+        "INSPECTOR_UPHELD",
+        "AI_UPHELD",
+        "KEPT_CLARIFICATION",
+        "ESCALATED",
+        "WITHDRAWN"
+      ]
+    },
+    "PlannedAction": {
+      "description": "Owner: AG-05. Source: ТЗ §9.2; 90 §3.2.1.",
+      "enum": [
+        "ISSUE_ORDER",
+        "REQUEST_EXPLANATION",
+        "REQUEST_DOCUMENTS",
+        "SCHEDULE_INSPECTION",
+        "NO_FURTHER_ACTION"
+      ]
+    },
+    "DiscoveryMethod": {
+      "description": "Owner: AG-07. Source: ТЗ §9.5; 90 §3.2.1.",
+      "enum": [
+        "LOGICAL_ANALYSIS",
+        "SEMANTIC_DISSONANCE",
+        "NORMATIVE_ANALYSIS",
+        "ML_PATTERN_ANALYSIS",
+        "GRAPHIC_DIFF"
+      ]
+    },
+    "SuspicionInspectorStatus": {
+      "description": "Owner: AG-07. Source: ТЗ §9.5; 90 §3.2.5.",
+      "enum": [
+        "PENDING",
+        "CLARIFICATION_REQUIRED",
+        "CONVERTED_TO_CANDIDATE",
+        "DISMISSED",
+        "STALE"
+      ]
+    },
+    "PromotedBy": {
+      "description": "Owner: AG-07. Source: 90 §3.2.1.",
+      "enum": [
+        "INSPECTOR",
+        "SYSTEM"
+      ]
+    },
+    "EvidenceBindStatus": {
+      "description": "Owner: AG-07. Source: 90 §3.2.1.",
+      "enum": [
+        "UNBOUND",
+        "PARTIAL",
+        "BOUND"
+      ]
+    },
+    "RetrainingStatus": {
+      "description": "Owner: AG-05. Source: ТЗ §10 #6; 90 §3.2.9.",
+      "enum": [
+        "NEW",
+        "IN_DRAFT",
+        "DISPUTED",
+        "CURATOR_ACCEPTED",
+        "CURATOR_EXCLUDED",
+        "RELEASED",
+        "USED_IN_TRAINING",
+        "REVOKED"
+      ]
+    },
+    "GoldLabel": {
+      "description": "Owner: AG-05. Source: ТЗ §14.1; 90 §3.2.1.",
+      "enum": [
+        "POSITIVE",
+        "NEGATIVE"
+      ]
+    },
+    "DatasetItemStatus": {
+      "description": "Owner: AG-05. Source: ТЗ §9.4; 90 §3.2.9.",
+      "enum": [
+        "DRAFT",
+        "PENDING_CURATION",
+        "INELIGIBLE",
+        "DISPUTED",
+        "SUSPENDED",
+        "ACCEPTED",
+        "EXCLUDED",
+        "RETURNED",
+        "RELEASED",
+        "REVOKE_PENDING"
+      ]
+    },
+    "Split": {
+      "description": "Owner: AG-10. Source: СХЕМА GOLD; 90 §3.2.1; 97 §2.7 (TRAIN_PUBLIC→TRAIN, TEST_HIDDEN→HIDDEN_TEST).",
+      "enum": [
+        "TRAIN",
+        "VALIDATION",
+        "HIDDEN_TEST"
+      ]
+    },
+    "SourceType": {
+      "description": "Owner: AG-05. Source: 90 §3.2.1.",
+      "enum": [
+        "PRODUCTION",
+        "PILOT",
+        "SYNTHETIC",
+        "IMPORTED"
+      ]
+    },
+    "DatasetVersionStatus": {
+      "description": "Owner: AG-05. Source: ТЗ §9.4; 90 §3.2.9.",
+      "enum": [
+        "DRAFT",
+        "IN_REVIEW",
+        "RELEASED",
+        "DEPRECATED",
+        "REVOKED"
+      ]
+    },
+    "ModelApprovalStatus": {
+      "description": "Owner: AG-05. Source: ТЗ §9.4; 90 §3.2.9.",
+      "enum": [
+        "TRAINING",
+        "TRAINED",
+        "GATE_FAILED",
+        "PENDING_APPROVAL",
+        "APPROVED",
+        "REJECTED",
+        "DEPLOYED",
+        "ROLLED_BACK",
+        "RETIRED",
+        "FAILED"
+      ]
+    },
+    "TrainingJobStatus": {
+      "description": "Owner: AG-05. Source: 90 §3.2.1.",
+      "enum": [
+        "QUEUED",
+        "RUNNING",
+        "SUCCEEDED",
+        "FAILED"
+      ]
+    },
+    "EvalKind": {
+      "description": "Owner: AG-10. Source: ТЗ §14; 90 §3.2.1; 97 §2.7 (+ SUBMISSION_SCORE).",
+      "enum": [
+        "VALIDATION",
+        "HIDDEN_TEST",
+        "OCR_BENCH",
+        "EXTERNAL_GOLD",
+        "PILOT",
+        "SYNTHETIC",
+        "BATCH",
+        "SUBMISSION_SCORE"
+      ]
+    },
+    "SyncStatus": {
+      "description": "Owner: AG-00. Source: ТЗ §9.6; 90 §3.2.8 (РиН is a stub, 97 §2.15).",
+      "enum": [
+        "NOT_REQUIRED",
+        "QUEUED",
+        "SENDING",
+        "PENDING_SYNC",
+        "SYNCED",
+        "SYNC_FAILED",
+        "CANCELLED"
+      ]
+    },
+    "DeliveryAttemptOutcome": {
+      "description": "Owner: AG-00. Source: 90 §3.2.1.",
+      "enum": [
+        "SUCCESS",
+        "RETRYABLE_HTTP",
+        "TIMEOUT",
+        "NETWORK",
+        "NON_RETRYABLE",
+        "DUPLICATE_OK"
+      ]
+    },
+    "RinInboxStatus": {
+      "description": "Owner: AG-00. Source: ТЗ §9.6; 90 §3.2.8.",
+      "enum": [
+        "NEW",
+        "DOWNLOADED",
+        "REJECTED_AV",
+        "FAILED_HASH",
+        "QUEUED_FOR_PROCESS",
+        "ATTACHED",
+        "BLOCKED_FINALIZED",
+        "AWAITING_INSPECTOR",
+        "NEW_CHECK_CREATED",
+        "DISMISSED"
+      ]
+    },
+    "PrescriptionStatus": {
+      "description": "Owner: AG-00. Source: ТЗ §9.6; 90 §3.2.8.",
+      "enum": [
+        "ISSUED",
+        "IN_PROGRESS",
+        "COMPLETED",
+        "CANCELLED",
+        "EXTENDED"
+      ]
+    },
+    "Role": {
+      "description": "Owner: AG-00. Source: ТЗ §12.2, §9.3, §9.4; 90 §3.10.",
+      "enum": [
+        "INSPECTOR"
+      ]
+    },
+    "AuditCategory": {
+      "description": "Owner: AG-00. Source: ТЗ §12.4–12.5; 90 §3.2.1.",
+      "enum": [
+        "BUSINESS",
+        "SECURITY",
+        "SYSTEM",
+        "INTEGRATION",
+        "ACCESS"
+      ]
+    },
+    "RetentionClass": {
+      "description": "Owner: AG-00. Source: ТЗ §12.4–12.5; 90 §3.2.1.",
+      "enum": [
+        "STANDARD",
+        "SECURITY",
+        "PERMANENT"
+      ]
+    },
+    "IndicatorColor": {
+      "description": "Owner: AG-08. Source: ТЗ §7 #7; 90 §3.2.1.",
+      "enum": [
+        "RED",
+        "YELLOW",
+        "GREEN",
+        "NONE"
+      ]
+    },
+    "IssueScope": {
+      "description": "Owner: AG-10. Source: ТЗ §7 #12; 90 §3.2.1.",
+      "enum": [
+        "PACKAGE",
+        "FILE",
+        "PAGE",
+        "ZONE",
+        "REGISTRY_ROW",
+        "REVISION_GROUP",
+        "PARAM",
+        "JOB",
+        "SYNC",
+        "SYSTEM"
+      ]
+    },
+    "IssueSeverity": {
+      "description": "Owner: AG-10. Source: 90 §3.2.1.",
+      "enum": [
+        "ERROR",
+        "WARNING",
+        "INFO"
+      ]
+    },
+    "IssueStatus": {
+      "description": "Owner: AG-10. Source: 90 §3.2.1.",
+      "enum": [
+        "OPEN",
+        "ACKNOWLEDGED",
+        "RESOLVED",
+        "SUPERSEDED"
+      ]
+    },
+    "ExportFormat": {
+      "description": "Owner: AG-04. Source: ТЗ §7 #7, §9.2; 90 §3.2.1 (lowercase).",
+      "enum": [
+        "pdf",
+        "docx",
+        "xml",
+        "json",
+        "gold_jsonl",
+        "gold_xlsx",
+        "gold_csv"
+      ]
+    },
+    "NotificationType": {
+      "description": "Owner: AG-00. Source: ТЗ §9.2 п.5, §13.7; 90 §3.2.1.",
+      "enum": [
+        "PROTOCOL_READY",
+        "PROTOCOL_UPDATED",
+        "UPLOAD_REJECTED",
+        "FILE_REJECTED_ASYNC",
+        "PROCESSING_FAILED",
+        "NEW_DOCS_AFTER_FINALIZATION",
+        "SYNC_PENDING",
+        "SYNC_FAILED",
+        "PROTOCOL_UNFINALIZED",
+        "PRESCRIPTION_STATUS_CHANGED",
+        "MATRIX_UPDATED",
+        "DATASET_DRAFT_ITEMS",
+        "MODEL_PENDING_APPROVAL",
+        "WEEKLY_REPORT_READY",
+        "ADMIN_ALERT"
+      ]
+    },
+    "ArtifactKind": {
+      "description": "Kinds of files in runs/<run_id>/. Path templates, schema, format and producer per kind live in run_layout.yaml. Owner: AG-00. Source: 97 §1.4, §2.5 (one engine, two front-ends: the web imports the run directory); M1 run layout (run_layout.yaml).",
+      "enum": [
+        "RUN_MANIFEST",
+        "RUN_CONTEXT",
+        "RUN_ARTIFACTS",
+        "PIPELINE_SUMMARY",
+        "INVENTORY_INDEX",
+        "INVENTORY",
+        "PAGE_TOKENS",
+        "TOKENS_INDEX",
+        "RECOGNIZE_SUMMARY",
+        "LAYOUT",
+        "TABLES",
+        "EXTRACTED_VALUES",
+        "FINDING_GROUPS",
+        "FINDINGS",
+        "PROTOCOL_JSON",
+        "PROTOCOL_DOCX",
+        "PROTOCOL_PDF",
+        "SUBMISSION",
+        "SUBMISSION_STRICT",
+        "SUBMISSION_SIDECAR",
+        "SCORE"
+      ]
+    },
+    "ArtifactFormat": {
+      "description": "Owner: AG-00. Source: run_layout.yaml.",
+      "enum": [
+        "JSON",
+        "JSONL",
+        "JSON_GZ",
+        "CSV",
+        "TXT",
+        "DOCX",
+        "PDF"
+      ]
+    },
+    "ArtifactScope": {
+      "description": "Owner: AG-00. Source: run_layout.yaml: how many files of a kind a run has.",
+      "enum": [
+        "RUN",
+        "OBJECT",
+        "FILE",
+        "PAGE"
+      ]
+    },
+    "TagKind": {
+      "description": "What a printed token on a drawing denotes. ROOM_NUMBER keeps leading zeros («012»). Owner: AG-02B. Source: 96 R-15 (room index + tag grammar); 95 (PD tags in the text layer, RD tags drawn as curves).",
+      "enum": [
+        "ROOM_NUMBER",
+        "VENT_SYSTEM",
+        "HEATING_SYSTEM",
+        "AIR_TERMINAL",
+        "EQUIPMENT",
+        "PIPE_RISER",
+        "AXIS",
+        "LEVEL_MARK",
+        "SHEET_REF",
+        "OTHER"
+      ]
+    },
+    "TagRoomLink": {
+      "description": "Owner: AG-02B. Source: 96 R-15 (room index + tag grammar): how a mark is attached to a room.",
+      "enum": [
+        "INSIDE",
+        "NEAREST",
+        "LEADER"
+      ]
+    },
+    "SheetMapBasis": {
+      "description": "Owner: AG-02B. Source: 97 §2.13 F6 (sheet↔page map with smoothing and duplicate detection); 95 RT-01.",
+      "enum": [
+        "TITLE_BLOCK",
+        "QR",
+        "SEQUENCE_SMOOTHED",
+        "CONTENTS_TABLE",
+        "MANUAL"
+      ]
+    },
+    "RoomSource": {
+      "description": "Owner: AG-02B. Source: 96 R-15 room index.",
+      "enum": [
+        "PLAN_LABEL",
+        "EXPLICATION_TABLE",
+        "SCHEMATIC_LABEL",
+        "TEXT_MENTION",
+        "MANUAL"
+      ]
+    },
+    "RevisionCloudSource": {
+      "description": "Owner: AG-02B. Source: 95 (layer «ОВ-Отопление-Изм. №3» over rooms 270/272); 97 §2.13 F6.",
+      "enum": [
+        "OCG_LAYER",
+        "VECTOR_SHAPE",
+        "MANUAL"
+      ]
+    },
+    "TableType": {
+      "description": "`columns` are the canonical cell keys of TableArtifacts rows for the type (table_artifacts.schema.json pins them). Owner: AG-02C. Source: 97 §2.13 F7 (typed header-anchored tables); 96 (header-anchored parser).",
+      "enum": [
+        "EXPLICATION",
+        "TEP",
+        "SPEC_21110",
+        "DEVIATION",
+        "CHANGE_LOG",
+        "AOSR",
+        "ID_REGISTRY",
+        "PROJECT_COMPOSITION"
+      ]
+    },
+    "TableRowKind": {
+      "description": "Owner: AG-02C. Source: 96 header-anchored parser (Σ checks, «в том числе» sub-zones).",
+      "enum": [
+        "DATA",
+        "SUBTOTAL",
+        "TOTAL",
+        "SUBZONE",
+        "SECTION_HEADER",
+        "NOTE"
+      ]
+    },
+    "TableCheckKind": {
+      "description": "Owner: AG-02C. Source: 96 (sum checks expose real double counts); 97 §1.5 (F0201 p18 «в том числе» counted twice).",
+      "enum": [
+        "SUM_MATCHES_TOTAL",
+        "SUBZONE_DOUBLE_COUNT",
+        "ROW_COUNT",
+        "HEADER_MATCHED",
+        "UNIT_CONSISTENT",
+        "CONTINUATION_JOINED"
+      ]
+    },
+    "ProtocolSummaryRow": {
+      "description": "`partition: true` rows sum to 132 and use largest-remainder percentages (93 §5.3). Owner: AG-04. Source: Приложение 2, Раздел 2 (verbatim labels); 93 §5.4 (added rows shown only when non-zero).",
+      "enum": [
+        "TOTAL_PARAMS",
+        "CHECKED_OK",
+        "NOT_CHECKED_NO_ID",
+        "NOT_LOADED_TECH_ERRORS",
+        "NOT_CHECKED_NO_PD_RD",
+        "NOT_CHECKED_REVISION_CONFLICT",
+        "NOT_APPLICABLE",
+        "VIOLATIONS_TOTAL",
+        "VIOLATIONS_CRITICAL",
+        "VIOLATIONS_SUBSTANTIAL",
+        "VIOLATIONS_CONFIRMED",
+        "AI_SUSPICIONS"
+      ]
+    },
+    "DeviationDirection": {
+      "description": "Owner: AG-04. Source: Приложение 2, Разделы 4–5 «Отклонение» (93 §5.4: arrow + verb + magnitude).",
+      "enum": [
+        "DECREASE",
+        "INCREASE",
+        "ABSENT",
+        "CHANGED"
+      ]
+    },
+    "DecisionRejectReason": {
+      "description": "`requires` is kept empty: a rejection needs only the reason code; the comment and the extra fields are optional. Owner: AG-05. Source: 05 §3.6.1 (decision_codes kind=REJECT → NEGATIVE_VERIFIED); 90 C-26.",
+      "enum": [
+        "WRONG_REVISION",
+        "APPROVED_CHANGE",
+        "OCR_ERROR",
+        "EXTRACTION_ERROR",
+        "CV_ERROR",
+        "LINKING_ERROR",
+        "WITHIN_TOLERANCE",
+        "EQUIVALENT_SOLUTION",
+        "METHODOLOGY_DIFFERENCE",
+        "NOT_APPLICABLE_PARAM",
+        "DUPLICATE",
+        "OTHER"
+      ]
+    },
+    "DecisionConfirmBasis": {
+      "description": "Owner: AG-05. Source: 05 §3.6.2 (decision_codes kind=CONFIRM; GOLD expert_reason_code).",
+      "enum": [
+        "CV_DEVIATION_PD_RD",
+        "CV_MISSING_IN_RD",
+        "CV_NOT_PER_RD",
+        "CV_TOLERANCE_EXCEEDED",
+        "CV_UNAPPROVED_CHANGE",
+        "CV_NORM_VIOLATION"
+      ]
+    },
+    "DecisionClarifyBasis": {
+      "description": "Owner: AG-05. Source: 05 §3.6.3 (decision_codes kind=CLARIFY).",
+      "enum": [
+        "REVISION_CONFLICT",
+        "APPROVAL_UNKNOWN",
+        "AMBIGUOUS_CHAIN",
+        "NO_REGISTRY",
+        "AWAITING_DOCUMENT",
+        "AWAITING_APPROVAL_CHECK",
+        "SOURCE_UNREADABLE",
+        "EXPERT_CONSULTATION"
+      ]
+    },
+    "RevisionBasis": {
+      "description": "Owner: AG-05. Source: 05 §3.6.3 (authoritative-revision basis codes).",
+      "enum": [
+        "REGISTRY_CONFIRMED",
+        "STAMP_IN_PRODUCTION",
+        "APPROVAL_LETTER",
+        "CUSTOMER_CONFIRMATION",
+        "LATEST_UKEP_SIGNED",
+        "OTHER"
+      ]
+    },
+    "SuspicionDismissReason": {
+      "description": "Owner: AG-05. Source: 05 §3.6.3 (suspicion dismissal codes).",
+      "enum": [
+        "NO_EVIDENCE",
+        "FALSE_HYPOTHESIS",
+        "DUPLICATE_OF_MATRIX_FINDING",
+        "OUT_OF_SCOPE",
+        "OTHER"
+      ]
+    },
+    "UnfinalizeReason": {
+      "description": "Owner: AG-05. Source: 05 §3.6.3 (un-finalization reason codes, text ≥ 20 chars).",
+      "enum": [
+        "DECISION_ERROR",
+        "NEW_DOCUMENTS",
+        "RIN_REJECTED",
+        "SUPERVISOR_REVIEW",
+        "OTHER"
+      ]
+    },
+    "CommentSource": {
+      "description": "Owner: AG-05. Source: 05 §3.6.2 (comment_source).",
+      "enum": [
+        "TEMPLATE",
+        "EDITED",
+        "MANUAL"
+      ]
+    },
+    "GoldEffect": {
+      "description": "Owner: AG-05. Source: 05 §4 event verification.decision.recorded (gold_effect).",
+      "enum": [
+        "POSITIVE_DRAFT",
+        "NEGATIVE_DRAFT",
+        "WITHDRAW",
+        "NONE"
+      ]
+    },
+    "PermissionScope": {
+      "description": "How far a granted permission reaches. ASSIGNED = objects in object_assignments; OWN = rows the user created or cases of the integration client. Owner: AG-00. Source: 09 §3.3.3; 90 §3.10 (assigned / all / own); rbac.yaml grants.",
+      "enum": [
+        "ALL",
+        "ASSIGNED",
+        "OWN"
+      ]
+    },
+    "AuditActorType": {
+      "description": "Owner: AG-00. Source: 09 §3.9 audit_log.actor_type; ANONYMOUS = a request without a session (INSPECTOR_AUTH_MODE=optional, login attempts).",
+      "enum": [
+        "USER",
+        "SYSTEM",
+        "INTEGRATION",
+        "ANONYMOUS"
+      ]
+    },
+    "AuditResult": {
+      "description": "Owner: AG-00. Source: 09 §3.9 audit_log.result.",
+      "enum": [
+        "SUCCESS",
+        "FAILURE",
+        "DENIED"
+      ]
+    },
+    "AuditObjectType": {
+      "description": "Owner: AG-00. Source: ТЗ §10 #12 (object_id = affected entity); 09 §3.9 audit_log.object_type.",
+      "enum": [
+        "USER",
+        "SESSION",
+        "OBJECT",
+        "FILE",
+        "PAGE",
+        "BATCH_RUN",
+        "PROCESS",
+        "PROTOCOL",
+        "FINDING",
+        "SUSPICION",
+        "DECISION",
+        "PARAM",
+        "NORMATIVE",
+        "CONFIG"
+      ]
+    },
+    "AuditAction": {
+      "description": "audit_log.action. `category` (AuditCategory) and `retention` (RetentionClass) are the defaults the audit writer stores. HTTP_<METHOD> = a mutation whose OpenAPI operation declares no x-audit-action. Owner: AG-00. Source: 09 §3.4.2 (action catalogue); 05 §3.5, §3.12 (verification actions, written by AG-05 in the decision transaction); ТЗ §12.4.",
+      "enum": [
+        "AUTH_LOGIN_SUCCESS",
+        "AUTH_LOGIN_FAILED",
+        "AUTH_LOCKED",
+        "AUTH_LOGOUT",
+        "AUTH_REAUTH",
+        "AUTH_PASSWORD_CHANGED",
+        "SESSION_REVOKED",
+        "ACCESS_DENIED",
+        "USER_CREATED",
+        "USER_UPDATED",
+        "USER_ROLE_CHANGED",
+        "USER_DEACTIVATED",
+        "OBJECT_ASSIGNMENT_CHANGED",
+        "CONFIG_CHANGED",
+        "PARAM_UPDATED",
+        "BATCH_RUN_IMPORTED",
+        "PROTOCOL_VERSION_CREATED",
+        "PROTOCOL_OPENED",
+        "EVIDENCE_VIEWED",
+        "FINDING_CONFIRMED",
+        "FINDING_REJECTED",
+        "FINDING_CLARIFICATION_REQUESTED",
+        "FINDING_DECISION_REVERTED",
+        "DECISION_OVERRIDE",
+        "FINDING_SPLIT",
+        "REVISION_SELECTED",
+        "SUSPICION_PROMOTED",
+        "SUSPICION_DISMISSED",
+        "VERIFICATION_COMPLETED",
+        "PROTOCOL_FINALIZED",
+        "PROTOCOL_UNFINALIZED",
+        "PROTOCOL_EXPORTED",
+        "RIN_SYNC_REQUESTED",
+        "RIN_SYNC_RESULT",
+        "SELFTEST_RUN",
+        "RETENTION_PURGE_EXECUTED",
+        "HTTP_POST",
+        "HTTP_PUT",
+        "HTTP_PATCH",
+        "HTTP_DELETE"
+      ]
+    }
+  }
+}

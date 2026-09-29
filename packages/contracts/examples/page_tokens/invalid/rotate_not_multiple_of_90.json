@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "file_id": "F0201",
+  "file_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+  "page_no": 17,
+  "page_basis": "PDF_NATIVE",
+  "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1",
+  "page": {
+    "width_pt": 1190.55,
+    "height_pt": 841.89,
+    "rotate": 45,
+    "content_rotation": 0,
+    "native_dpi": null,
+    "render_dpi": 200
+  },
+  "page_class": "VECTOR_OUTLINED_TEXT",
+  "text_source": "OCR_LAYER_ISOLATED",
+  "is_stamp_page": false,
+  "quality_flag": "OK",
+  "mean_conf": 0.94,
+  "coverage": 0.97,
+  "layers": [
+    "Текст",
+    "Стены",
+    "Изм. №1"
+  ],
+  "pipeline_version": "0.1.0+dev",
+  "engine_versions": {
+    "det": "PP-OCRv6_det_small",
+    "rec": "cyrillic_PP-OCRv5_rec_mobile"
+  },
+  "tokens": [
+    {
+      "id": 0,
+      "text": "012",
+      "bbox": [
+        0.4312,
+        0.2511,
+        0.4521,
+        0.2634
+      ],
+      "conf": 0.97,
+      "source": "OCR_LAYER_ISOLATED",
+      "angle": 0,
+      "line_id": 0,
+      "layer": "Текст"
+    },
+    {
+      "id": 1,
+      "text": "П1",
+      "text_raw": "Пl",
+      "corrected_by": "code_corrector",
+      "bbox": [
+        0.4601,
+        0.2511,
+        0.4702,
+        0.2634
+      ],
+      "conf": 0.88,
+      "source": "OCR_LAYER_ISOLATED",
+      "line_id": 0
+    }
+  ],
+  "lines": [
+    {
+      "id": 0,
+      "text": "012 П1",
+      "bbox": [
+        0.4312,
+        0.2511,
+        0.4702,
+        0.2634
+      ],
+      "token_ids": [
+        0,
+        1
+      ],
+      "conf": 0.92,
+      "source": "OCR_LAYER_ISOLATED"
+    }
+  ],
+  "zones": [
+    {
+      "kind": "TITLE_BLOCK",
+      "bbox": [
+        0.66,
+        0.8,
+        1.0,
+        1.0
+      ],
+      "source": "AUTO",
+      "quality_flag": "OK"
+    },
+    {
+      "kind": "REVISION_CLOUD",
+      "bbox": [
+        0.3,
+        0.2,
+        0.5,
+        0.4
+      ],
+      "source": "AUTO"
+    }
+  ]
+}

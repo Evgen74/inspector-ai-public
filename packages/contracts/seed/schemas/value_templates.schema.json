@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/seed/value_templates.schema.json",
+  "title": "Matrix seed: value templates for pd_value / rd_value / id_value (packages/contracts/seed/value_templates.json)",
+  "description": "Submission-style formats (Russian decimal comma, units, class marks) and templates per ComparisonResult with an element-noun lexicon (93 §3.5). Change-map routes carry the gold-specific templates; these are the generic fallback. Renderer: inspector_common.params (format_value, stage_values, protocol_cell). Built by seed/src/build_seed.py from src/value_templates.yaml. Owner: AG-03.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seed", "schema_version", "matrix_version", "sources", "number_format", "units", "class_formats", "cells", "predicates", "by_comparison_result", "fallbacks", "nouns", "lexicon", "agreement_by_ending", "content_sha256"],
+  "properties": {
+    "seed": {"const": "value_templates"},
+    "schema_version": {"const": 1},
+    "matrix_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "content_sha256": {"$ref": "../schemas/common.schema.json#/$defs/Sha256"},
+    "sources": {"$ref": "params.schema.json#/$defs/Sources"},
+    "number_format": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decimal_separator", "group_thousands", "dimension_separator", "unit_separator", "percent", "per_mille"],
+      "properties": {
+        "decimal_separator": {"const": ","},
+        "group_thousands": {"type": "boolean"},
+        "dimension_separator": {"type": "string", "minLength": 1},
+        "unit_separator": {"type": "string"},
+        "percent": {"type": "string", "pattern": "\\{value\\}"},
+        "per_mille": {"type": "string", "pattern": "\\{value\\}"}
+      }
+    },
+    "units": {"type": "object", "additionalProperties": {"type": "string", "minLength": 1}},
+    "class_formats": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "pattern", "format"],
+        "properties": {
+          "kind": {"type": "string", "pattern": "^[A-Z][A-Z_]*$"},
+          "pattern": {"type": "string", "minLength": 1},
+          "format": {"type": "string", "minLength": 1},
+          "requires_kind": {"type": "boolean"}
+        }
+      }
+    },
+    "cells": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["not_applicable", "missing"],
+      "properties": {
+        "not_applicable": {"const": "—"},
+        "missing": {"const": "нет данных"}
+      }
+    },
+    "predicates": {"type": "object", "additionalProperties": {"$ref": "#/$defs/Forms"}},
+    "by_comparison_result": {
+      "type": "object",
+      "propertyNames": {"$ref": "../schemas/enums.schema.json#/$defs/ComparisonResult"},
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["PD", "RD", "ID"],
+        "properties": {
+          "PD": {"type": ["string", "null"]},
+          "RD": {"type": ["string", "null"]},
+          "ID": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "fallbacks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["placeholder", "find", "replace"],
+        "properties": {
+          "placeholder": {"type": "string"},
+          "find": {"type": "string", "minLength": 1},
+          "replace": {"type": "string"}
+        }
+      }
+    },
+    "nouns": {"type": "object", "additionalProperties": {"$ref": "#/$defs/Noun"}},
+    "lexicon": {"type": "object", "additionalProperties": {"$ref": "#/$defs/Noun"}},
+    "agreement_by_ending": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["first", "agr"],
+        "properties": {
+          "first": {"type": "string", "minLength": 1},
+          "last": {"type": "array", "items": {"type": "string"}},
+          "agr": {"$ref": "#/$defs/Agr"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Agr": {"enum": ["m", "f", "n", "pl"]},
+    "Forms": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["m", "f", "n", "pl"],
+      "properties": {"m": {"type": "string"}, "f": {"type": "string"}, "n": {"type": "string"}, "pl": {"type": "string"}}
+    },
+    "Noun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nom", "agr", "gen"],
+      "properties": {
+        "nom": {"type": "string", "minLength": 1},
+        "agr": {"$ref": "#/$defs/Agr"},
+        "gen": {"type": ["string", "null"]}
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+# Files vendored byte-for-byte from the organizers' package. Never edit them; `inspector-contracts check`
+# fails if the sha256 changes. The source checksum is the package's own sha256sums.txt line.
+files:
+  schemas/submission.organizer.schema.json:
+    sha256: 75c58bef6b580528e7e4af8e4fdcdf5a5d40599b8966dae90df38b3a5f04a8d7
+    source: "ПАКЕТ_УЧАСТНИКАМ_БЕЗ_ОТВЕТОВ_v2.0/data/submission_schema.json"
+    note: "Draft 2020-12, no $id; registered by the loader at https://contracts.inspector-ai.local/schemas/submission.organizer.schema.json"

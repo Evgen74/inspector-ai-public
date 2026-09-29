@@ -1,0 +1,289 @@
+{
+ "seed": "free_topics",
+ "schema_version": 1,
+ "matrix_version": "1.1.1",
+ "numbering": {
+  "code_pattern": "^FREE-([A-Z]+)-(\\d{3})$",
+  "scope": "per finding group within object and topic",
+  "order": [
+   "pd_file_id",
+   "pd_page",
+   "first_location"
+  ],
+  "start": 1
+ },
+ "export_policy": {
+  "evidence_bound_only": true,
+  "max_groups_per_object": 5,
+  "basis": "97 §1.6 (precision-first on FREE-*), 93 §3.7"
+ },
+ "criticality": "Существенное (предписание) — требует утверждения",
+ "criticality_level": "SUBSTANTIAL_ORDER",
+ "protocol_status": "WARNING",
+ "sources": [
+  {
+   "path": "packages/contracts/seed/src/change_matrix_map.yaml",
+   "sha256": "01c49d1972ffed8ed9af76ca2e86f13388325b9b58aaff4c2cbd448f757913d8"
+  },
+  {
+   "path": "packages/contracts/seed/src/free_topics.yaml",
+   "sha256": "63657ccfdb99e5b33e063e6f8682143f2d6b76b2c217ec8a60bb937c60f90390"
+  }
+ ],
+ "topics": [
+  {
+   "topic": "HEATING",
+   "label_ru": "Отопление",
+   "code_example": "FREE-HEATING-001",
+   "disciplines": [
+    "ОВ",
+    "ТС",
+    "ТМ"
+   ],
+   "sections": [
+    "ИОС4"
+   ],
+   "description": "Отопление и теплоснабжение вне параметров IOS4-076/077 (тёплые полы, оборудование ИТП).",
+   "change_map_families": [
+    "WARM_FLOOR",
+    "HEAT_POINT"
+   ]
+  },
+  {
+   "topic": "VENTILATION",
+   "label_ru": "Вентиляция",
+   "code_example": "FREE-VENTILATION-001",
+   "disciplines": [
+    "ОВ"
+   ],
+   "sections": [
+    "ИОС4"
+   ],
+   "description": "Вентиляция и кондиционирование вне IOS4-078/079 и PPM-111/112 (напр. кондиционеры, воздушно-тепловые завесы).",
+   "change_map_families": []
+  },
+  {
+   "topic": "WATER",
+   "label_ru": "Водоснабжение",
+   "code_example": "FREE-WATER-001",
+   "disciplines": [
+    "ВК",
+    "НВК"
+   ],
+   "sections": [
+    "ИОС2"
+   ],
+   "description": "Водоснабжение вне IOS2-071…073 (санитарные приборы, водоподготовка).",
+   "change_map_families": [
+    "SANITARY_FIXTURE"
+   ]
+  },
+  {
+   "topic": "SEWER",
+   "label_ru": "Водоотведение",
+   "code_example": "FREE-SEWER-001",
+   "disciplines": [
+    "ВК",
+    "НВК"
+   ],
+   "sections": [
+    "ИОС3"
+   ],
+   "description": "Канализация и водостоки вне IOS3-074/075 (трапы, лотки, локальные очистные).",
+   "change_map_families": []
+  },
+  {
+   "topic": "ELECTRICAL",
+   "label_ru": "Электроснабжение",
+   "code_example": "FREE-ELECTRICAL-001",
+   "disciplines": [
+    "ЭОМ",
+    "ЭС",
+    "ЭМ"
+   ],
+   "sections": [
+    "ИОС1"
+   ],
+   "description": "Электроснабжение вне IOS1-068…070 (щиты, розеточные сети, электроотопление).",
+   "change_map_families": []
+  },
+  {
+   "topic": "LIGHTING",
+   "label_ru": "Освещение",
+   "code_example": "FREE-LIGHTING-001",
+   "disciplines": [
+    "ЭОМ",
+    "ЭО"
+   ],
+   "sections": [
+    "ИОС1",
+    "ЗУ"
+   ],
+   "description": "Освещение вне ZU-130 (отсутствие светильников, аварийное и эвакуационное освещение).",
+   "change_map_families": [
+    "LIGHTING_FIXTURE"
+   ]
+  },
+  {
+   "topic": "FIRE",
+   "label_ru": "Пожарная безопасность",
+   "code_example": "FREE-FIRE-001",
+   "disciplines": [
+    "ПБ",
+    "АПС",
+    "СС",
+    "ОВ",
+    "ВК"
+   ],
+   "sections": [
+    "ППМ"
+   ],
+   "description": "Противопожарные мероприятия вне PPM-102…114 (напр. АУПТ, противопожарные занавесы).",
+   "change_map_families": []
+  },
+  {
+   "topic": "EVACUATION",
+   "label_ru": "Эвакуация",
+   "code_example": "FREE-EVACUATION-001",
+   "disciplines": [
+    "АР",
+    "ПБ"
+   ],
+   "sections": [
+    "АР",
+    "ППМ"
+   ],
+   "description": "Пути эвакуации вне AR-040…043 и PPM-104…106 (напр. незадымляемость лестничных клеток).",
+   "change_map_families": []
+  },
+  {
+   "topic": "ACCESSIBILITY",
+   "label_ru": "Доступность для МГН",
+   "code_example": "FREE-ACCESSIBILITY-001",
+   "disciplines": [
+    "АР",
+    "ОДИ",
+    "ГП"
+   ],
+   "sections": [
+    "ОДИ"
+   ],
+   "description": "Доступность вне ODI-115…123 и SPZU-038 (пандусы, зоны безопасности МГН).",
+   "change_map_families": []
+  },
+  {
+   "topic": "ARCHITECTURE",
+   "label_ru": "Архитектурные решения",
+   "code_example": "FREE-ARCHITECTURE-001",
+   "disciplines": [
+    "АР"
+   ],
+   "sections": [
+    "АР"
+   ],
+   "description": "Архитектурные решения вне AR-040…053 (перепланировки, внутренние перегородки).",
+   "change_map_families": []
+  },
+  {
+   "topic": "STRUCTURE",
+   "label_ru": "Конструктивные решения",
+   "code_example": "FREE-STRUCTURE-001",
+   "disciplines": [
+    "КР",
+    "КЖ",
+    "КМ",
+    "КД"
+   ],
+   "sections": [
+    "КР"
+   ],
+   "description": "Конструкции вне KR-054…067 (марки бетона F/W при неизменном классе — решение Q4a; отметки верха сверх допуска; работы без РД).",
+   "change_map_families": [
+    "CONCRETE_FW_MARK",
+    "STRUCTURE_ELEVATION",
+    "STRUCTURE_REPAIR_WORKS"
+   ]
+  },
+  {
+   "topic": "SITE",
+   "label_ru": "Земельный участок и благоустройство",
+   "code_example": "FREE-SITE-001",
+   "disciplines": [
+    "ГП",
+    "ПП"
+   ],
+   "sections": [
+    "СПЗУ"
+   ],
+   "description": "Благоустройство вне SPZU-024…039 (освещение территории, контейнерные площадки).",
+   "change_map_families": []
+  },
+  {
+   "topic": "ROOF",
+   "label_ru": "Кровля",
+   "code_example": "FREE-ROOF-001",
+   "disciplines": [
+    "АР"
+   ],
+   "sections": [
+    "АР"
+   ],
+   "description": "Кровля вне AR-044/045 и ZU-128 (ограждения кровли, выходы на кровлю).",
+   "change_map_families": []
+  },
+  {
+   "topic": "FACADE",
+   "label_ru": "Фасады",
+   "code_example": "FREE-FACADE-001",
+   "disciplines": [
+    "АР"
+   ],
+   "sections": [
+    "АР"
+   ],
+   "description": "Фасады вне AR-052 (навесные фасадные системы, крепления).",
+   "change_map_families": []
+  },
+  {
+   "topic": "LIFT",
+   "label_ru": "Лифты",
+   "code_example": "FREE-LIFT-001",
+   "disciplines": [
+    "АР",
+    "ЛО"
+   ],
+   "sections": [
+    "АР",
+    "КР"
+   ],
+   "description": "Пассажирские и грузовые лифты (в Матрице есть только шахты KR-064 и подъёмники МГН ODI-115).",
+   "change_map_families": [
+    "PASSENGER_LIFT"
+   ]
+  },
+  {
+   "topic": "ENERGY",
+   "label_ru": "Энергоэффективность",
+   "code_example": "FREE-ENERGY-001",
+   "disciplines": [
+    "ЭЭ",
+    "ОВ",
+    "ЭОМ"
+   ],
+   "sections": [
+    "ЗУ"
+   ],
+   "description": "Энергоэффективность вне ZU-124…131 (автоматизация, рекуперация).",
+   "change_map_families": []
+  },
+  {
+   "topic": "OTHER",
+   "label_ru": "Прочее",
+   "code_example": "FREE-OTHER-001",
+   "disciplines": [],
+   "sections": [],
+   "description": "Находки свободного поиска, не отнесённые ни к одной теме; использовать в последнюю очередь.",
+   "change_map_families": []
+  }
+ ]
+}

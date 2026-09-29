@@ -1,0 +1,225 @@
+{
+ "schema_version": 1,
+ "file_id": "F0202",
+ "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+ "file_sha256": "632379a0e541f0c81e6b03e5528946730b4433939c796db4fdc1e5c3fc8b71ee",
+ "stage": "RD",
+ "pipeline_version": "fixture-ag04-tyumen-1",
+ "generated_at": "2026-09-28T00:00:00Z",
+ "pages_total": 36,
+ "ext": {
+  "fixture": "AG-04 hand-made development fixture (not recognition output)",
+  "sources": [
+   "docs/analysis/95_tyumen_dev_fixtures.json page_facts, markup_zone_bboxes",
+   "docs/analysis/95_corpus_train_objects.md §3.3"
+  ]
+ },
+ "title_blocks": [
+  {
+   "pdf_page_number": 17,
+   "sheet_number": 4,
+   "document_code_raw": "АНО/150321/1-РД-ОВ2.1",
+   "document_code": "АНО/150321/1-РД-ОВ2.1",
+   "stage_raw": "Р",
+   "stage": "RD",
+   "sheet_title": "План 2-го этажа (отопление)",
+   "revision": "3",
+   "change_rows": [
+    {
+     "change_no": "3",
+     "count": null,
+     "sheet": "4",
+     "doc_no": "861-24",
+     "date": null
+    }
+   ],
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.93
+   }
+  }
+ ],
+ "sheet_page_map": [
+  {
+   "pdf_page_number": 17,
+   "sheet_number": 4,
+   "document_code": "АНО/150321/1-РД-ОВ2.1",
+   "basis": "TITLE_BLOCK",
+   "confidence": 0.95
+  }
+ ],
+ "rooms": [
+  {
+   "room_token": "267",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.351,
+    0.669,
+    0.367,
+    0.681
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "270",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.347,
+    0.695,
+    0.363,
+    0.707
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "271",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.386,
+    0.669,
+    0.402,
+    0.681
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "272",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.384,
+    0.695,
+    0.4,
+    0.707
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  }
+ ],
+ "tags": [
+  {
+   "tag": "PRADO Universal 22-500-700",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.351,
+    0.681,
+    0.367,
+    0.693
+   ],
+   "room_token": "267",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.88
+   }
+  },
+  {
+   "tag": "PRADO Universal 22-500-700",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.347,
+    0.707,
+    0.363,
+    0.719
+   ],
+   "room_token": "270",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.88
+   }
+  },
+  {
+   "tag": "PRADO Universal 22-500-700",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.386,
+    0.681,
+    0.402,
+    0.693
+   ],
+   "room_token": "271",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.88
+   }
+  },
+  {
+   "tag": "PRADO Universal 22-500-700",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.384,
+    0.707,
+    0.4,
+    0.719
+   ],
+   "room_token": "272",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.88
+   }
+  }
+ ],
+ "cad_layers": [
+  {
+   "name": "ОВ-Отопление-Изм. №3",
+   "pages": [
+    17
+   ],
+   "visible_default": true,
+   "is_text_layer": false,
+   "is_revision_layer": true,
+   "revision_label": "Изм. №3",
+   "discipline_hint": "ОВ"
+  }
+ ],
+ "revision_clouds": [
+  {
+   "pdf_page_number": 17,
+   "bbox": [
+    0.337,
+    0.687,
+    0.423,
+    0.73
+   ],
+   "source": "OCG_LAYER",
+   "layer": "ОВ-Отопление-Изм. №3",
+   "revision_label": "Изм. №3",
+   "rooms_covered": [
+    "270",
+    "272"
+   ],
+   "confidence": 0.9
+  }
+ ],
+ "qr_links": [
+  {
+   "pdf_page_number": 17,
+   "payload": "exon 87cc1a16/1/wd/17",
+   "doc_key": "87cc1a16",
+   "doc_page": 17,
+   "target_file_id": "F0202",
+   "target_pdf_page_number": 17
+  }
+ ]
+}

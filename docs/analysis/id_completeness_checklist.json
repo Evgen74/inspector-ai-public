@@ -1,0 +1,4849 @@
+{
+  "checklist_version": "1.0.0",
+  "generated_for": "B03-matrix-domain (Инспектор ИИ)",
+  "sources": [
+    "ТЗ §5 (состав ИД по Приказу Минстроя России № 344/пр, прил. 1, 13 строк) и примечания 1–4",
+    "Приложение 19 к Регламенту Комитета государственного строительного надзора г. Москвы: «Примерный перечень исполнительной документации» (сканы img_perechen/image1–4.png)",
+    "Перечень_исполнительной_документации_редакция1_1.docx: обязательный машиночитаемый реестр файлов и правила выбора источника"
+  ],
+  "package_requirements": [
+    {
+      "id": "PKG-REGISTRY",
+      "title": "Машиночитаемый реестр файлов комплекта (CSV/XLSX/JSON)",
+      "required_fields": [
+        "object_id",
+        "file_id",
+        "file_name",
+        "sha256",
+        "doc_stage",
+        "discipline",
+        "document_code",
+        "revision",
+        "approval_status",
+        "approval_date",
+        "sheet_page_range",
+        "predecessor_id",
+        "successor_id",
+        "signature_status"
+      ],
+      "approval_status_enum": [
+        "DRAFT",
+        "APPROVED",
+        "FOR_CONSTRUCTION",
+        "SUPERSEDED",
+        "CANCELLED"
+      ],
+      "on_missing": "CLARIFICATION_REQUIRED (пакет принимается, вывод о нарушениях блокируется)"
+    },
+    {
+      "id": "PKG-SIGNATURE",
+      "title": "ТЗ §5 прим. 1: электронная ИД подписывается УКЭП или УНЭП (п. 4 Приказа № 344/пр)",
+      "check": "signature_status из реестра + наличие подписи/штампа ЭП; криптопроверка — вне MVP",
+      "on_missing": "CLARIFICATION_REQUIRED"
+    },
+    {
+      "id": "PKG-SCAN-REQUISITES",
+      "title": "ТЗ §5 прим. 2: для сканов бумажной ИД — визуальная проверка обязательных реквизитов",
+      "requisites": [
+        "подписи уполномоченных лиц",
+        "печати (при наличии)",
+        "даты",
+        "регистрационные номера"
+      ],
+      "on_missing": "LOW_QUALITY / ABSTAIN по документу; позиция перечня — MISSING_EVIDENCE при отсутствии реквизитов"
+    },
+    {
+      "id": "PKG-RD-STAMPS",
+      "title": "ТЗ §5 прим. 3: штампы «В производство работ» и «Выполнено согласно проекту» на рабочих чертежах в составе ИД",
+      "applies_to": [
+        "ID19-1"
+      ],
+      "on_missing": "MISSING_EVIDENCE для ID19-1"
+    },
+    {
+      "id": "PKG-HIDDEN-WORKS",
+      "title": "ТЗ §5 прим. 4: перечень скрытых работ/конструкций/участков сетей берётся из Общих данных РД",
+      "applies_to": [
+        "ID19-6",
+        "ID19-7",
+        "ID19-8",
+        "ID19-9",
+        "ID19-10",
+        "ID19-11"
+      ],
+      "method": "извлечь «Перечень видов работ, для которых необходимо составление АОСР» из ОД РД; каждая позиция → ожидаемый АОСР; сопоставление по semantic anchors"
+    }
+  ],
+  "object_profile_variables": {
+    "purpose": "RESIDENTIAL | PUBLIC | INDUSTRIAL | MIXED",
+    "functional_class": "Ф1.1 … Ф5.x (123-ФЗ ст. 32)",
+    "works_type": "NEW | RECONSTRUCTION | CAPITAL_REPAIR",
+    "phase": "DESIGN | CONSTRUCTION | COMPLETED (определяет ожидаемость ИД)",
+    "check_type": "INTERIM | FINAL (FINAL включает позиции recommended_final_check)",
+    "referenced_variables": [
+      "foundation_type",
+      "functional_class",
+      "has_air_conditioning",
+      "has_collector",
+      "has_corrosion_protection",
+      "has_customer_remarks",
+      "has_emf_sources",
+      "has_engineering_structures",
+      "has_escalators",
+      "has_excavation",
+      "has_ext_heat",
+      "has_ext_lighting",
+      "has_ext_lowcurrent",
+      "has_ext_power",
+      "has_ext_sewer",
+      "has_ext_storm",
+      "has_ext_water",
+      "has_facade_works",
+      "has_fire_extinguishing",
+      "has_fire_protection_coating",
+      "has_fire_protection_systems",
+      "has_foundation_works",
+      "has_garbage_chute",
+      "has_gas_supply",
+      "has_heating",
+      "has_internal_storm",
+      "has_lifts",
+      "has_lowcurrent",
+      "has_masonry",
+      "has_mgn_platforms",
+      "has_monolithic_concrete",
+      "has_ozds",
+      "has_piles",
+      "has_polymer_structures",
+      "has_power",
+      "has_precast",
+      "has_roof_works",
+      "has_sealing",
+      "has_sewer",
+      "has_site_works",
+      "has_sound_insulation",
+      "has_special_systems",
+      "has_steel_structures",
+      "has_thermal_insulation",
+      "has_timber",
+      "has_underground_part",
+      "has_ventilation_mech",
+      "has_ventilation_natural",
+      "has_wall_drainage",
+      "has_water_supply",
+      "has_waterproofing",
+      "has_welding",
+      "purpose",
+      "works_type"
+    ]
+  },
+  "status_rules": {
+    "item_status": {
+      "FOUND": "есть ≥1 файл, классифицированный в позицию (detection_anchors / doc_kind / реестр), с требуемыми реквизитами",
+      "FOUND_LOW_QUALITY": "файл есть, но реквизиты не распознаны → LOW_QUALITY, решение инспектора",
+      "MISSING": "позиция применима, файл не найден → MISSING_EVIDENCE в протоколе (не нарушение)",
+      "NOT_APPLICABLE": "условие применимости ложно — с обязательным основанием (факт профиля + источник)",
+      "APPLICABILITY_UNKNOWN": "нет фактов профиля: при default_applicable=true → считать применимой; иначе NOT_APPLICABLE с пометкой «подтвердить применимость»"
+    },
+    "group_status": "группа FOUND, если все применимые дочерние FOUND; PARTIAL, если часть; MISSING, если ни одной",
+    "aggregate_id_status": {
+      "ID_UPLOADED": "все применимые позиции текущего check_type FOUND",
+      "ID_PARTIAL": "часть применимых позиций FOUND (либо загружено меньше файлов, чем заявлено в реестре → сценарий PARTIALLY_LOADED)",
+      "ID_MISSING": "ни одной позиции / ни одного файла стадии ID"
+    },
+    "phase_rule": "phase=DESIGN → ИД не ожидается: позиции NOT_APPLICABLE («объект на стадии проектирования»); phase=CONSTRUCTION и check_type=INTERIM → ожидаются только позиции по выполненным видам работ (по ОЖР/реестру), recommended_final_check-позиции не требуются"
+  },
+  "source_inconsistencies": [
+    "Итоговый абзац Приложения 19 рекомендует проверять п. 11.2.8, но в перечне п. 11.2 заканчивается на 11.2.7 — ссылка на несуществующий пункт (вероятно, 11.2.7 «наружное освещение» или пропуск).",
+    "Строки ТЗ §5 «Замечания застройщика/технического заказчика» (п. 6) и «Общий и специальные журналы работ» (п. 13) отсутствуют в Приложении 19 — добавлены как TZ5-06 и TZ5-13.",
+    "Пункт 14 Приложения 19 (законченные инженерные сооружения) не имеет прямого аналога среди 13 строк ТЗ §5 — отнесён к п. 5/10.",
+    "Пункт 15 перечисляет три документа без нумерации — оцифрованы как 15.1–15.3."
+  ],
+  "items": [
+    {
+      "id": "ID19-1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 1",
+      "appendix19_no": "1",
+      "title": "Рабочая документация на строительство, реконструкцию объекта капитального строительства с записями о соответствии выполненных в натуре работ рабочей документации, сделанных лицом, осуществляющим строительство",
+      "parent": null,
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 7,
+      "pr344_title": "Комплект рабочих чертежей с отметками о соответствии выполненных работ",
+      "tz_s5_row": 7,
+      "doc_kind": "ISP_DRAWINGS",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "в производство работ",
+        "выполнено согласно проекту",
+        "выполнено в соответствии с рабочей документацией",
+        "исполнительный чертёж"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера",
+          "штамп «В производство работ»",
+          "штамп/запись «Выполнено согласно проекту»"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП",
+          "штамп «В производство работ»",
+          "отметка «Выполнено согласно проекту»"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": "ТЗ §5 прим. 3: комплект рабочих чертежей — основная часть ИД; обязательны штампы «В производство работ» и «Выполнено согласно проекту»."
+    },
+    {
+      "id": "ID19-2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 2",
+      "appendix19_no": "2",
+      "title": "Документы, подтверждающие проведение контроля за качеством применяемых строительных материалов (изделий)",
+      "parent": null,
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 12,
+      "pr344_title": "Документы, подтверждающие качество применяемых строительных материалов (паспорта, сертификаты, декларации)",
+      "tz_s5_row": 12,
+      "doc_kind": "QUALITY_DOCS",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "паспорт качества",
+        "сертификат соответствия",
+        "декларация о соответствии",
+        "протокол испытаний",
+        "документ о качестве"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-029",
+        "M-041",
+        "M-050",
+        "M-055",
+        "M-056",
+        "M-057",
+        "M-066",
+        "M-069",
+        "M-072",
+        "M-075",
+        "M-077",
+        "M-103",
+        "M-107",
+        "M-109",
+        "M-111",
+        "M-125",
+        "M-126",
+        "M-127",
+        "M-128",
+        "M-130"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3",
+      "appendix19_no": "3",
+      "title": "Исполнительная геодезическая документация",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": null,
+      "pr344_title": null,
+      "tz_s5_row": null,
+      "doc_kind": "GROUP",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-3.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.1",
+      "appendix19_no": "3.1",
+      "title": "Акт разбивки осей объекта капитального строительства на местности",
+      "parent": "ID19-3",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 2,
+      "pr344_title": "Акты разбивки осей объекта на местности",
+      "tz_s5_row": 2,
+      "doc_kind": "AKT_RAZBIVKI_OSEY",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "акт разбивки осей",
+        "вынос осей в натуру",
+        "разбивка осей объекта"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-001",
+        "M-054"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-3.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.2",
+      "appendix19_no": "3.2",
+      "title": "Акт освидетельствования геодезической разбивочной основы объекта капитального строительства",
+      "parent": "ID19-3",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 1,
+      "pr344_title": "Акт освидетельствования геодезической разбивочной основы",
+      "tz_s5_row": 1,
+      "doc_kind": "AKT_GRO",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "геодезическая разбивочная основа",
+        "акт освидетельствования геодезической разбивочной основы",
+        "ГРО"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-009",
+        "M-054"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-3.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.3",
+      "appendix19_no": "3.3",
+      "title": "Исполнительные геодезические схемы",
+      "parent": "ID19-3",
+      "level": 2,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 8,
+      "pr344_title": "Исполнительные геодезические схемы (чертежи)",
+      "tz_s5_row": 8,
+      "doc_kind": "ISP_GEO_SCHEME",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-3.3.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.3.1",
+      "appendix19_no": "3.3.1",
+      "title": "Исполнительная схема котлована",
+      "parent": "ID19-3.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 8,
+      "pr344_title": "Исполнительные геодезические схемы (чертежи)",
+      "tz_s5_row": 8,
+      "doc_kind": "ISP_GEO_SCHEME",
+      "applicability": {
+        "logic": {
+          "or": [
+            {
+              "var": "object.has_excavation"
+            },
+            {
+              "var": "object.has_underground_part"
+            }
+          ]
+        },
+        "text": "При устройстве котлована/подземной части.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительная схема котлована",
+        "отметки дна котлована"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-005",
+        "M-024"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-3.3.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.3.2",
+      "appendix19_no": "3.3.2",
+      "title": "Исполнительная схема свайного поля",
+      "parent": "ID19-3.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 8,
+      "pr344_title": "Исполнительные геодезические схемы (чертежи)",
+      "tz_s5_row": 8,
+      "doc_kind": "ISP_GEO_SCHEME",
+      "applicability": {
+        "logic": {
+          "var": "object.has_piles"
+        },
+        "text": "Только для свайных фундаментов.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительная схема свайного поля",
+        "отклонение свай",
+        "исполнительная схема свай"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-054",
+        "M-058"
+      ],
+      "notes": "Пилот IZM12: в ИД есть отдельная исполнительная схема ремонта свай, отсутствующая в РД → Logical_Rule LR-33."
+    },
+    {
+      "id": "ID19-3.3.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.3.3",
+      "appendix19_no": "3.3.3",
+      "title": "Исполнительная схема фундаментов",
+      "parent": "ID19-3.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 8,
+      "pr344_title": "Исполнительные геодезические схемы (чертежи)",
+      "tz_s5_row": 8,
+      "doc_kind": "ISP_GEO_SCHEME",
+      "applicability": {
+        "logic": {
+          "var": "object.has_foundation_works"
+        },
+        "text": "При устройстве фундаментов.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительная схема фундаментов",
+        "фундаментная плита",
+        "ростверк"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-054",
+        "M-058"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-3.3.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.3.4",
+      "appendix19_no": "3.3.4",
+      "title": "Поэтажные исполнительные схемы зданий (сооружений)",
+      "parent": "ID19-3.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 8,
+      "pr344_title": "Исполнительные геодезические схемы (чертежи)",
+      "tz_s5_row": 8,
+      "doc_kind": "ISP_GEO_SCHEME",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "поэтажная исполнительная схема",
+        "исполнительная схема вертикальных конструкций",
+        "исполнительная схема перекрытия",
+        "отклонения от вертикали"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-008",
+        "M-040",
+        "M-041",
+        "M-042",
+        "M-047",
+        "M-054",
+        "M-059",
+        "M-060",
+        "M-061",
+        "M-064",
+        "M-102",
+        "M-104",
+        "M-116",
+        "M-119"
+      ],
+      "notes": "Пилот OKT103-V01 (CONFIRMED_VIOLATION): «Исполнительная схема вертикальных конструкций −1 этажа»."
+    },
+    {
+      "id": "ID19-3.3.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.3.5",
+      "appendix19_no": "3.3.5",
+      "title": "Исполнительная схема кровли",
+      "parent": "ID19-3.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 8,
+      "pr344_title": "Исполнительные геодезические схемы (чертежи)",
+      "tz_s5_row": 8,
+      "doc_kind": "ISP_GEO_SCHEME",
+      "applicability": {
+        "logic": {
+          "var": "object.has_roof_works"
+        },
+        "text": "При устройстве кровли.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительная схема кровли",
+        "нивелировка кровли",
+        "отметки водосточных воронок"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-044",
+        "M-045"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-3.3.6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 3.3.6",
+      "appendix19_no": "3.3.6",
+      "title": "Исполнительная схема расположения объекта капитального строительства в границах земельного участка",
+      "parent": "ID19-3.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 8,
+      "pr344_title": "Исполнительные геодезические схемы (чертежи)",
+      "tz_s5_row": 8,
+      "doc_kind": "ISP_GEO_SCHEME",
+      "applicability": {
+        "logic": {
+          "in": [
+            {
+              "var": "object.works_type"
+            },
+            [
+              "NEW",
+              "RECONSTRUCTION"
+            ]
+          ]
+        },
+        "text": "Новое строительство и реконструкция с изменением посадки.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительная схема расположения",
+        "границы земельного участка",
+        "исполнительная съёмка"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-001",
+        "M-025",
+        "M-027",
+        "M-030",
+        "M-037",
+        "M-121"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4",
+      "appendix19_no": "4",
+      "title": "Исполнительные чертежи и продольные профили подземных сетей инженерно-технического обеспечения в объеме проекта",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.1",
+      "appendix19_no": "4.1",
+      "title": "Исполнительный чертёж наружных сетей водоснабжения",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_water"
+        },
+        "text": "При наличии в проекте (В1).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж наружных сетей водоснабжения",
+        "продольный профиль",
+        "В1"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-016",
+        "M-034",
+        "M-114"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.2",
+      "appendix19_no": "4.2",
+      "title": "Исполнительный чертёж наружных сетей канализации",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_sewer"
+        },
+        "text": "При наличии в проекте (К1).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж наружных сетей канализации",
+        "продольный профиль",
+        "К1"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-034",
+        "M-074"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.3",
+      "appendix19_no": "4.3",
+      "title": "Исполнительный чертёж наружных тепловых сетей",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_heat"
+        },
+        "text": "При наличии в проекте (Т1/Т2).",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж наружных тепловых сетей",
+        "продольный профиль",
+        "Т1/Т2"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-017",
+        "M-034"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.4",
+      "appendix19_no": "4.4",
+      "title": "Исполнительный чертёж наружных сетей газоснабжения",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_gas_supply"
+        },
+        "text": "При наличии в проекте (Г).",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж наружных сетей газоснабжения",
+        "продольный профиль",
+        "Г"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-018",
+        "M-034"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.5",
+      "appendix19_no": "4.5",
+      "title": "Исполнительный чертёж наружных сетей электроснабжения",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_power"
+        },
+        "text": "При наличии в проекте (КЛ).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж наружных сетей электроснабжения",
+        "продольный профиль",
+        "КЛ"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-014",
+        "M-034"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.6",
+      "appendix19_no": "4.6",
+      "title": "Исполнительные чертежи слаботочных сетей",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_lowcurrent"
+        },
+        "text": "При наличии в проекте (СС).",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж слаботочных сетей",
+        "продольный профиль",
+        "СС"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.7",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.7",
+      "appendix19_no": "4.7",
+      "title": "Исполнительные чертежи внутриквартального коллектора",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_collector"
+        },
+        "text": "При наличии в проекте (коллектор).",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж внутриквартального коллектора",
+        "продольный профиль",
+        "коллектор"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.8",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.8",
+      "appendix19_no": "4.8",
+      "title": "Исполнительные чертежи наружного водостока",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_storm"
+        },
+        "text": "При наличии в проекте (К2).",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж наружного водостока",
+        "продольный профиль",
+        "К2"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-039"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-4.9",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 4.9",
+      "appendix19_no": "4.9",
+      "title": "Исполнительные чертежи пристенного дренажа",
+      "parent": "ID19-4",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_wall_drainage"
+        },
+        "text": "При наличии в проекте (Др).",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж пристенного дренажа",
+        "продольный профиль",
+        "Др"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-039"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5",
+      "appendix19_no": "5",
+      "title": "Исполнительные чертежи систем инженерно-технического обеспечения здания (сооружения) в объеме проекта",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-5.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5.1",
+      "appendix19_no": "5.1",
+      "title": "Исполнительный чертёж системы водопровода",
+      "parent": "ID19-5",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_water_supply"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж системы водопровода",
+        "исполнительная схема системы водопровода"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-071",
+        "M-072"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-5.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5.2",
+      "appendix19_no": "5.2",
+      "title": "Исполнительный чертёж системы канализации",
+      "parent": "ID19-5",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_sewer"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж системы канализации",
+        "исполнительная схема системы канализации"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-074",
+        "M-075"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-5.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5.3",
+      "appendix19_no": "5.3",
+      "title": "Исполнительный чертёж системы отопления",
+      "parent": "ID19-5",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_heating"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж системы отопления",
+        "исполнительная схема системы отопления"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-076",
+        "M-077"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-5.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5.4",
+      "appendix19_no": "5.4",
+      "title": "Исполнительный чертёж системы вентиляции",
+      "parent": "ID19-5",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ventilation_mech"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж системы вентиляции",
+        "исполнительная схема системы вентиляции"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-078",
+        "M-079",
+        "M-111"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-5.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5.5",
+      "appendix19_no": "5.5",
+      "title": "Исполнительный чертёж системы газоснабжения",
+      "parent": "ID19-5",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_gas_supply"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж системы газоснабжения",
+        "исполнительная схема системы газоснабжения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-018"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-5.6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5.6",
+      "appendix19_no": "5.6",
+      "title": "Исполнительный чертёж системы электроснабжения",
+      "parent": "ID19-5",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_power"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж системы электроснабжения",
+        "исполнительная схема системы электроснабжения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-068",
+        "M-069"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-5.7",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5.7",
+      "appendix19_no": "5.7",
+      "title": "Исполнительные чертежи слаботочных систем",
+      "parent": "ID19-5",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_lowcurrent"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж слаботочных систем",
+        "исполнительная схема слаботочных систем"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-080",
+        "M-108",
+        "M-110"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-5.8",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 5.8",
+      "appendix19_no": "5.8",
+      "title": "Исполнительный чертёж систем пожаротушения",
+      "parent": "ID19-5",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 9,
+      "pr344_title": "Исполнительные схемы участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 9,
+      "doc_kind": "ISP_SCHEME_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_fire_extinguishing"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "исполнительный чертёж систем пожаротушения",
+        "исполнительная схема систем пожаротушения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-113"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6",
+      "appendix19_no": "6",
+      "title": "Акты освидетельствования скрытых работ",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": "ТЗ §5 прим. 4: перечень скрытых работ определяется ПД и указывается в Общих данных → ожидаемый набор АОСР строится динамически из «Перечня видов работ, для которых необходимо составление актов освидетельствования скрытых работ» (ОД РД)."
+    },
+    {
+      "id": "ID19-6.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.1",
+      "appendix19_no": "6.1",
+      "title": "Акт освидетельствования качества грунтов основания",
+      "parent": "ID19-6",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_foundation_works"
+        },
+        "text": "При устройстве фундаментов.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "освидетельствование грунтов основания",
+        "акт освидетельствования основания",
+        "вскрытые грунты"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.2",
+      "appendix19_no": "6.2",
+      "title": "Акт освидетельствования обратной засыпки выемок",
+      "parent": "ID19-6",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_excavation"
+        },
+        "text": "При устройстве выемок.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "обратная засыпка",
+        "уплотнение грунта"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-024"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.3",
+      "appendix19_no": "6.3",
+      "title": "Акты освидетельствования работ при устройстве фундаментов",
+      "parent": "ID19-6",
+      "level": 2,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.3.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.3.1",
+      "appendix19_no": "6.3.1",
+      "title": "ленточные фундаменты",
+      "parent": "ID19-6.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "==": [
+            {
+              "var": "object.foundation_type"
+            },
+            "STRIP"
+          ]
+        },
+        "text": "Ленточные фундаменты.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "ленточный фундамент"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.3.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.3.2",
+      "appendix19_no": "6.3.2",
+      "title": "монолитная плита",
+      "parent": "ID19-6.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "==": [
+            {
+              "var": "object.foundation_type"
+            },
+            "SLAB"
+          ]
+        },
+        "text": "Фундаментная плита.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "фундаментная плита",
+        "монолитная плита"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-058"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.3.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.3.3",
+      "appendix19_no": "6.3.3",
+      "title": "свайные фундаменты и т.д.",
+      "parent": "ID19-6.3",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_piles"
+        },
+        "text": "Свайные фундаменты.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "свайное основание",
+        "погружение свай",
+        "ростверк"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-058"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.4",
+      "appendix19_no": "6.4",
+      "title": "Акты освидетельствования монолитных бетонных работ",
+      "parent": "ID19-6",
+      "level": 2,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.4.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.4.1",
+      "appendix19_no": "6.4.1",
+      "title": "опалубочные работы",
+      "parent": "ID19-6.4",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_monolithic_concrete"
+        },
+        "text": "Монолитные конструкции.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "установка опалубки",
+        "опалубочные работы"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.4.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.4.2",
+      "appendix19_no": "6.4.2",
+      "title": "арматурные работы",
+      "parent": "ID19-6.4",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_monolithic_concrete"
+        },
+        "text": "Монолитные конструкции.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "армирование",
+        "арматурные работы"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-057",
+        "M-062"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.4.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.4.3",
+      "appendix19_no": "6.4.3",
+      "title": "бетонные работы",
+      "parent": "ID19-6.4",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_monolithic_concrete"
+        },
+        "text": "Монолитные конструкции.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "бетонирование",
+        "бетонные работы",
+        "укладка бетонной смеси"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-055"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.5",
+      "appendix19_no": "6.5",
+      "title": "Акты освидетельствования монтажных работ",
+      "parent": "ID19-6",
+      "level": 2,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.5.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.5.1",
+      "appendix19_no": "6.5.1",
+      "title": "монтаж сборных железобетонных конструкций",
+      "parent": "ID19-6.5",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_precast"
+        },
+        "text": "Сборный ЖБ.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "монтаж сборных железобетонных"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.5.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.5.2",
+      "appendix19_no": "6.5.2",
+      "title": "монтаж металлоконструкций",
+      "parent": "ID19-6.5",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_steel_structures"
+        },
+        "text": "Металлоконструкции.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "монтаж металлоконструкций"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-056"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.5.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.5.3",
+      "appendix19_no": "6.5.3",
+      "title": "монтаж деревянных конструкций",
+      "parent": "ID19-6.5",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_timber"
+        },
+        "text": "Деревянные конструкции.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "монтаж деревянных конструкций"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-6.5.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 6.5.4",
+      "appendix19_no": "6.5.4",
+      "title": "монтаж конструкций из полимерных материалов",
+      "parent": "ID19-6.5",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_polymer_structures"
+        },
+        "text": "Конструкции из полимерных материалов.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "полимерных материалов"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-7",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 7",
+      "appendix19_no": "7",
+      "title": "Акты освидетельствования работ по устройству каменной кладки",
+      "parent": null,
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_masonry"
+        },
+        "text": "При наличии кладки.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "каменная кладка",
+        "кладка стен",
+        "армирование кладки"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-8",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 8",
+      "appendix19_no": "8",
+      "title": "Акты освидетельствования сварочных работ",
+      "parent": null,
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "or": [
+            {
+              "var": "object.has_steel_structures"
+            },
+            {
+              "var": "object.has_welding"
+            }
+          ]
+        },
+        "text": "При сварочных работах.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "сварочные работы",
+        "сварные соединения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-056"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-9",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 9",
+      "appendix19_no": "9",
+      "title": "Акты освидетельствования работ по изоляции и защите конструкций и соединений",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-9.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 9.1",
+      "appendix19_no": "9.1",
+      "title": "работы по антикоррозионной защите конструкций и соединений",
+      "parent": "ID19-9",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_corrosion_protection"
+        },
+        "text": "При наличии работ в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "антикоррозионная защита"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-066"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-9.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 9.2",
+      "appendix19_no": "9.2",
+      "title": "гидроизоляционные работы",
+      "parent": "ID19-9",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_waterproofing"
+        },
+        "text": "При наличии работ в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "гидроизоляция"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-044"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-9.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 9.3",
+      "appendix19_no": "9.3",
+      "title": "теплоизоляционные работы",
+      "parent": "ID19-9",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_thermal_insulation"
+        },
+        "text": "При наличии работ в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "теплоизоляция",
+        "утепление"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-044",
+        "M-125",
+        "M-128"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-9.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 9.4",
+      "appendix19_no": "9.4",
+      "title": "звукоизоляционные работы",
+      "parent": "ID19-9",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_sound_insulation"
+        },
+        "text": "При наличии работ в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "звукоизоляция"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-053"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-9.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 9.5",
+      "appendix19_no": "9.5",
+      "title": "работы по антисептированию и огневой защите конструкций",
+      "parent": "ID19-9",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_fire_protection_coating"
+        },
+        "text": "При наличии работ в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "огнезащита",
+        "антисептирование"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-066"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-9.6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 9.6",
+      "appendix19_no": "9.6",
+      "title": "работы по герметизации",
+      "parent": "ID19-9",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_sealing"
+        },
+        "text": "При наличии работ в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "герметизация швов"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-9.7",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 9.7",
+      "appendix19_no": "9.7",
+      "title": "работы по устройству молниезащиты и заземлению",
+      "parent": "ID19-9",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 3,
+      "pr344_title": "Акты освидетельствования скрытых работ (АОСР)",
+      "tz_s5_row": 3,
+      "doc_kind": "AOSR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_power"
+        },
+        "text": "При наличии работ в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "молниезащита",
+        "заземление"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-070"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-10",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 10",
+      "appendix19_no": "10",
+      "title": "Акты освидетельствования ответственных конструкций",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 4,
+      "pr344_title": "Акты освидетельствования строительных конструкций",
+      "tz_s5_row": 4,
+      "doc_kind": "AKT_OSV_KONSTR",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-10.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 10.1",
+      "appendix19_no": "10.1",
+      "title": "акт освидетельствования фундаментов",
+      "parent": "ID19-10",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 4,
+      "pr344_title": "Акты освидетельствования строительных конструкций",
+      "tz_s5_row": 4,
+      "doc_kind": "AKT_OSV_KONSTR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_foundation_works"
+        },
+        "text": "При наличии конструкции.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "фундаментов"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-058"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-10.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 10.2",
+      "appendix19_no": "10.2",
+      "title": "акт освидетельствования конструкций подземной части",
+      "parent": "ID19-10",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 4,
+      "pr344_title": "Акты освидетельствования строительных конструкций",
+      "tz_s5_row": 4,
+      "doc_kind": "AKT_OSV_KONSTR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_underground_part"
+        },
+        "text": "При наличии конструкции.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "конструкций подземной части"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-061"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-10.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 10.3",
+      "appendix19_no": "10.3",
+      "title": "акты освидетельствования этажей и пролетов",
+      "parent": "ID19-10",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 4,
+      "pr344_title": "Акты освидетельствования строительных конструкций",
+      "tz_s5_row": 4,
+      "doc_kind": "AKT_OSV_KONSTR",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "этажей и пролетов"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-059",
+        "M-060",
+        "M-061",
+        "M-102"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-10.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 10.4",
+      "appendix19_no": "10.4",
+      "title": "акт освидетельствования конструкции кровли",
+      "parent": "ID19-10",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 4,
+      "pr344_title": "Акты освидетельствования строительных конструкций",
+      "tz_s5_row": 4,
+      "doc_kind": "AKT_OSV_KONSTR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_roof_works"
+        },
+        "text": "При наличии конструкции.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "конструкции кровли"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-044",
+        "M-049",
+        "M-128"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-10.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 10.5",
+      "appendix19_no": "10.5",
+      "title": "акты освидетельствования фасадных систем",
+      "parent": "ID19-10",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 4,
+      "pr344_title": "Акты освидетельствования строительных конструкций",
+      "tz_s5_row": 4,
+      "doc_kind": "AKT_OSV_KONSTR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_facade_works"
+        },
+        "text": "При наличии конструкции.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "фасадных систем"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-046",
+        "M-125"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-10.6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 10.6",
+      "appendix19_no": "10.6",
+      "title": "акт освидетельствования мусоропроводов и помещений мусоросборников",
+      "parent": "ID19-10",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 4,
+      "pr344_title": "Акты освидетельствования строительных конструкций",
+      "tz_s5_row": 4,
+      "doc_kind": "AKT_OSV_KONSTR",
+      "applicability": {
+        "logic": {
+          "var": "object.has_garbage_chute"
+        },
+        "text": "При наличии конструкции.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "мусоропроводов и помещений мусоросборников"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-11",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11",
+      "appendix19_no": "11",
+      "title": "Акты освидетельствования участков сетей (систем) инженерно-технического обеспечения",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1",
+      "appendix19_no": "11.1",
+      "title": "Акты освидетельствования участков систем инженерно-технического обеспечения",
+      "parent": "ID19-11",
+      "level": 2,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.1",
+      "appendix19_no": "11.1.1",
+      "title": "акт освидетельствования системы отопления",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_heating"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы отопления"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-076",
+        "M-077"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.2",
+      "appendix19_no": "11.1.2",
+      "title": "акт освидетельствования системы естественной вентиляции",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ventilation_natural"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы естественной вентиляции"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.3",
+      "appendix19_no": "11.1.3",
+      "title": "акт освидетельствования системы приточно-вытяжной вентиляции с приложением паспортов систем",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ventilation_mech"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы приточно-вытяжной вентиляции с приложением паспортов"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-078",
+        "M-079"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.4",
+      "appendix19_no": "11.1.4",
+      "title": "акт освидетельствования системы кондиционирования воздуха с приложением паспортов системы",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_air_conditioning"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы кондиционирования воздуха с приложением паспортов си"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.5",
+      "appendix19_no": "11.1.5",
+      "title": "акт освидетельствования системы канализации и выпусков здания",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_sewer"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы канализации и выпусков здания"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-074",
+        "M-075"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.6",
+      "appendix19_no": "11.1.6",
+      "title": "акт освидетельствования системы и выпусков водостока здания",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_internal_storm"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы и выпусков водостока здания"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-045"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.7",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.7",
+      "appendix19_no": "11.1.7",
+      "title": "акт освидетельствования системы холодного и горячего водоснабжения",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_water_supply"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы холодного и горячего водоснабжения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-071",
+        "M-072"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.8",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.8",
+      "appendix19_no": "11.1.8",
+      "title": "акт освидетельствования системы газоснабжения",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_gas_supply"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы газоснабжения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-018"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.9",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.9",
+      "appendix19_no": "11.1.9",
+      "title": "акты освидетельствования специализированных систем в соответствии с проектом",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_special_systems"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "специализированных систем в соответствии с проектом"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.10",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.10",
+      "appendix19_no": "11.1.10",
+      "title": "акт освидетельствования системы электроснабжения",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_power"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "системы электроснабжения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-015",
+        "M-068",
+        "M-069"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.11",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.11",
+      "appendix19_no": "11.1.11",
+      "title": "акты освидетельствования слаботочных систем (сигнализация, СМИС, ОДС, видеонаблюдение, телефонизация, радиофикация и др. в соответствии с проектом)",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_lowcurrent"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "слаботочных систем (сигнализация, СМИС, ОДС, видеонаблюдение"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-123"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.1.12",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.1.12",
+      "appendix19_no": "11.1.12",
+      "title": "акты освидетельствования систем пожаротушения и пожарной сигнализации (водопровод, ППА и ДУ и др. в соответствии с проектом)",
+      "parent": "ID19-11.1",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_fire_protection_systems"
+        },
+        "text": "При наличии системы в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "систем пожаротушения и пожарной сигнализации (водопровод, ПП"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-080",
+        "M-108",
+        "M-110",
+        "M-111",
+        "M-112",
+        "M-113"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.2",
+      "appendix19_no": "11.2",
+      "title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "parent": "ID19-11",
+      "level": 2,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.2.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.2.1",
+      "appendix19_no": "11.2.1",
+      "title": "акт освидетельствования сети теплоснабжения",
+      "parent": "ID19-11.2",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_heat"
+        },
+        "text": "При наличии сети в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "сети теплоснабжения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-017"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.2.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.2.2",
+      "appendix19_no": "11.2.2",
+      "title": "акт освидетельствования сети водоснабжения",
+      "parent": "ID19-11.2",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_water"
+        },
+        "text": "При наличии сети в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "сети водоснабжения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-016",
+        "M-114"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.2.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.2.3",
+      "appendix19_no": "11.2.3",
+      "title": "акт освидетельствования сети дворовой канализации",
+      "parent": "ID19-11.2",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_sewer"
+        },
+        "text": "При наличии сети в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "сети дворовой канализации"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-074"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.2.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.2.4",
+      "appendix19_no": "11.2.4",
+      "title": "акт освидетельствования сети водостоков",
+      "parent": "ID19-11.2",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_storm"
+        },
+        "text": "При наличии сети в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "сети водостоков"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-039"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.2.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.2.5",
+      "appendix19_no": "11.2.5",
+      "title": "акт освидетельствования сети пристенных дренажей и водовыпусков в водостоки",
+      "parent": "ID19-11.2",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_wall_drainage"
+        },
+        "text": "При наличии сети в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "сети пристенных дренажей и водовыпусков в водостоки"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-039"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.2.6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.2.6",
+      "appendix19_no": "11.2.6",
+      "title": "акт освидетельствования сети электроснабжения",
+      "parent": "ID19-11.2",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_power"
+        },
+        "text": "При наличии сети в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "сети электроснабжения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-014"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-11.2.7",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 11.2.7",
+      "appendix19_no": "11.2.7",
+      "title": "акт освидетельствования сети наружного освещения",
+      "parent": "ID19-11.2",
+      "level": 3,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ext_lighting"
+        },
+        "text": "При наличии сети в проекте.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "сети наружного освещения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-130"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-12",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 12",
+      "appendix19_no": "12",
+      "title": "Акты испытания и опробования технических устройств",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 10,
+      "pr344_title": "Акты испытания технических устройств и систем инженерно-технического обеспечения",
+      "tz_s5_row": 10,
+      "doc_kind": "AKT_ISPYTANIY",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-12.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 12.1",
+      "appendix19_no": "12.1",
+      "title": "акты индивидуального испытания и опробования оборудования (противопожарной защиты, технологического, медицинского, холодильного, специального, доступности маломобильных граждан и др. в соответствии с проектом)",
+      "parent": "ID19-12",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 10,
+      "pr344_title": "Акты испытания технических устройств и систем инженерно-технического обеспечения",
+      "tz_s5_row": 10,
+      "doc_kind": "AKT_ISPYTANIY",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "индивидуальное испытание",
+        "опробование оборудования",
+        "акт ПНР"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-013",
+        "M-068",
+        "M-073",
+        "M-079",
+        "M-115",
+        "M-123",
+        "M-129"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-12.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 12.2",
+      "appendix19_no": "12.2",
+      "title": "акты комплексного испытания противопожарной защиты",
+      "parent": "ID19-12",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 10,
+      "pr344_title": "Акты испытания технических устройств и систем инженерно-технического обеспечения",
+      "tz_s5_row": 10,
+      "doc_kind": "AKT_ISPYTANIY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_fire_protection_systems"
+        },
+        "text": "При наличии СПЗ.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "комплексное испытание",
+        "противопожарная защита",
+        "комплексное опробование СПЗ"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-080",
+        "M-108",
+        "M-110",
+        "M-112",
+        "M-113"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-12.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 12.3",
+      "appendix19_no": "12.3",
+      "title": "акты технического освидетельствования подъемно-транспортного оборудования (лифты, эскалаторы, траволаторы и др. в соответствии с проектом)",
+      "parent": "ID19-12",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 10,
+      "pr344_title": "Акты испытания технических устройств и систем инженерно-технического обеспечения",
+      "tz_s5_row": 10,
+      "doc_kind": "AKT_ISPYTANIY",
+      "applicability": {
+        "logic": {
+          "or": [
+            {
+              "var": "object.has_lifts"
+            },
+            {
+              "var": "object.has_escalators"
+            }
+          ]
+        },
+        "text": "При наличии лифтов/эскалаторов.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "техническое освидетельствование лифта",
+        "эскалатор"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-064"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-13",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13",
+      "appendix19_no": "13",
+      "title": "Результаты экспертиз, обследований, лабораторных и иных испытаний выполненных работ, проведенных в процессе строительного контроля",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.1",
+      "appendix19_no": "13.1",
+      "title": "результаты измерений уровней шума в помещениях и в зоне влияния объекта, уровня вибрации (при наличии в проекте мероприятий по виброизоляции зданий от метро)",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "in": [
+            {
+              "var": "object.purpose"
+            },
+            [
+              "RESIDENTIAL",
+              "PUBLIC",
+              "MIXED"
+            ]
+          ]
+        },
+        "text": "Жилые/общественные; вибрация — только при мероприятиях по виброизоляции от метро.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты измерений уровней шума в помещениях и в зоне влияния объект"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-053"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.2",
+      "appendix19_no": "13.2",
+      "title": "результаты исследования воздуха в закрытых помещениях",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "in": [
+            {
+              "var": "object.purpose"
+            },
+            [
+              "RESIDENTIAL",
+              "PUBLIC",
+              "MIXED"
+            ]
+          ]
+        },
+        "text": "Жилые/общественные.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты исследования воздуха в закрытых помещениях"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.3",
+      "appendix19_no": "13.3",
+      "title": "результаты радиологического обследования помещений и территории после завершения благоустройства",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "var": "object.has_site_works"
+        },
+        "text": "При благоустройстве.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты радиологического обследования помещений и территории после "
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-027"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.4",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.4",
+      "appendix19_no": "13.4",
+      "title": "результаты лабораторных исследований воды из разводящих сетей здания",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "var": "object.has_water_supply"
+        },
+        "text": "При наличии водопровода.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты лабораторных исследований воды из разводящих сетей здания"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-071"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.5",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.5",
+      "appendix19_no": "13.5",
+      "title": "результаты измерений параметров микроклимата и освещенности в ДОУ и школах",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "in": [
+            {
+              "var": "object.functional_class"
+            },
+            [
+              "Ф1.1",
+              "Ф4.1"
+            ]
+          ]
+        },
+        "text": "Только ДОО (Ф1.1) и школы (Ф4.1).",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты измерений параметров микроклимата и освещенности в ДОУ и шк"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-051",
+        "M-013"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.6",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.6",
+      "appendix19_no": "13.6",
+      "title": "результаты измерения уровней электромагнитных полей в жилых помещениях, расположенных смежно с источниками (в случае наличия)",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "and": [
+            {
+              "in": [
+                {
+                  "var": "object.purpose"
+                },
+                [
+                  "RESIDENTIAL",
+                  "MIXED"
+                ]
+              ]
+            },
+            {
+              "var": "object.has_emf_sources"
+            }
+          ]
+        },
+        "text": "Жилые помещения, смежные с источниками ЭМП (ТП, ВРУ и т.п.).",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты измерения уровней электромагнитных полей в жилых помещениях"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.7",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.7",
+      "appendix19_no": "13.7",
+      "title": "результаты исследований грунтов по санитарно-химическим, микробиологическим, паразитологическим и экологическим показателям",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "var": "object.has_site_works"
+        },
+        "text": "При благоустройстве/завозе грунта.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты исследований грунтов по санитарно-химическим, микробиологич"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.8",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.8",
+      "appendix19_no": "13.8",
+      "title": "акт проверки работоспособности ОЗДС (в соответствии с проектом)",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "var": "object.has_ozds"
+        },
+        "text": "При наличии ОЗДС в проекте.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "акт проверки работоспособности ОЗДС (в соответствии с проектом)"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.9",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.9",
+      "appendix19_no": "13.9",
+      "title": "результаты измерения индекса изоляции воздушного шума ограждающими конструкциями",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "in": [
+            {
+              "var": "object.purpose"
+            },
+            [
+              "RESIDENTIAL",
+              "PUBLIC",
+              "MIXED"
+            ]
+          ]
+        },
+        "text": "Жилые/общественные.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты измерения индекса изоляции воздушного шума ограждающими кон"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-053"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-13.10",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 13.10",
+      "appendix19_no": "13.10",
+      "title": "результаты измерения индекса приведенного уровня ударного шума (для перекрытий)",
+      "parent": "ID19-13",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 11,
+      "pr344_title": "Результаты экспертиз, обследований, лабораторных и иных испытаний",
+      "tz_s5_row": 11,
+      "doc_kind": "LAB_RESULTS",
+      "applicability": {
+        "logic": {
+          "in": [
+            {
+              "var": "object.purpose"
+            },
+            [
+              "RESIDENTIAL",
+              "PUBLIC",
+              "MIXED"
+            ]
+          ]
+        },
+        "text": "Жилые/общественные (перекрытия).",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "результаты измерения индекса приведенного уровня ударного шума (для пе"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-053"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-14",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 14",
+      "appendix19_no": "14",
+      "title": "Акты освидетельствования законченных строительством инженерных сооружений (ЦТП, ГРП, РТП, ИТП, ТП, КНС, бойлерной, АИТ, очистных сооружений и другие сооружения, входящие в состав проекта)",
+      "parent": null,
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 5,
+      "pr344_title": "Акты освидетельствования участков сетей инженерно-технического обеспечения",
+      "tz_s5_row": 5,
+      "doc_kind": "AKT_OSV_SETEY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_engineering_structures"
+        },
+        "text": "При наличии инженерных сооружений в составе проекта.",
+        "default_applicable": true
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "ЦТП",
+        "ИТП",
+        "ТП",
+        "КНС",
+        "ГРП",
+        "АИТ",
+        "очистные сооружения"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-015",
+        "M-017",
+        "M-018"
+      ],
+      "notes": "В Приказе № 344/пр отдельного пункта нет — отнесено к п. 5 (акты освидетельствования участков сетей ИТО) и п. 10 (испытания)."
+    },
+    {
+      "id": "ID19-15",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 15",
+      "appendix19_no": "15",
+      "title": "Документы, подтверждающие соответствие выполненных работ при монтаже лифтового оборудования требованиям технического регламента Таможенного союза",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 10,
+      "pr344_title": "Акты испытания технических устройств и систем инженерно-технического обеспечения",
+      "tz_s5_row": 10,
+      "doc_kind": "LIFT_DOCS",
+      "applicability": {
+        "logic": {
+          "var": "object.has_lifts"
+        },
+        "text": "При наличии лифтов.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "ID19-15.1",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 15.1",
+      "appendix19_no": "15.1",
+      "title": "акт технического освидетельствования лифта",
+      "parent": "ID19-15",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 10,
+      "pr344_title": "Акты испытания технических устройств и систем инженерно-технического обеспечения",
+      "tz_s5_row": 10,
+      "doc_kind": "AKT_ISPYTANIY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_lifts"
+        },
+        "text": "При наличии лифтов.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "акт технического освидетельствования лифта"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-064"
+      ],
+      "notes": "Подпункт выделен при оцифровке (в оригинале — перечень без номеров)."
+    },
+    {
+      "id": "ID19-15.2",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 15.2",
+      "appendix19_no": "15.2",
+      "title": "декларация о соответствии лифта требованиям технического регламента Таможенного союза «Безопасность лифтов» (ТР ТС 011/2011)",
+      "parent": "ID19-15",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 12,
+      "pr344_title": "Документы, подтверждающие качество применяемых строительных материалов (паспорта, сертификаты, декларации)",
+      "tz_s5_row": 12,
+      "doc_kind": "QUALITY_DOCS",
+      "applicability": {
+        "logic": {
+          "var": "object.has_lifts"
+        },
+        "text": "При наличии лифтов.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "декларация о соответствии",
+        "ТР ТС 011/2011"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-064"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-15.3",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 15.3",
+      "appendix19_no": "15.3",
+      "title": "паспорт лифта",
+      "parent": "ID19-15",
+      "level": 2,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 12,
+      "pr344_title": "Документы, подтверждающие качество применяемых строительных материалов (паспорта, сертификаты, декларации)",
+      "tz_s5_row": 12,
+      "doc_kind": "QUALITY_DOCS",
+      "applicability": {
+        "logic": {
+          "var": "object.has_lifts"
+        },
+        "text": "При наличии лифтов.",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "паспорт лифта"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-064"
+      ],
+      "notes": null
+    },
+    {
+      "id": "ID19-16",
+      "source": "Приложение 19 к Регламенту МГСН (Примерный перечень ИД), п. 16",
+      "appendix19_no": "16",
+      "title": "Акт технического освидетельствования подъемных платформ для инвалидов (оформленный с учетом требований приказа Ростехнадзора от 12.10.2017 № 425)",
+      "parent": null,
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 10,
+      "pr344_title": "Акты испытания технических устройств и систем инженерно-технического обеспечения",
+      "tz_s5_row": 10,
+      "doc_kind": "AKT_ISPYTANIY",
+      "applicability": {
+        "logic": {
+          "var": "object.has_mgn_platforms"
+        },
+        "text": "При наличии подъёмных платформ для инвалидов.",
+        "default_applicable": false
+      },
+      "check_phase": "FINAL_RECOMMENDED",
+      "recommended_final_check": true,
+      "detection_anchors": [
+        "подъёмная платформа для инвалидов",
+        "техническое освидетельствование платформы"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-115"
+      ],
+      "notes": null
+    },
+    {
+      "id": "TZ5-06",
+      "source": "ТЗ §5, строка 6 (Приказ № 344/пр, прил. 1 п. 6)",
+      "appendix19_no": null,
+      "title": "Замечания застройщика / технического заказчика",
+      "parent": null,
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 6,
+      "pr344_title": "Замечания застройщика / технического заказчика",
+      "tz_s5_row": 6,
+      "doc_kind": "CUSTOMER_REMARKS",
+      "applicability": {
+        "logic": {
+          "var": "object.has_customer_remarks"
+        },
+        "text": "При наличии выданных замечаний (иначе NOT_APPLICABLE с основанием «замечания не выдавались»).",
+        "default_applicable": false
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "замечания технического заказчика",
+        "предписание строительного контроля застройщика"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "TZ5-13",
+      "source": "ТЗ §5, строка 13 (Приказ № 344/пр, прил. 1 п. 13)",
+      "appendix19_no": null,
+      "title": "Общий и специальные журналы работ",
+      "parent": null,
+      "level": 1,
+      "is_group": true,
+      "group_rule": "SATISFIED_IF_ALL_APPLICABLE_CHILDREN_FOUND",
+      "pr344_item": 13,
+      "pr344_title": "Общий и специальные журналы работ",
+      "tz_s5_row": 13,
+      "doc_kind": "JOURNALS",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [],
+      "notes": null
+    },
+    {
+      "id": "TZ5-13.1",
+      "source": "ТЗ §5, строка 13",
+      "appendix19_no": null,
+      "title": "Общий журнал работ (ОЖР)",
+      "parent": "TZ5-13",
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 13,
+      "pr344_title": "Общий и специальные журналы работ",
+      "tz_s5_row": 13,
+      "doc_kind": "JOURNAL_OZHR",
+      "applicability": {
+        "logic": true,
+        "text": "Всегда (для зданий/сооружений нового строительства и реконструкции).",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "общий журнал работ",
+        "ОЖР"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-067",
+        "M-082",
+        "M-087",
+        "M-091"
+      ],
+      "notes": null
+    },
+    {
+      "id": "TZ5-13.2",
+      "source": "ТЗ §5, строка 13",
+      "appendix19_no": null,
+      "title": "Специальные журналы работ (бетонных, сварочных, антикоррозионной защиты, монтажа конструкций и др. по видам работ)",
+      "parent": "TZ5-13",
+      "level": 1,
+      "is_group": false,
+      "group_rule": null,
+      "pr344_item": 13,
+      "pr344_title": "Общий и специальные журналы работ",
+      "tz_s5_row": 13,
+      "doc_kind": "JOURNAL_SPECIAL",
+      "applicability": {
+        "logic": {
+          "or": [
+            {
+              "var": "object.has_monolithic_concrete"
+            },
+            {
+              "var": "object.has_welding"
+            },
+            {
+              "var": "object.has_steel_structures"
+            }
+          ]
+        },
+        "text": "По видам выполняемых работ.",
+        "default_applicable": true
+      },
+      "check_phase": "AS_WORKS_PERFORMED",
+      "recommended_final_check": false,
+      "detection_anchors": [
+        "журнал бетонных работ",
+        "журнал сварочных работ",
+        "журнал антикоррозионной защиты",
+        "журнал монтажа строительных конструкций"
+      ],
+      "required_requisites": {
+        "scan": [
+          "подписи уполномоченных лиц",
+          "печати (при наличии)",
+          "даты",
+          "регистрационные номера"
+        ],
+        "electronic": [
+          "УКЭП или УНЭП (п. 4 Приказа № 344/пр)"
+        ]
+      },
+      "related_matrix_params": [
+        "M-055",
+        "M-056"
+      ],
+      "notes": null
+    }
+  ]
+}

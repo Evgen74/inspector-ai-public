@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/decision.schema.json",
+  "title": "Decision",
+  "description": "One inspector verdict on one finding (ТЗ §9.3; 05 §3.5–3.6; 90 §3.2.4 axis C). Only an inspector sets CONFIRMED_VIOLATION. Rules: NEGATIVE_VERIFIED needs only `reason_code` (DecisionRejectReason) — the comment is optional; CONFIRMED_VIOLATION carries `basis_code` (DecisionConfirmBasis, auto-defaulted); CLARIFICATION_REQUIRED carries `clarify_code` (DecisionClarifyBasis). Decisions live in the web product only and never flow into a submission (97 §1.4). Owner: AG-05.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decision_id", "finding_id", "object_id", "decision", "comment", "decided_by", "decided_at"],
+  "properties": {
+    "decision_id": {"type": "string", "minLength": 1, "maxLength": 64},
+    "finding_id": {"type": "string", "minLength": 1, "maxLength": 96},
+    "finding_group_id": {"type": ["string", "null"]},
+    "object_id": {"$ref": "common.schema.json#/$defs/ObjectId"},
+    "run_id": {"type": ["string", "null"], "description": "Batch run the finding was imported from."},
+    "process_id": {"type": ["string", "null"]},
+    "protocol_version": {"type": ["integer", "null"], "minimum": 1},
+    "decision": {"$ref": "enums.schema.json#/$defs/DecisionType"},
+    "effective_status": {"$ref": "enums.schema.json#/$defs/InspectorStatus", "description": "Inspector status of the finding after this decision (REVERT_TO_PENDING → PENDING)."},
+    "reason_code": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DecisionRejectReason"}, {"type": "null"}]},
+    "basis_code": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DecisionConfirmBasis"}, {"type": "null"}]},
+    "clarify_code": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DecisionClarifyBasis"}, {"type": "null"}]},
+    "comment": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "comment_source": {"$ref": "enums.schema.json#/$defs/CommentSource"},
+    "approved_change_ref": {"type": ["string", "null"], "description": "Uploaded file+page or an external reference (type, number, date); «NONE» when absent."},
+    "approved_change_file_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/CitableFileId"}, {"type": "null"}]},
+    "approved_change_page": {"oneOf": [{"$ref": "common.schema.json#/$defs/PageNumber"}, {"type": "null"}]},
+    "corrected_value": {"$ref": "common.schema.json#/$defs/StageValue"},
+    "correct_file_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/CitableFileId"}, {"type": "null"}], "description": "WRONG_REVISION: the authoritative revision (never SUPERSEDED/CANCELLED)."},
+    "correct_locus": {"type": ["string", "null"], "description": "LINKING_ERROR: the right sheet / room / element."},
+    "duplicate_of": {"type": ["string", "null"], "description": "DUPLICATE: an ACTIVE finding_id."},
+    "na_basis": {"type": ["string", "null"], "description": "NOT_APPLICABLE_PARAM: the mandatory basis («с обязательным основанием»)."},
+    "justification": {"type": ["string", "null"], "description": "Confirming while approved_change_ref ≠ NONE."},
+    "authoritative_file_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/CitableFileId"}, {"type": "null"}]},
+    "authoritative_basis_code": {"oneOf": [{"$ref": "enums.schema.json#/$defs/RevisionBasis"}, {"type": "null"}]},
+    "authoritative_basis_text": {"type": ["string", "null"]},
+    "planned_action": {"oneOf": [{"$ref": "enums.schema.json#/$defs/PlannedAction"}, {"type": "null"}], "description": "Informational only (VER-42); nothing is issued automatically."},
+    "ai_verdict": {"oneOf": [{"$ref": "enums.schema.json#/$defs/AiVerdict"}, {"type": "null"}], "description": "Rejection validator verdict (05 §3.7)."},
+    "ai_confidence": {"oneOf": [{"$ref": "common.schema.json#/$defs/Confidence"}, {"type": "null"}]},
+    "ai_comment": {"type": ["string", "null"], "description": "«🤖 ИИ СОГЛАСЕН (NN%). …» (Приложение 2 §6 «Комментарий ИИ»)."},
+    "system_comment": {"type": ["string", "null"], "description": "§9.4 template, e.g. «Результат инспектора: NEGATIVE_VERIFIED. Причина: {reason_code}. …»."},
+    "gold_effect": {"$ref": "enums.schema.json#/$defs/GoldEffect"},
+    "evidence_fingerprint": {"oneOf": [{"$ref": "common.schema.json#/$defs/Sha256"}, {"type": "null"}], "description": "Fingerprint of the evidence the inspector saw (seen_fingerprint)."},
+    "override_of_decision_id": {"type": ["string", "null"]},
+    "decided_by": {"type": "string", "minLength": 1, "description": "User id of the inspector."},
+    "decided_role": {"$ref": "enums.schema.json#/$defs/Role"},
+    "decided_at": {"$ref": "common.schema.json#/$defs/Timestamp"},
+    "ext": {"$ref": "common.schema.json#/$defs/Extension"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"decision": {"const": "NEGATIVE_VERIFIED"}}, "required": ["decision"]},
+      "then": {
+        "required": ["reason_code"],
+        "properties": {"reason_code": {"$ref": "enums.schema.json#/$defs/DecisionRejectReason"}, "basis_code": {"type": "null"}, "clarify_code": {"type": "null"}}
+      }
+    },
+    {
+      "if": {"properties": {"decision": {"const": "CONFIRMED_VIOLATION"}}, "required": ["decision"]},
+      "then": {"properties": {"reason_code": {"type": "null"}, "clarify_code": {"type": "null"}}}
+    },
+    {
+      "if": {"properties": {"decision": {"const": "CLARIFICATION_REQUIRED"}}, "required": ["decision"]},
+      "then": {
+        "required": ["clarify_code"],
+        "properties": {"clarify_code": {"$ref": "enums.schema.json#/$defs/DecisionClarifyBasis"}, "reason_code": {"type": "null"}, "basis_code": {"type": "null"}}
+      }
+    }
+  ]
+}

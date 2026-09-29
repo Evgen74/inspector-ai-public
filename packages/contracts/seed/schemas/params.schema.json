@@ -1,0 +1,363 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/seed/params.schema.json",
+  "title": "Matrix seed: 132 parameters (packages/contracts/seed/params.json)",
+  "description": "ТЗ §8.1 fields (id → param_id; code = catalog code) plus 90 §3.3.3 / 97 §2.8 extensions. Built by seed/src/build_seed.py; loaded by inspector_common.params. Owner: AG-03.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seed", "schema_version", "matrix_version", "content_sha256", "counts", "review", "sources", "seed_changes", "params", "context_gates", "hedge_groups", "moved_to_logical_rules"],
+  "properties": {
+    "seed": {"const": "params"},
+    "schema_version": {"const": 1},
+    "matrix_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "content_sha256": {"$ref": "../schemas/common.schema.json#/$defs/Sha256"},
+    "counts": {"type": "object"},
+    "review": {"type": "object"},
+    "sources": {"$ref": "#/$defs/Sources"},
+    "seed_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "field", "change", "reason"],
+        "properties": {
+          "code": {"type": "string"},
+          "field": {"type": "string"},
+          "change": {"type": "string"},
+          "reason": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "params": {"type": "array", "minItems": 132, "maxItems": 132, "items": {"$ref": "#/$defs/Param"}},
+    "context_gates": {"type": "array", "items": {"$ref": "#/$defs/ContextGate"}},
+    "hedge_groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["codes", "kind", "basis"],
+        "properties": {
+          "codes": {"type": "array", "minItems": 2, "uniqueItems": true, "items": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"}},
+          "kind": {"$ref": "../schemas/enums.schema.json#/$defs/HedgeKind", "enum": ["SAME_SYSTEM", "DUPLICATE", "PARTIAL_DUPLICATE"]},
+          "basis": {"type": "string"}
+        }
+      }
+    },
+    "moved_to_logical_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sub_id", "code", "title", "logical_rule", "reason"],
+        "properties": {
+          "sub_id": {"$ref": "comparison_rule.schema.json#/$defs/SubId"},
+          "code": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"},
+          "title": {"type": ["string", "null"]},
+          "logical_rule": {"type": ["string", "null"], "pattern": "^HR-(LOG|SEM|GRA|ML)-[0-9]{3}$"},
+          "operator": {"type": ["string", "null"]},
+          "evaluate_on": {"type": ["array", "null"]},
+          "tolerance": {"type": ["object", "null"]},
+          "reason": {"type": "string"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "Sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path", "sha256"],
+        "properties": {
+          "path": {"type": "string"},
+          "sha256": {"$ref": "../schemas/common.schema.json#/$defs/Sha256"}
+        }
+      }
+    },
+    "AliasCode": {
+      "description": "M-xxx, ТЗ/Приложение 2 short Latin (KR-55) or Cyrillic (КР-55) form (97 §2.9).",
+      "type": "string",
+      "maxLength": 20,
+      "pattern": "^(M-[0-9]{3}|(PZ|SPZU|AR|KR|IOS[1-5]|POS|POD|OOS|PPM|ODI|ZU|SM|ПЗ|СПЗУ|АР|КР|ИОС[1-5]|ПОС|ПОД|ООС|ППМ|ОДИ|ЗУ|СМ)-[0-9]{2,3})$"
+    },
+    "Reference": {
+      "description": "One web-verified normative reference (src/norms, checked 2026-09-27). `ref` is the ТЗ §8.1 display form «СП 1.13130.2020, п. 4.2.1»; `matrix_cited` is what the Matrix cited.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "confidence", "status", "designation"],
+      "properties": {
+        "ref": {"type": "string", "minLength": 1},
+        "confidence": {"$ref": "../schemas/enums.schema.json#/$defs/ReferenceConfidence"},
+        "status": {"$ref": "#/$defs/NormRefStatus"},
+        "designation": {"type": "string", "minLength": 1},
+        "clause": {"type": ["string", "null"]},
+        "edition": {"type": ["string", "null"]},
+        "matrix_cited": {"type": ["string", "null"]},
+        "condition": {"type": ["string", "null"]},
+        "value": {"type": ["string", "null"]},
+        "url": {"type": ["string", "null"]},
+        "quote": {"type": ["string", "null"]},
+        "note": {"type": "string"}
+      }
+    },
+    "NormRefStatus": {
+      "description": "Verification status of a normative reference (seed vocabulary, proposed to AG-00 as enum NormRefStatus; norms.yaml reference_status).",
+      "enum": ["CONFIRMED", "CORRECTED", "OUTDATED", "NOT_FOUND", "ADDED"]
+    },
+    "NormThresholdStatus": {
+      "description": "Verdict on the matrix threshold (seed vocabulary, proposed to AG-00 as enum NormThresholdStatus; norms.yaml threshold_status).",
+      "enum": ["CONFIRMED", "CORRECTED", "CONDITIONAL", "MATRIX_STRICTER_THAN_NORM", "CUSTOMER_THRESHOLD", "RULE_BASED", "NOT_NORMATIVE", "OBJECT_SPECIFIC", "NO_BASIS_FOUND"]
+    },
+    "EditionRule": {
+      "description": "Edition registry entry that concerns the parameter (90 C-50): the designation in force is chosen by the PD approval date (PD_APPROVAL_DATE) or by the date of the event (EVENT_DATE).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["designation", "applies_by"],
+      "properties": {
+        "designation": {"type": "string", "minLength": 1},
+        "replaced_by": {"type": "string", "minLength": 1},
+        "effective_from": {"type": "string", "format": "date", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "valid_until": {"type": "string", "format": "date", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "applies_by": {"enum": ["PD_APPROVAL_DATE", "EVENT_DATE"]}
+      },
+      "oneOf": [{"required": ["replaced_by", "effective_from"]}, {"required": ["valid_until"]}]
+    },
+    "NormVerification": {
+      "description": "Result of the web verification of the parameter's norms (src/norms/*.json merged by build_templates.py).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checked_at", "record", "threshold", "notes", "references_not_found", "edition_rules", "regime_changes", "threshold_decision"],
+      "properties": {
+        "checked_at": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+        "record": {"type": "string", "pattern": "^M-[0-9]{3}$"},
+        "threshold": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["status", "staging_status", "min_value", "max_value", "unit", "condition"],
+          "properties": {
+            "status": {"$ref": "#/$defs/NormThresholdStatus"},
+            "staging_status": {"type": "string"},
+            "min_value": {"type": ["number", "null"]},
+            "max_value": {"type": ["number", "null"]},
+            "unit": {"type": ["string", "null"]},
+            "condition": {"type": ["string", "null"]}
+          }
+        },
+        "notes": {"type": ["string", "null"]},
+        "references_not_found": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["cited", "designation", "confidence"],
+            "properties": {
+              "cited": {"type": ["string", "null"]},
+              "designation": {"type": "string"},
+              "clause": {"type": ["string", "null"]},
+              "confidence": {"$ref": "../schemas/enums.schema.json#/$defs/ReferenceConfidence"},
+              "note": {"type": ["string", "null"]}
+            }
+          }
+        },
+        "edition_rules": {"type": "array", "items": {"$ref": "#/$defs/EditionRule"}},
+        "regime_changes": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}},
+        "threshold_decision": {"type": ["string", "null"], "description": "AG-03 decision on the thresholds after the verification (norms.yaml threshold_decisions)."}
+      }
+    },
+    "RegexExample": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text"],
+      "properties": {
+        "text": {"type": "string", "minLength": 1},
+        "discipline": {"type": "string"},
+        "value": {"type": "string"},
+        "groups": {"type": "object", "additionalProperties": {"type": "string"}}
+      }
+    },
+    "TextOrigin": {"$ref": "../schemas/enums.schema.json#/$defs/TextOrigin", "enum": ["APPENDIX2", "AG03_DRAFT"]},
+    "SourceDoc": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["doc_kind", "raw"],
+      "properties": {
+        "discipline": {"type": "string"},
+        "doc_kind": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+        "raw": {"type": "string"},
+        "checklist_refs": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "ContextGate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "description", "window_chars", "default"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+        "description": {"type": "string"},
+        "window_chars": {"type": "integer", "minimum": 1, "maximum": 400},
+        "accept_if_groups": {"type": "array", "items": {"type": "string"}},
+        "require_any": {"type": "array", "items": {"type": "string", "maxLength": 512}},
+        "reject_any": {"type": "array", "items": {"type": "string", "maxLength": 512}},
+        "accept_disciplines": {"type": "array", "items": {"type": "string"}},
+        "reject_disciplines": {"type": "array", "items": {"type": "string"}},
+        "default": {"enum": ["accept", "reject"]}
+      }
+    },
+    "Param": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "param_id", "code", "alias_codes", "matrix_row", "mapping_status", "section", "pd_section", "parameter_name",
+        "short_name", "unit", "data_type", "source_pd", "source_rd", "source_id", "trigger_logic", "criticality",
+        "criticality_level", "review_priority", "min_value", "max_value", "comparison_rule", "atomic_sub_checks",
+        "stages_required", "applicability_conditions", "feasibility_tier", "regex_pattern", "regex_aux", "regex_gates",
+        "regex_flags", "regex_examples", "semantic_anchors", "sp_reference", "gost_reference", "fz_reference",
+        "other_normative", "references", "linked_params", "hedge_group", "element_nouns", "work_type",
+        "deviation_verb", "recommendation_template", "text_sources", "demo_priority", "is_active", "norm_verification"
+      ],
+      "properties": {
+        "param_id": {"$ref": "../schemas/common.schema.json#/$defs/ParamId"},
+        "code": {"allOf": [{"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"}, {"maxLength": 20}]},
+        "alias_codes": {"type": "array", "minItems": 3, "uniqueItems": true, "items": {"$ref": "#/$defs/AliasCode"}},
+        "matrix_row": {"type": "integer", "minimum": 1},
+        "mapping_status": {"$ref": "../schemas/enums.schema.json#/$defs/ParameterMappingStatus"},
+        "section": {"type": "string", "maxLength": 50, "enum": ["ПЗ", "СПЗУ", "АР", "КР", "ИОС1", "ИОС2", "ИОС3", "ИОС4", "ИОС5", "ПОС", "ПОД", "ООС", "ППМ", "ОДИ", "ЗУ", "СМ"]},
+        "pd_section": {"type": "string", "pattern": "^Раздел [0-9]{1,2}\\. "},
+        "matrix_section_no": {"type": "integer", "minimum": 1, "maximum": 12},
+        "pp87_section_no": {"type": "string"},
+        "parameter_name": {"type": "string", "minLength": 1, "maxLength": 255},
+        "short_name": {"type": "string", "minLength": 2, "maxLength": 60},
+        "name_variants": {"type": "array", "items": {"type": "string", "minLength": 2}},
+        "unit": {"type": ["string", "null"], "maxLength": 20},
+        "unit_canonical": {"type": ["string", "null"]},
+        "data_type": {"$ref": "../schemas/enums.schema.json#/$defs/DataType"},
+        "source_pd": {"type": ["string", "null"]},
+        "source_rd": {"type": ["string", "null"]},
+        "source_id": {"type": ["string", "null"]},
+        "source_docs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pd", "rd", "id", "id_checklist_refs", "tz6_mapping"],
+          "properties": {
+            "pd": {"type": "array", "items": {"$ref": "#/$defs/SourceDoc"}},
+            "rd": {"type": "array", "items": {"$ref": "#/$defs/SourceDoc"}},
+            "id": {"type": "array", "items": {"$ref": "#/$defs/SourceDoc"}},
+            "id_checklist_refs": {"type": "array", "items": {"type": "string"}},
+            "tz6_mapping": {"type": "object"}
+          }
+        },
+        "trigger_logic": {"type": "string"},
+        "criticality": {"enum": ["Критическое (приостановка работ)", "Существенное (предписание)"]},
+        "criticality_level": {"$ref": "../schemas/enums.schema.json#/$defs/CriticalityLevel", "enum": ["CRITICAL_SUSPEND", "SUBSTANTIAL_ORDER"]},
+        "review_priority": {"allOf": [{"$ref": "../schemas/enums.schema.json#/$defs/ReviewPriority"}, {"maxLength": 20}]},
+        "review_priority_matrix_text": {"type": ["string", "null"]},
+        "risk_level_default": {"$ref": "../schemas/enums.schema.json#/$defs/RiskLevel"},
+        "min_value": {"type": ["number", "null"]},
+        "max_value": {"type": ["number", "null"]},
+        "threshold_source": {"$ref": "../schemas/enums.schema.json#/$defs/ThresholdSource", "enum": ["MATRIX_TRIGGER", "NONE", "NORMATIVE", "PD_VALUE", "OBJECT_GPZU", "ADMIN_REQUIRED", "SHEET_OR_NORMATIVE", "NORMATIVE_OVERRIDE"]},
+        "threshold_note": {"type": ["string", "null"]},
+        "matrix_trigger_value": {"type": ["object", "null"]},
+        "comparison_rule": {"$ref": "comparison_rule.schema.json"},
+        "atomic_sub_checks": {"type": "array", "items": {"$ref": "comparison_rule.schema.json#/$defs/SubId"}, "uniqueItems": true},
+        "stages_required": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["pairs", "min_pairs", "sufficient_sets", "single_stage_check", "missing_stage_policy"],
+          "properties": {
+            "pairs": {"type": "array", "minItems": 1, "items": {"enum": ["PD-RD", "RD-ID", "PD-ID"]}, "uniqueItems": true},
+            "min_pairs": {"type": "integer", "minimum": 1},
+            "sufficient_sets": {"type": "array", "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "../schemas/enums.schema.json#/$defs/DocStage"}}},
+            "single_stage_check": {"anyOf": [{"type": "null"}, {"$ref": "../schemas/enums.schema.json#/$defs/RuleType"}]},
+            "missing_stage_policy": {"enum": ["PHASE_BASED"]},
+            "note": {"type": "string"}
+          }
+        },
+        "applicability_conditions": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["logic", "text", "default_applicable"],
+          "properties": {
+            "logic": {"type": "object"},
+            "text": {"type": "string"},
+            "default_applicable": {"type": "boolean"},
+            "positive_anchors": {"type": "array", "items": {"type": "string"}},
+            "negative_anchors": {"type": "array", "items": {"type": "string"}}
+          }
+        },
+        "element_key": {"type": ["string", "null"]},
+        "extraction_method": {"$ref": "#/$defs/ExtractionStrategy"},
+        "extraction_methods_all": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/ExtractionStrategy"}},
+        "feasibility_tier": {"$ref": "../schemas/enums.schema.json#/$defs/FeasibilityTier", "enum": ["A", "B", "C", "D"]},
+        "feasibility_note": {"type": ["string", "null"]},
+        "regex_pattern": {"type": "string", "minLength": 1, "maxLength": 255},
+        "regex_aux": {"type": "array", "items": {"type": "string", "minLength": 1, "maxLength": 512}},
+        "regex_gates": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}, "uniqueItems": true},
+        "regex_flags": {"type": "string"},
+        "regex_examples": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["positive", "negative"],
+          "properties": {
+            "positive": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/RegexExample"}},
+            "negative": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/RegexExample"}}
+          }
+        },
+        "semantic_anchors": {"type": "array", "items": {"type": "string", "minLength": 1}},
+        "sp_reference": {"type": ["string", "null"]},
+        "gost_reference": {"type": ["string", "null"]},
+        "fz_reference": {"type": ["string", "null"]},
+        "other_normative": {"type": ["string", "null"]},
+        "references": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["sp", "gost", "fz", "other"],
+          "properties": {
+            "sp": {"type": "array", "items": {"$ref": "#/$defs/Reference"}},
+            "gost": {"type": "array", "items": {"$ref": "#/$defs/Reference"}},
+            "fz": {"type": "array", "items": {"$ref": "#/$defs/Reference"}},
+            "other": {"type": "array", "items": {"$ref": "#/$defs/Reference"}}
+          }
+        },
+        "reference_confidence_min": {"anyOf": [{"type": "null"}, {"$ref": "../schemas/enums.schema.json#/$defs/ReferenceConfidence"}]},
+        "norm_verification": {"$ref": "#/$defs/NormVerification"},
+        "linked_params": {"type": "array", "items": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"}, "uniqueItems": true},
+        "hedge_group": {"type": "array", "items": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"}, "uniqueItems": true},
+        "element_nouns": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
+        "work_type": {"type": "string", "minLength": 3},
+        "deviation_verb": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": {"$ref": "../schemas/enums.schema.json#/$defs/DiscrepancyType"},
+          "additionalProperties": {"type": "string", "minLength": 3}
+        },
+        "recommendation_template": {"type": "string", "minLength": 10},
+        "text_sources": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["short_name", "work_type", "recommendation_template"],
+          "properties": {
+            "short_name": {"$ref": "#/$defs/TextOrigin"},
+            "work_type": {"$ref": "#/$defs/TextOrigin"},
+            "recommendation_template": {"$ref": "#/$defs/TextOrigin"}
+          }
+        },
+        "demo_priority": {"type": "integer", "minimum": 1, "maximum": 3},
+        "pilot_evidence": {"type": "array"},
+        "is_active": {"type": "boolean"},
+        "notes": {"type": ["string", "null"]}
+      },
+      "allOf": [
+        {"if": {"properties": {"criticality": {"const": "Критическое (приостановка работ)"}}},
+         "then": {"properties": {"criticality_level": {"const": "CRITICAL_SUSPEND"}, "review_priority": {"const": "HIGH"}}}},
+        {"if": {"properties": {"criticality": {"const": "Существенное (предписание)"}}},
+         "then": {"properties": {"criticality_level": {"const": "SUBSTANTIAL_ORDER"}, "review_priority": {"const": "MEDIUM"}}}}
+      ]
+    },
+    "ExtractionStrategy": {
+      "$ref": "../schemas/enums.schema.json#/$defs/ParamExtractionStrategy",
+      "description": "Planned extraction strategy of the matrix (03 §3.2), not the provenance enum ExtractionMethod. Contract enum ParamExtractionStrategy ($ref); the enum copy is kept for the drift test.",
+      "enum": ["TABLE_TEXT", "FREE_TEXT_REGEX", "SPEC_TABLE", "DRAWING_GEOMETRY", "SEMANTIC", "EXTERNAL_SYSTEM", "MANUAL"]
+    }
+  }
+}

@@ -1,0 +1,89 @@
+# Docker proof: the whole product from `docker compose up` on a stock ubuntu-latest runner (Linux x86_64, no GPU).
+# Builds the images, starts every service, logs in as the demo inspector, uploads a small generated package
+# (zip with пд/ and рд/), waits for the process to become READY, checks the protocol and a page image through nginx.
+# Not part of ci.yml on purpose: it builds ~4 GB of images and needs the network for the OCR models (modelscope.cn).
+name: Docker
+
+on:
+  push:
+    paths-ignore:
+      - "docs/**"
+      - "**/*.md"
+  workflow_dispatch:
+
+concurrency:
+  group: docker-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Free disk space (the images are large)
+        run: |
+          sudo rm -rf /usr/share/dotnet /opt/ghc /usr/local/lib/android /opt/hostedtoolcache/CodeQL || true
+          df -h /
+          docker version
+          docker compose version
+
+      - name: Validate the compose files
+        run: |
+          docker compose -f docker-compose.yml config --quiet
+          docker compose -f docker-compose.yml -f docker-compose.gpu.yml config --quiet
+          INSPECTOR_DATA_HOST_PATH=/tmp docker compose -f docker-compose.yml -f docker-compose.data.yml config --quiet
+
+      - name: docker compose build
+        run: docker compose build --progress=plain
+
+      - name: Image sizes
+        run: docker image ls --format 'table {{.Repository}}:{{.Tag}}\t{{.Size}}'
+
+      - name: docker compose up -d
+        run: docker compose up -d
+
+      - name: Wait until every service is healthy
+        run: |
+          set -u
+          migrate_id=$(docker compose ps -aq migrate)
+          echo "migrate exit code: $(docker inspect -f '{{.State.ExitCode}}' "$migrate_id")"
+          test "$(docker inspect -f '{{.State.ExitCode}}' "$migrate_id")" = 0
+          for svc in postgres redis rabbitmq api ml-api web; do
+            cid=$(docker compose ps -q "$svc")
+            status=unknown
+            for _ in $(seq 1 120); do
+              status=$(docker inspect -f '{{if .State.Health}}{{.State.Health.Status}}{{else}}no-healthcheck{{end}}' "$cid")
+              [ "$status" = healthy ] && break
+              sleep 5
+            done
+            echo "$svc: $status"
+            [ "$status" = healthy ] || exit 1
+          done
+          docker compose ps
+
+      - name: Health endpoints (api through nginx, ml-api inside its container, web)
+        run: |
+          curl -fsS http://localhost:8080/api/v1/health; echo
+          docker compose exec -T ml-api python -c "import urllib.request; print(urllib.request.urlopen('http://127.0.0.1:8090/health', timeout=5).read().decode())"
+          curl -fsS -o /dev/null -w 'web: HTTP %{http_code}\n' http://localhost:8080/
+
+      - name: Generate the smoke package (PyMuPDF from the api image)
+        run: |
+          docker compose exec -T api python - /tmp/smoke.zip < tools/ci/make_smoke_package.py
+          docker compose cp api:/tmp/smoke.zip ./smoke.zip
+          ls -l smoke.zip
+
+      - name: Login, upload, READY, protocol, page image
+        run: python3 tools/ci/docker_smoke.py --base-url http://localhost:8080 --package smoke.zip --timeout 900
+
+      - name: Logs on failure
+        if: failure()
+        run: |
+          docker compose ps -a || true
+          docker compose logs --no-color --tail=400 || true
+
+      - name: docker compose down -v
+        if: always()
+        run: docker compose down -v --remove-orphans

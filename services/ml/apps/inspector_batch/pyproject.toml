@@ -1,0 +1,35 @@
+[project]
+name = "inspector-batch"
+version = "0.1.0"
+description = "Инспектор ИИ: inspector-batch CLI (native, no DB/RabbitMQ): inventory, recognize, layout, tables, compare, export, score, bench, run"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "inspector-common",
+    "inspector-registry",
+    "inspector-docproc",
+    "inspector-layout",
+    "inspector-tables",
+    "inspector-eval",
+    "inspector-compare",
+    "inspector-hypothesis",
+]
+
+[project.scripts]
+inspector-batch = "inspector_batch.cli:entrypoint"
+
+[tool.uv.sources]
+inspector-common = { workspace = true }
+inspector-registry = { workspace = true }
+inspector-docproc = { workspace = true }
+inspector-layout = { workspace = true }
+inspector-tables = { workspace = true }
+inspector-eval = { workspace = true }
+inspector-compare = { workspace = true }
+inspector-hypothesis = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inspector_batch"]

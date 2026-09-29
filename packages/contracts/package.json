@@ -1,0 +1,29 @@
+{
+  "name": "@inspector/contracts",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Контракты «Инспектор ИИ»: enums.yaml, codes.yaml, errors.yaml, JSON Schema 2020-12 (источник истины для Python и TypeScript)",
+  "files": [
+    "enums.yaml",
+    "codes.yaml",
+    "errors.yaml",
+    "vendored.yaml",
+    "run_layout.yaml",
+    "rbac.yaml",
+    "schemas",
+    "examples",
+    "vectors",
+    "seed",
+    "openapi"
+  ],
+  "exports": {
+    "./schemas/*": "./schemas/*",
+    "./enums.yaml": "./enums.yaml",
+    "./codes.yaml": "./codes.yaml",
+    "./errors.yaml": "./errors.yaml",
+    "./vectors/*": "./vectors/*",
+    "./run_layout.yaml": "./run_layout.yaml",
+    "./openapi/*": "./openapi/*",
+    "./rbac.yaml": "./rbac.yaml"
+  }
+}

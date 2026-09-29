@@ -1,0 +1,2039 @@
+# «Инспектор ИИ» — change_matrix_map: element family × discrepancy type → parameter code (97 §2.10, 93 §3.8).
+# Owner: AG-03. Consumers: AG-04 (comparators/exporter), AG-07 (FREE-* path). Built into change_matrix_map.json.
+#
+# Policy («learned from T», i.e. from the organizers' train gold on OBJ-TYUMENSKAYA-5-GOLD-SEED):
+# - A change is reported under the closest matrix parameter OF THE SAME ENGINEERING SYSTEM whose element family
+#   it touches, even when the trigger wording differs → PROVISIONAL_DOMAIN_MAPPING (gold: ventilation → IOS4-078/079).
+# - A family no matrix parameter of its system covers is a matrix gap → FREE-<TOPIC> + MATRIX_GAP_CONFIRMED
+#   (gold: warm floors → FREE-HEATING-001). NNN is numbered per finding group at export (FreeTopic vocabulary).
+# - Directional triggers are enforced: a change in the non-violating direction does not emit (emit: false).
+# - Additions and relocations are context, not findings (emit: false); ИД≠РД only in the violating direction.
+# - Top-2 hedging uses hedge_codes (from params.json hedge_groups) when the runner-up has p ≥ 0.1 (97 §1.6).
+#
+# Route fields: discrepancy_types (enums.DiscrepancyType, each mapped to ONE comparison_result via
+# enums.yaml mappings.discrepancy_to_comparison_result), parameter_code (catalog code | FREE-<TOPIC> | null),
+# parameter_mapping_status, emit, sub_check (the DSL sub-check that evaluates it), hedge_codes,
+# value_templates {pd, rd, id} mirroring the gold phrasing (93 §3.5), basis:
+#   GOLD:<group>   — organizer train gold;  MATRIX — the catalog trigger names this element/change literally;
+#   ANALOGY        — the 97 §2.10 rule applied to a family not seen in gold (provisional, review);
+#   USER:Q4x       — user decision on 97 Q4 (КР routing); CONTEXT — non-emitting by policy.
+# Placeholders in value_templates: {pd_value} {rd_value} {id_value} {pd_sheet} {rd_plan_mark} {location}.
+
+schema_version: 1
+policy:
+  max_free_groups_per_object: 5
+  hedge_min_runner_up_p: 0.1
+  hedge_budget_share_of_critical: 0.2
+
+families:
+  # ─────────────────────────────── ИОС4: вентиляция (gold: G-TR-001, G-TR-003, G-TR-004) ───────────────────────────────
+  - family: VENT_SUPPLY_UNIT
+    label_ru: Приточные установки общеобменной вентиляции
+    section: ИОС4
+    disciplines: [ОВ]
+    topic: VENTILATION
+    tag_patterns: ['^П\d{1,2}(?:\.\d{1,2})?$']
+    anchors: [приточная установка, вентагрегат, венткамера, приточная система]
+    routes:
+      - discrepancy_types: [CONFIGURATION_CHANGED, FUNCTION_CHANGED]
+        parameter_code: IOS4-079
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: IOS4-079.b
+        hedge_codes: [IOS4-078]
+        basis: GOLD:G-TR-001
+        value_templates: {pd: 'Конфигурация приточных установок по листу {pd_sheet} ПД', rd: 'Иная конфигурация на плане {rd_plan_mark}, помещение {location}', id: null}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: IOS4-079
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: IOS4-079.b
+        hedge_codes: [IOS4-078]
+        basis: ANALOGY
+        value_templates: {pd: 'Приточная установка предусмотрена', rd: 'Приточная установка отсутствует', id: null}
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: IOS4-079
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: IOS4-079.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: IOS4-079
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «подмена на аналоги с меньшей кратностью»; рост производительности не нарушение
+      - discrepancy_types: [ELEMENT_ADDED]
+        parameter_code: null
+        comparison_result: EXTRA_ELEMENT
+        emit: false
+        basis: CONTEXT
+        reason: добавления — контекст, не нарушение (97 §2.10)
+
+  - family: VENT_EXHAUST_UNIT
+    label_ru: Вытяжные установки и вентиляторы общеобменной вентиляции
+    section: ИОС4
+    disciplines: [ОВ]
+    topic: VENTILATION
+    tag_patterns: ['^В[ЕД]?\d{1,2}(?:\.\d{1,2})?$']
+    anchors: [вытяжная установка, вытяжной вентилятор, крышный вентилятор]
+    routes:
+      - discrepancy_types: [CONFIGURATION_CHANGED, FUNCTION_CHANGED]
+        parameter_code: IOS4-079
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: IOS4-079.b
+        hedge_codes: [IOS4-078]
+        basis: ANALOGY
+        value_templates: {pd: 'Конфигурация вытяжных установок по листу {pd_sheet} ПД', rd: 'Иная конфигурация на плане {rd_plan_mark}, помещение {location}', id: null}
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: IOS4-079
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: IOS4-079.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_ADDED]
+        parameter_code: null
+        comparison_result: EXTRA_ELEMENT
+        emit: false
+        basis: CONTEXT
+        reason: добавления — контекст, не нарушение (97 §2.10)
+
+  - family: VENT_EXHAUST_BRANCH
+    label_ru: Вытяжная вентиляция помещений (ветви, местные отсосы)
+    section: ИОС4
+    disciplines: [ОВ]
+    topic: VENTILATION
+    tag_patterns: ['^В\d{1,2}\.\d{1,2}$']
+    anchors: [вытяжная вентиляция, местный отсос, вытяжная ветвь, «М.О.»]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: IOS4-078
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: IOS4-078.b
+        hedge_codes: [IOS4-079]
+        basis: GOLD:G-TR-003
+        value_templates: {pd: 'Вытяжная вентиляция предусмотрена', rd: 'Вытяжная вентиляция отсутствует', id: null}
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: IOS4-078
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: IOS4-078.b
+        hedge_codes: [IOS4-079]
+        basis: GOLD:G-TR-004
+        value_templates: {pd: 'Конфигурация вентиляции по листу {pd_sheet} ПД', rd: 'Конфигурация вентиляции изменена', id: null}
+      - discrepancy_types: [ELEMENT_ADDED, UNDOCUMENTED_WORK]
+        parameter_code: null
+        comparison_result: EXTRA_ELEMENT
+        emit: false
+        basis: CONTEXT
+        reason: добавленные ветви — контекст (97 §2.10); перенумерация ветвей не является нарушением
+      - discrepancy_types: [POSITION_SHIFTED]
+        parameter_code: null
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: перенос без изменения состава по помещению — контекст (97 §2.10)
+
+  - family: VENT_DUCT
+    label_ru: Воздуховоды общеобменной вентиляции (сечения)
+    section: ИОС4
+    disciplines: [ОВ]
+    topic: VENTILATION
+    anchors: [воздуховод, сечение воздуховода]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: IOS4-078
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: IOS4-078.a
+        hedge_codes: [IOS4-079]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: IOS4-078
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «уменьшение площади сечения»
+
+  - family: SMOKE_CONTROL_FAN
+    label_ru: Вентиляторы дымоудаления и подпора воздуха
+    section: ППМ
+    disciplines: [ОВ, ПБ]
+    topic: FIRE
+    tag_patterns: ['^(?:ДУ|ДВ|ПД|ВД|КД)\d{1,2}$']
+    anchors: [дымоудаление, подпор воздуха, противодымная вентиляция]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: PPM-112
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: PPM-112
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Система противодымной вентиляции предусмотрена', rd: 'Система противодымной вентиляции отсутствует', id: null}
+
+  - family: FIRE_DAMPER
+    label_ru: Огнезадерживающие клапаны
+    section: ППМ
+    disciplines: [ОВ, ПБ]
+    topic: FIRE
+    anchors: [огнезадерживающий клапан, ОЗК]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: PPM-111
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: PPM-111.b
+        basis: MATRIX
+        value_templates: {pd: 'Огнезадерживающий клапан предусмотрен', rd: 'Огнезадерживающий клапан отсутствует', id: null}
+      - discrepancy_types: [CLASS_DOWNGRADED]
+        parameter_code: PPM-111
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: PPM-111.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  # ─────────────────────────────── ИОС4: отопление (gold: G-TR-002) ───────────────────────────────
+  - family: WARM_FLOOR
+    label_ru: Тёплые полы (напольное отопление)
+    section: ИОС4
+    disciplines: [ОВ]
+    topic: HEATING
+    anchors: [тёплый пол, теплый пол, контур тёплого пола, напольное отопление, Multibox]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: FREE-HEATING
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: GOLD:G-TR-002
+        value_templates: {pd: 'Тёплый пол предусмотрен', rd: 'Тёплый пол отсутствует', id: null}
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: FREE-HEATING
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Конфигурация тёплого пола по листу {pd_sheet} ПД', rd: 'Конфигурация тёплого пола изменена', id: null}
+      - discrepancy_types: [ELEMENT_ADDED]
+        parameter_code: null
+        comparison_result: EXTRA_ELEMENT
+        emit: false
+        basis: CONTEXT
+        reason: добавления — контекст, не нарушение (97 §2.10)
+
+  - family: HEATING_DEVICE
+    label_ru: Отопительные приборы (радиаторы, конвекторы)
+    section: ИОС4
+    disciplines: [ОВ]
+    topic: HEATING
+    anchors: [радиатор, конвектор, отопительный прибор]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, COUNT_CHANGED]
+        parameter_code: IOS4-077
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: IOS4-077.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: IOS4-077
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: IOS4-077.c
+        basis: ANALOGY
+        value_templates: {pd: 'Отопительный прибор предусмотрен', rd: 'Отопительный прибор отсутствует', id: null}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: IOS4-077
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «сокращение количества секций / меньшая теплоотдача»
+
+  - family: HEATING_PIPE
+    label_ru: Трубопроводы отопления Т1/Т2 (магистрали, стояки)
+    section: ИОС4
+    disciplines: [ОВ, ТС]
+    topic: HEATING
+    tag_patterns: ['^Т(?:1|2|11|21)$']
+    anchors: [трубопровод отопления, стояк отопления, магистраль Т1]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, VALUE_INCREASED, VALUE_CHANGED]
+        parameter_code: IOS4-076
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: HEAT_POINT
+    label_ru: Тепловой пункт (ИТП) и его оборудование
+    section: ИОС4
+    disciplines: [ОВ, ТМ]
+    topic: HEATING
+    anchors: [ИТП, тепловой пункт, теплообменник]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: FREE-HEATING
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Оборудование теплового пункта предусмотрено', rd: 'Оборудование теплового пункта отсутствует', id: null}
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: FREE-HEATING
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Конфигурация теплового пункта по листу {pd_sheet} ПД', rd: 'Конфигурация теплового пункта изменена', id: null}
+
+  - family: HEAT_LOAD
+    label_ru: Тепловая нагрузка объекта
+    section: ПЗ
+    disciplines: [ПЗ, ОВ]
+    topic: HEATING
+    anchors: [тепловая нагрузка, теплопотребление]
+    routes:
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: PZ-017
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: PZ-017
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «превышение суммарной тепловой нагрузки»
+
+  # ─────────────────────────────── ИОС2/ИОС3: водоснабжение и канализация ───────────────────────────────
+  - family: WATER_PIPE
+    label_ru: Трубопроводы водоснабжения В1/Т3/Т4
+    section: ИОС2
+    disciplines: [ВК]
+    topic: WATER
+    tag_patterns: ['^(?:В1|Т3|Т4)$']
+    anchors: [стояк В1, магистраль ХВС, трубопровод ГВС]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: IOS2-071
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: IOS2-072
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: IOS2-072.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: IOS2-071
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «уменьшение диаметров»
+
+  - family: WATER_PUMP
+    label_ru: Насосные установки хозяйственно-питьевого водоснабжения
+    section: ИОС2
+    disciplines: [ВК]
+    topic: WATER
+    anchors: [насосная установка, повысительная насосная станция]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: IOS2-073
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: IOS2-073
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Насосная установка предусмотрена', rd: 'Насосная установка отсутствует', id: null}
+
+  - family: SANITARY_FIXTURE
+    label_ru: Санитарные приборы
+    section: ИОС2
+    disciplines: [ВК]
+    topic: WATER
+    anchors: [умывальник, унитаз, санитарный прибор, мойка]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: FREE-WATER
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Санитарный прибор предусмотрен', rd: 'Санитарный прибор отсутствует', id: null}
+
+  - family: SEWER_PIPE
+    label_ru: Выпуски и магистрали канализации К1/К2
+    section: ИОС3
+    disciplines: [ВК]
+    topic: SEWER
+    tag_patterns: ['^К[123]$']
+    anchors: [выпуск канализации, бытовая канализация, внутренний водосток]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: IOS3-074
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: IOS3-075
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: IOS3-074
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «уменьшение диаметров выпусков»
+
+  - family: ROOF_DRAIN
+    label_ru: Водосточные воронки кровли
+    section: АР
+    disciplines: [АР, ВК]
+    topic: ROOF
+    anchors: [водосточная воронка]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED]
+        parameter_code: AR-045
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: AR-045.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: AR-045
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: AR-045.b
+        basis: ANALOGY
+        value_templates: {pd: 'Водосточная воронка предусмотрена', rd: 'Водосточная воронка отсутствует', id: null}
+
+  - family: FIRE_WATER_INTERNAL
+    label_ru: Внутренний противопожарный водопровод (пожарные краны)
+    section: ППМ
+    disciplines: [ВК, ПБ]
+    topic: FIRE
+    anchors: [пожарный кран, ВПВ]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, COUNT_CHANGED]
+        parameter_code: PPM-113
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: PPM-113
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Пожарный кран предусмотрен', rd: 'Пожарный кран отсутствует', id: null}
+
+  - family: FIRE_HYDRANT
+    label_ru: Наружное пожаротушение (гидранты)
+    section: ППМ
+    disciplines: [НВК, ПБ, ГП]
+    topic: FIRE
+    anchors: [пожарный гидрант, наружное пожаротушение]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: PPM-114
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: PPM-114
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Пожарный гидрант предусмотрен', rd: 'Пожарный гидрант отсутствует', id: null}
+
+  # ─────────────────────────────── ИОС1: электроснабжение, освещение ───────────────────────────────
+  - family: SWITCHGEAR_PROTECTION
+    label_ru: Аппараты защиты ВРУ/ГРЩ
+    section: ИОС1
+    disciplines: [ЭОМ, ЭС]
+    topic: ELECTRICAL
+    anchors: [ВРУ, ГРЩ, автоматический выключатель]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, VALUE_INCREASED, VALUE_CHANGED]
+        parameter_code: IOS1-068
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: POWER_CABLE
+    label_ru: Распределительные и питающие кабели
+    section: ИОС1
+    disciplines: [ЭОМ, ЭС]
+    topic: ELECTRICAL
+    anchors: [кабель, сечение жил, кабельная линия]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: IOS1-069
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: IOS1-069.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [CLASS_DOWNGRADED, MATERIAL_SUBSTITUTED]
+        parameter_code: IOS1-069
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: IOS1-069.b
+        hedge_codes: [PPM-109]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: IOS1-069
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «занижение сечения»
+
+  - family: FIRE_SAFETY_CABLE
+    label_ru: Кабели систем противопожарной защиты (FR)
+    section: ППМ
+    disciplines: [ЭОМ, СС, ПБ]
+    topic: FIRE
+    anchors: [FRLS, FRHF, огнестойкий кабель, кабель СПЗ]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED, MATERIAL_SUBSTITUTED]
+        parameter_code: PPM-109
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: PPM-109.b
+        hedge_codes: [IOS1-069]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: GROUNDING
+    label_ru: Заземление и молниезащита
+    section: ИОС1
+    disciplines: [ЭОМ, ЭС]
+    topic: ELECTRICAL
+    anchors: [заземлитель, молниеприёмник, контур заземления]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED, VALUE_DECREASED]
+        parameter_code: IOS1-070
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: IOS1-070.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: IOS1-070
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: IOS1-070.a
+        basis: MATRIX
+        value_templates: {pd: 'Элементы молниезащиты предусмотрены', rd: 'Элементы молниезащиты отсутствуют', id: null}
+
+  - family: LIGHTING_FIXTURE
+    label_ru: Светильники и источники света
+    section: ЗУ
+    disciplines: [ЭОМ, ЭО]
+    topic: LIGHTING
+    anchors: [светильник, светодиодный, люминесцентный]
+    routes:
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: ZU-130
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: FREE-LIGHTING
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Освещение предусмотрено', rd: 'Освещение отсутствует', id: null}
+
+  - family: ENERGY_METER
+    label_ru: Приборы учёта энергоресурсов
+    section: ЗУ
+    disciplines: [ЭОМ, ВК, ОВ, ТМ]
+    topic: ENERGY
+    anchors: [узел учёта, прибор учёта, счётчик]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: ZU-129
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: 'Прибор учёта предусмотрен', rd: 'Прибор учёта отсутствует', id: null}
+      - discrepancy_types: [COUNT_CHANGED]
+        parameter_code: ZU-129
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: POWER_LOAD
+    label_ru: Расчётная электрическая мощность объекта
+    section: ПЗ
+    disciplines: [ПЗ, ЭОМ, ЭС]
+    topic: ELECTRICAL
+    anchors: [расчётная мощность, Рр]
+    routes:
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: PZ-014
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: PZ-014
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «превышение расчётной мощности»
+
+  # ─────────────────────────────── Пожарная безопасность, СС ───────────────────────────────
+  - family: FIRE_DETECTOR
+    label_ru: Пожарные извещатели (количество, расстановка)
+    section: ППМ
+    disciplines: [СС, АПС, ПБ]
+    topic: FIRE
+    anchors: [извещатель, АПС]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED, VALUE_DECREASED]
+        parameter_code: PPM-108
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: PPM-108.a
+        hedge_codes: [IOS5-080]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: PPM-108
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: PPM-108.a
+        hedge_codes: [IOS5-080]
+        basis: ANALOGY
+        value_templates: {pd: 'Пожарные извещатели предусмотрены', rd: 'Пожарные извещатели отсутствуют', id: null}
+
+  - family: FIRE_ALARM_SYSTEM
+    label_ru: Состав системы пожарной сигнализации (приборы, ЗКПС)
+    section: ИОС5
+    disciplines: [СС, АПС]
+    topic: FIRE
+    anchors: [ЗКПС, прибор приёмно-контрольный, пожарная сигнализация]
+    routes:
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: IOS5-080
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        hedge_codes: [PPM-108]
+        basis: ANALOGY
+        value_templates: {pd: 'Состав системы пожарной сигнализации по листу {pd_sheet} ПД', rd: 'Состав системы пожарной сигнализации изменён', id: null}
+      - discrepancy_types: [COUNT_CHANGED]
+        parameter_code: IOS5-080
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: IOS5-080.a
+        hedge_codes: [PPM-108]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: EVACUATION_ALERT
+    label_ru: Оповещатели СОУЭ и табло «Выход»
+    section: ППМ
+    disciplines: [СС, ПБ]
+    topic: FIRE
+    anchors: [оповещатель, СОУЭ, табло «Выход»]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED]
+        parameter_code: PPM-110
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: PPM-110.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: PPM-110
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: PPM-110.b
+        basis: MATRIX
+        value_templates: {pd: 'Табло «Выход» предусмотрено', rd: 'Табло «Выход» отсутствует', id: null}
+
+  - family: FIRE_DOOR
+    label_ru: Противопожарные двери и ворота
+    section: ППМ
+    disciplines: [АР, ПБ]
+    topic: FIRE
+    anchors: [противопожарная дверь, EI]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED]
+        parameter_code: PPM-103
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: PPM-103.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: PPM-103
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Противопожарная дверь предусмотрена', rd: 'Противопожарная дверь отсутствует', id: null}
+
+  - family: FIRE_COMPARTMENT
+    label_ru: Пожарные отсеки и противопожарные преграды
+    section: ППМ
+    disciplines: [АР, КР, ПБ]
+    topic: FIRE
+    anchors: [пожарный отсек, противопожарная стена, противопожарное перекрытие]
+    routes:
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: PPM-102
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: PPM-102.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: PPM-102
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: PPM-102.c
+        basis: MATRIX
+        value_templates: {pd: 'Противопожарная преграда по листу {pd_sheet} ПД', rd: 'Непрерывность противопожарной преграды нарушена', id: null}
+
+  - family: FIRE_PROTECTION_COATING
+    label_ru: Огнезащита и антикоррозионная защита конструкций
+    section: КР
+    disciplines: [КР, КМ, ПБ]
+    topic: FIRE
+    anchors: [огнезащитное покрытие, огнезащита, антикоррозионное покрытие]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED, MATERIAL_SUBSTITUTED]
+        parameter_code: KR-066
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: KR-066
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: KR-066.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  # ─────────────────────────────── АР, эвакуация, МГН ───────────────────────────────
+  - family: EVAC_CORRIDOR
+    label_ru: Эвакуационные коридоры и проходы (ширина)
+    section: АР
+    disciplines: [АР]
+    topic: EVACUATION
+    anchors: [эвакуационный коридор, ширина коридора, эвакуационный проход]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: AR-040
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        hedge_codes: [PPM-104, ODI-116]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: EVAC_DOOR
+    label_ru: Эвакуационные двери и выходы (ширина)
+    section: АР
+    disciplines: [АР]
+    topic: EVACUATION
+    anchors: [эвакуационный выход, ширина двери в свету]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: AR-041
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        hedge_codes: [PPM-105]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: DOOR_SWING
+    label_ru: Направление открывания эвакуационных дверей
+    section: АР
+    disciplines: [АР]
+    topic: EVACUATION
+    anchors: [открывание по направлению выхода]
+    routes:
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: AR-043
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: AR-043.b
+        hedge_codes: [PPM-106]
+        basis: MATRIX
+        value_templates: {pd: 'Открывание по направлению выхода', rd: 'Открывание против направления выхода', id: null}
+
+  - family: EVAC_HEIGHT
+    label_ru: Высота путей эвакуации и эвакуационных дверей
+    section: АР
+    disciplines: [АР]
+    topic: EVACUATION
+    anchors: [высота в свету]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: AR-042
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: FINISH_MATERIAL
+    label_ru: Отделочные материалы путей эвакуации (класс КМ)
+    section: АР
+    disciplines: [АР, ПБ]
+    topic: FIRE
+    anchors: [отделка, КМ0, КМ1, ведомость отделки]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED, MATERIAL_SUBSTITUTED]
+        parameter_code: AR-050
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: AR-050.b
+        hedge_codes: [PPM-107]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: WINDOW
+    label_ru: Оконные блоки (количество, габариты)
+    section: АР
+    disciplines: [АР]
+    topic: ARCHITECTURE
+    anchors: [оконный блок, ведомость заполнения проёмов]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED, VALUE_DECREASED]
+        parameter_code: AR-046
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: AR-046
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «сокращение количества окон, уменьшение остекления»
+
+  - family: WINDOW_THERMAL
+    label_ru: Теплозащита оконных блоков (Ro)
+    section: ЗУ
+    disciplines: [АР, ЭЭ]
+    topic: ENERGY
+    anchors: [приведённое сопротивление теплопередаче, Ro]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: ZU-127
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [CLASS_DOWNGRADED]
+        parameter_code: ZU-127
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: ROOF_ASSEMBLY
+    label_ru: Состав кровельного пирога
+    section: АР
+    disciplines: [АР]
+    topic: ROOF
+    anchors: [состав кровли, пароизоляция, мембрана, разуклонка]
+    routes:
+      - discrepancy_types: [LAYER_REMOVED]
+        parameter_code: AR-044
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        hedge_codes: [ZU-128]
+        basis: MATRIX
+        value_templates: {pd: 'Слой {element} предусмотрен', rd: 'Слой {element} отсутствует', id: null}
+      - discrepancy_types: [LAYER_CHANGED]
+        parameter_code: AR-044
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        hedge_codes: [ZU-128]
+        basis: MATRIX
+        value_templates: {pd: 'Состав кровли по листу {pd_sheet} ПД', rd: 'Состав кровли изменён', id: null}
+      - discrepancy_types: [MATERIAL_SUBSTITUTED, CLASS_DOWNGRADED]
+        parameter_code: AR-044
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        hedge_codes: [ZU-128]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: ROOF_INSULATION
+    label_ru: Утеплитель покрытия и чердачного перекрытия
+    section: ЗУ
+    disciplines: [АР, ЭЭ]
+    topic: ENERGY
+    anchors: [утеплитель кровли, утеплитель чердачного перекрытия]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: ZU-128
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        hedge_codes: [AR-044]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: ROOF_SLOPE
+    label_ru: Уклоны кровли
+    section: АР
+    disciplines: [АР]
+    topic: ROOF
+    anchors: [уклон кровли]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: AR-045
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: AR-045.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: STAIR
+    label_ru: Лестничные марши и ступени
+    section: АР
+    disciplines: [АР, КЖ]
+    topic: ARCHITECTURE
+    anchors: [лестничный марш, ступень, подступенок, проступь]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED, THRESHOLD_ABOVE_MAX, THRESHOLD_BELOW_MIN]
+        parameter_code: AR-048
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: RAILING
+    label_ru: Ограждения лестниц, балконов и кровли
+    section: АР
+    disciplines: [АР]
+    topic: ARCHITECTURE
+    anchors: [ограждение, высота ограждения]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: AR-049
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: VESTIBULE
+    label_ru: Тамбуры входных групп
+    section: АР
+    disciplines: [АР]
+    topic: ACCESSIBILITY
+    anchors: [тамбур]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: AR-047
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: FACADE_FINISH
+    label_ru: Облицовка и колористика фасадов
+    section: АР
+    disciplines: [АР]
+    topic: FACADE
+    anchors: [облицовка фасада, RAL, колористика]
+    routes:
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: AR-052
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: NOISE_PROTECTION
+    label_ru: Звукоизоляционные мероприятия
+    section: АР
+    disciplines: [АР, КР]
+    topic: ARCHITECTURE
+    anchors: [демпферная лента, звукоизоляционная прокладка]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: AR-053
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: 'Звукоизоляционные мероприятия предусмотрены', rd: 'Звукоизоляционные мероприятия отсутствуют', id: null}
+
+  - family: ROOM
+    label_ru: Помещения (экспликация)
+    section: ПЗ
+    disciplines: [АР]
+    topic: ARCHITECTURE
+    anchors: [экспликация помещений, наименование помещения, площадь помещения]
+    routes:
+      - discrepancy_types: [FUNCTION_CHANGED]
+        parameter_code: PZ-003
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: PZ-003.b
+        basis: ANALOGY
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_DECREASED, TOTAL_CHANGED]
+        parameter_code: PZ-003
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: PZ-003.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: PZ-003
+        parameter_mapping_status: PROVISIONAL_DOMAIN_MAPPING
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: PZ-003.b
+        basis: ANALOGY
+        value_templates: {pd: 'Помещение предусмотрено', rd: 'Помещение отсутствует', id: null}
+      - discrepancy_types: [ELEMENT_ADDED]
+        parameter_code: null
+        comparison_result: EXTRA_ELEMENT
+        emit: false
+        basis: CONTEXT
+        reason: добавленные помещения — контекст (97 §2.10)
+      - discrepancy_types: [POSITION_SHIFTED]
+        parameter_code: null
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: перенесённые помещения — контекст (97 §2.10)
+
+  - family: APARTMENT_MIX
+    label_ru: Квартирография
+    section: ПЗ
+    disciplines: [АР, ПЗ]
+    topic: ARCHITECTURE
+    anchors: [квартирография, однокомнатная, студия]
+    routes:
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: PZ-011
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: PZ-011.a
+        basis: MATRIX
+        value_templates: {pd: 'Квартирография по листу {pd_sheet} ПД', rd: 'Квартирография изменена', id: null}
+      - discrepancy_types: [COUNT_CHANGED]
+        parameter_code: PZ-010
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: MGN_LIFT
+    label_ru: Подъёмники и платформы для МГН
+    section: ОДИ
+    disciplines: [АР, ОДИ]
+    topic: ACCESSIBILITY
+    anchors: [подъёмная платформа, подъёмник для инвалидов]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: ODI-115
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: ODI-115.a
+        basis: MATRIX
+        value_templates: {pd: 'Подъёмная платформа для МГН предусмотрена', rd: 'Подъёмная платформа для МГН отсутствует', id: null}
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: ODI-115
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: ODI-115.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: MGN_PATH
+    label_ru: Ширина путей движения МГН
+    section: ОДИ
+    disciplines: [АР, ОДИ]
+    topic: ACCESSIBILITY
+    anchors: [путь движения МГН]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: ODI-116
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        hedge_codes: [AR-040, PPM-104]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: MGN_DOOR
+    label_ru: Дверные проёмы на путях движения МГН
+    section: ОДИ
+    disciplines: [АР, ОДИ]
+    topic: ACCESSIBILITY
+    anchors: [дверной проём МГН]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: ODI-117
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: DOOR_THRESHOLD
+    label_ru: Пороги в дверных проёмах
+    section: ОДИ
+    disciplines: [АР, ОДИ]
+    topic: ACCESSIBILITY
+    anchors: [порог]
+    routes:
+      - discrepancy_types: [THRESHOLD_ABOVE_MAX, VALUE_INCREASED]
+        parameter_code: ODI-118
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: MGN_WC
+    label_ru: Универсальные кабины санузлов для МГН
+    section: ОДИ
+    disciplines: [АР, ОДИ]
+    topic: ACCESSIBILITY
+    anchors: [универсальная кабина, санузел МГН]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: ODI-119
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: GRAB_BAR
+    label_ru: Опорные и откидные поручни
+    section: ОДИ
+    disciplines: [АР, ОДИ]
+    topic: ACCESSIBILITY
+    anchors: [поручень, откидной поручень]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: ODI-120
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: ODI-120.a
+        basis: MATRIX
+        value_templates: {pd: 'Поручни предусмотрены', rd: 'Поручни отсутствуют', id: null}
+      - discrepancy_types: [COUNT_CHANGED]
+        parameter_code: ODI-120
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: ODI-120.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: TACTILE_INDICATOR
+    label_ru: Тактильно-контрастные указатели
+    section: ОДИ
+    disciplines: [АР, ОДИ, ГП]
+    topic: ACCESSIBILITY
+    anchors: [тактильный указатель, тактильная полоса]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: ODI-122
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: 'Тактильные указатели предусмотрены', rd: 'Тактильные указатели отсутствуют', id: null}
+
+  - family: CALL_SYSTEM
+    label_ru: Системы двухсторонней связи и вызова помощника
+    section: ОДИ
+    disciplines: [СС, ОДИ]
+    topic: ACCESSIBILITY
+    anchors: [кнопка вызова, двухсторонняя связь]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: ODI-123
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: 'Система вызова предусмотрена', rd: 'Система вызова отсутствует', id: null}
+
+  - family: MGN_PARKING
+    label_ru: Места для автотранспорта МГН
+    section: СПЗУ
+    disciplines: [ГП, ОДИ]
+    topic: ACCESSIBILITY
+    anchors: [место для МГН, стоянка инвалидов]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED, VALUE_DECREASED]
+        parameter_code: SPZU-038
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: SPZU-038.b
+        hedge_codes: [ODI-121]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [THRESHOLD_BELOW_MIN]
+        parameter_code: ODI-121
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: ODI-121.b
+        hedge_codes: [SPZU-038]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: PASSENGER_LIFT
+    label_ru: Пассажирские лифты
+    section: АР
+    disciplines: [АР, ЛО]
+    topic: LIFT
+    anchors: [лифт, пассажирский лифт]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: FREE-LIFT
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Лифт предусмотрен', rd: 'Лифт отсутствует', id: null}
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: FREE-LIFT
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: 'Состав лифтов по листу {pd_sheet} ПД', rd: 'Состав лифтов изменён', id: null}
+
+  # ─────────────────────────────── КР / КЖ ───────────────────────────────
+  - family: CONCRETE_CLASS
+    label_ru: Класс бетона по прочности
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [класс бетона, бетон класса]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED]
+        parameter_code: KR-055
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: KR-055
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: повышение класса бетона не нарушение (направленный триггер «понижение класса»)
+
+  - family: CONCRETE_FW_MARK
+    label_ru: Марки бетона по морозостойкости (F) и водонепроницаемости (W) при неизменном классе
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [марка по морозостойкости, марка по водонепроницаемости, F150, W6]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED, MATERIAL_SUBSTITUTED]
+        parameter_code: FREE-STRUCTURE
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: USER:Q4a
+        reason: класс В не изменён, поэтому KR-055 («понижение класса») не нарушен; снижение F/W — свободный поиск с доказательствами ПД+РД+ИД
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: STEEL_GRADE
+    label_ru: Марка стали металлопроката
+    section: КР
+    disciplines: [КР, КМ]
+    topic: STRUCTURE
+    anchors: [марка стали, С345, С245]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED]
+        parameter_code: KR-056
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: REBAR_CLASS
+    label_ru: Класс рабочей арматуры
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [класс арматуры, А500С, А400]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED, MATERIAL_SUBSTITUTED]
+        parameter_code: KR-057
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: REBAR_DIAMETER
+    label_ru: Диаметр продольной арматуры колонн и пилонов
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [диаметр арматуры, продольная арматура]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: KR-062
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: FOUNDATION_SLAB
+    label_ru: Фундаментная плита, ростверк (толщина)
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [фундаментная плита, ростверк]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: KR-058
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: KR-058.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [TOLERANCE_EXCEEDED]
+        parameter_code: KR-058
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: TOLERANCE_EXCEEDED
+        emit: true
+        sub_check: KR-058.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: KR-058
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: USER:Q4b
+        reason: утолщение плиты не нарушение (направленный триггер «уменьшение»; Новослободская NS-C14)
+
+  - family: FLOOR_SLAB
+    label_ru: Плиты перекрытий и покрытия (толщина)
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [плита перекрытия, плита покрытия]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: KR-059
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: KR-059.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [TOLERANCE_EXCEEDED]
+        parameter_code: KR-059
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: TOLERANCE_EXCEEDED
+        emit: true
+        sub_check: KR-059.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: KR-059
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: USER:Q4b
+        reason: увеличение толщины не нарушение (направленный триггер «уменьшение»)
+
+  - family: COLUMN_SECTION
+    label_ru: Сечения колонн и пилонов
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [сечение колонны, пилон]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: KR-060
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: KR-060.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [TOLERANCE_EXCEEDED]
+        parameter_code: KR-060
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: TOLERANCE_EXCEEDED
+        emit: true
+        sub_check: KR-060.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: KR-060
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: USER:Q4b
+        reason: увеличение сечения не нарушение (направленный триггер «уменьшение площади сечения»)
+
+  - family: BEARING_WALL
+    label_ru: Несущие монолитные стены, ядра жёсткости (толщина)
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [несущая стена, ядро жёсткости, диафрагма]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: KR-061
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: KR-061.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [TOLERANCE_EXCEEDED]
+        parameter_code: KR-061
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: TOLERANCE_EXCEEDED
+        emit: true
+        sub_check: KR-061.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: KR-061
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: USER:Q4b
+        reason: утолщение стен не нарушение (направленный триггер «уменьшение толщины»)
+
+  - family: STRUCTURE_AXES
+    label_ru: Координационные оси несущего каркаса
+    section: КР
+    disciplines: [КР, КЖ, ГП]
+    topic: STRUCTURE
+    anchors: [шаг колонн, привязка осей, исполнительная схема]
+    routes:
+      - discrepancy_types: [POSITION_SHIFTED]
+        parameter_code: KR-054
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: KR-054.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_CHANGED]
+        parameter_code: KR-054
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: KR-054.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [TOLERANCE_EXCEEDED]
+        parameter_code: KR-054
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: TOLERANCE_EXCEEDED
+        emit: true
+        sub_check: KR-054.b
+        basis: MATRIX
+        value_templates: {pd: null, rd: '{rd_value}', id: '{id_value}'}
+
+  - family: STRUCTURE_ELEVATION
+    label_ru: Отметки верха конструкций по исполнительной документации
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [отметка верха, исполнительная схема, захватка]
+    routes:
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: null
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: USER:Q4c
+        reason: отметка верха в ИД выше проектной в пределах обычного перелива — не нарушение (Новослободская NS-C09)
+      - discrepancy_types: [TOLERANCE_EXCEEDED]
+        parameter_code: FREE-STRUCTURE
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: TOLERANCE_EXCEEDED
+        emit: true
+        basis: ANALOGY
+        value_templates: {pd: null, rd: '{rd_value}', id: '{id_value}'}
+
+  - family: STRUCTURE_REPAIR_WORKS
+    label_ru: Ремонт и усиление конструкций, выполненные без РД
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [ремонт свай, усиление, устранение дефектов]
+    routes:
+      - discrepancy_types: [UNDOCUMENTED_WORK]
+        parameter_code: FREE-STRUCTURE
+        parameter_mapping_status: MATRIX_GAP_CONFIRMED
+        comparison_result: EXTRA_ELEMENT
+        emit: true
+        basis: ANALOGY
+        reason: работы в ИД без РД (пилот IZM12) — отдельная находка свободного поиска, не матрица
+        value_templates: {pd: 'Работы не предусмотрены', rd: 'Работы не предусмотрены', id: 'Работы выполнены'}
+
+  - family: EXPANSION_JOINT
+    label_ru: Деформационные швы
+    section: КР
+    disciplines: [КР, КЖ, АР]
+    topic: STRUCTURE
+    anchors: [деформационный шов, осадочный шов]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: KR-063
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: KR-063.a
+        basis: MATRIX
+        value_templates: {pd: 'Деформационный шов предусмотрен', rd: 'Деформационный шов отсутствует', id: null}
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: KR-063
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: KR-063.b
+        basis: MATRIX
+        value_templates: {pd: 'Узел шва по листу {pd_sheet} ПД', rd: 'Узел шва изменён', id: null}
+
+  - family: LIFT_SHAFT
+    label_ru: Лифтовые шахты (габариты, привязки)
+    section: КР
+    disciplines: [КР, КЖ, АР]
+    topic: LIFT
+    anchors: [лифтовая шахта]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: KR-064
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: KR-064.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [POSITION_SHIFTED]
+        parameter_code: KR-064
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        sub_check: KR-064.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: TECH_OPENING
+    label_ru: Технологические проёмы в перекрытиях и стенах
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [технологический проём, отверстие в плите]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: KR-065
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: KR-065.a
+        basis: MATRIX
+        value_templates: {pd: 'Проём предусмотрен', rd: 'Проём заделан', id: null}
+
+  - family: MATERIAL_QUANTITIES
+    label_ru: Ведомости расхода бетона и стали
+    section: КР
+    disciplines: [КР, КЖ]
+    topic: STRUCTURE
+    anchors: [ведомость расхода, расход бетона, ВРС]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, VALUE_INCREASED, VALUE_CHANGED, TOTAL_CHANGED]
+        parameter_code: KR-067
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  # ─────────────────────────────── СПЗУ / ГП ───────────────────────────────
+  - family: GREENING
+    label_ru: Озеленение и газоны
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [озеленение, газон]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: SPZU-027
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: SPZU-027
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: направленный триггер «сокращение площади озеленения»
+
+  - family: ASPHALT_PAVEMENT
+    label_ru: Асфальтобетонные покрытия
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [асфальтобетонное покрытие]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, VALUE_INCREASED, VALUE_CHANGED]
+        parameter_code: SPZU-025
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: TILE_PAVEMENT
+    label_ru: Плиточное мощение
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [тротуарная плитка, брусчатка]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, VALUE_INCREASED, VALUE_CHANGED]
+        parameter_code: SPZU-026
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: PLAYGROUND
+    label_ru: Детские и спортивные площадки
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [детская площадка, спортивная площадка]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: SPZU-028
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: SMALL_ARCH_FORMS
+    label_ru: Малые архитектурные формы
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [МАФ, скамья, урна]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED]
+        parameter_code: SPZU-029
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: SPZU-029.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: SPZU-029
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: SPZU-029.a
+        basis: MATRIX
+        value_templates: {pd: 'МАФ предусмотрены', rd: 'МАФ отсутствуют', id: null}
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: SPZU-029
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: SPZU-029.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: FIRE_ACCESS_ROAD
+    label_ru: Пожарные проезды (ширина)
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: FIRE
+    anchors: [пожарный проезд, ширина проезда]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: SPZU-030
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: ROAD_RADIUS
+    label_ru: Радиусы поворота проездов
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [радиус поворота]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED, THRESHOLD_BELOW_MIN]
+        parameter_code: SPZU-031
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: ROAD_PAVEMENT_LAYERS
+    label_ru: Конструкция дорожной одежды
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [дорожная одежда, щебёночное основание]
+    routes:
+      - discrepancy_types: [LAYER_REMOVED]
+        parameter_code: SPZU-032
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: 'Слой {element} предусмотрен', rd: 'Слой {element} отсутствует', id: null}
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: SPZU-032
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: ROAD_SLOPE
+    label_ru: Уклоны дорог и проездов
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [продольный уклон, поперечный уклон]
+    routes:
+      - discrepancy_types: [VALUE_CHANGED, THRESHOLD_ABOVE_MAX, THRESHOLD_BELOW_MIN]
+        parameter_code: SPZU-033
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: NETWORK_CONNECTION
+    label_ru: Точки подключения наружных сетей
+    section: СПЗУ
+    disciplines: [ГП, НВК, ЭС, ТС]
+    topic: SITE
+    anchors: [точка подключения, координаты]
+    routes:
+      - discrepancy_types: [POSITION_SHIFTED]
+        parameter_code: SPZU-034
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: SITE_FENCE
+    label_ru: Ограждение территории
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [ограждение территории]
+    routes:
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: SPZU-036
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        sub_check: SPZU-036.a
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: SPZU-036
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: SPZU-036.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: PARKING
+    label_ru: Наземные парковочные места
+    section: СПЗУ
+    disciplines: [ГП]
+    topic: SITE
+    anchors: [парковочное место, открытая автостоянка]
+    routes:
+      - discrepancy_types: [COUNT_CHANGED, VALUE_DECREASED]
+        parameter_code: SPZU-037
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: SITE_DRAINAGE
+    label_ru: Дренаж и водоотводные лотки
+    section: СПЗУ
+    disciplines: [ГП, НВК]
+    topic: SITE
+    anchors: [пристенный дренаж, водоотводный лоток]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: SPZU-039
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: 'Дренаж предусмотрен', rd: 'Дренаж отсутствует', id: null}
+
+  - family: EARTHWORKS
+    label_ru: Объёмы выемки и насыпи
+    section: СПЗУ
+    disciplines: [ГП, ПОС]
+    topic: SITE
+    anchors: [выемка, насыпь, баланс земляных масс]
+    routes:
+      - discrepancy_types: [VALUE_CHANGED, VALUE_DECREASED, VALUE_INCREASED]
+        parameter_code: SPZU-024
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  # ─────────────────────────────── ЗУ: энергоэффективность ───────────────────────────────
+  - family: WALL_INSULATION
+    label_ru: Теплоизоляция наружных стен
+    section: ЗУ
+    disciplines: [АР, ЭЭ]
+    topic: ENERGY
+    anchors: [утеплитель, теплоизоляционный слой]
+    routes:
+      - discrepancy_types: [VALUE_DECREASED]
+        parameter_code: ZU-125
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [LAYER_REMOVED]
+        parameter_code: ZU-125
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: 'Теплоизоляционный слой предусмотрен', rd: 'Теплоизоляционный слой отсутствует', id: null}
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: ZU-126
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: ENERGY_CLASS
+    label_ru: Класс энергетической эффективности
+    section: ЗУ
+    disciplines: [ПЗ, ЭЭ]
+    topic: ENERGY
+    anchors: [класс энергетической эффективности, энергетический паспорт]
+    routes:
+      - discrepancy_types: [CLASS_DOWNGRADED]
+        parameter_code: ZU-124
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        hedge_codes: [PZ-021]
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  # ─────────────────────────────── ПОС / ПОД ───────────────────────────────
+  - family: CRANE_ZONE
+    label_ru: Опасные зоны работы кранов
+    section: ПОС
+    disciplines: [ПОС, ППР]
+    topic: OTHER
+    anchors: [опасная зона крана, стройгенплан]
+    routes:
+      - discrepancy_types: [VALUE_INCREASED]
+        parameter_code: POS-081
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: VALUE_MISMATCH
+        emit: true
+        sub_check: POS-081.b
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+
+  - family: WHEEL_WASH
+    label_ru: Пункты мойки колёс
+    section: ПОС
+    disciplines: [ПОС, ППР]
+    topic: OTHER
+    anchors: [мойка колёс]
+    routes:
+      - discrepancy_types: [ELEMENT_MISSING]
+        parameter_code: POS-089
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MISSING_DESIGN_ELEMENT
+        emit: true
+        sub_check: POS-089.a
+        basis: MATRIX
+        value_templates: {pd: 'Пункт мойки колёс предусмотрен', rd: 'Пункт мойки колёс отсутствует', id: null}
+      - discrepancy_types: [POSITION_SHIFTED]
+        parameter_code: null
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: false
+        basis: CONTEXT
+        reason: перенос пункта мойки — контекст; нарушение только при отсутствии оборотного водоснабжения (POS-089.b)
+
+  - family: DEMOLITION_METHOD
+    label_ru: Методы демонтажа
+    section: ПОД
+    disciplines: [ПОД, ППР]
+    topic: OTHER
+    anchors: [метод демонтажа, механизированная разборка]
+    routes:
+      - discrepancy_types: [MATERIAL_SUBSTITUTED]
+        parameter_code: POD-091
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: MATERIAL_SUBSTITUTION
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: '{pd_value}', rd: '{rd_value}', id: '{id_value}'}
+      - discrepancy_types: [CONFIGURATION_CHANGED]
+        parameter_code: POD-091
+        parameter_mapping_status: SOURCE_MATRIX
+        comparison_result: CONFIGURATION_MISMATCH
+        emit: true
+        basis: MATRIX
+        value_templates: {pd: 'Метод демонтажа по ПОД: {pd_value}', rd: 'Метод демонтажа изменён: {rd_value}', id: null}

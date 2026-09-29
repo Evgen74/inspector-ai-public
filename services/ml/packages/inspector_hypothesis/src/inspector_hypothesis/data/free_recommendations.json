@@ -1,0 +1,678 @@
+{
+ "schema_version": 1,
+ "source": {
+  "path": "docs/analysis/norms_staging/recommendation_templates.json",
+  "sha256": "b66a5f8639113ec5cd9947cc7e89d9c6fea68b65e1f7087e142f532cd9ddbce1",
+  "version": "1",
+  "generated_at": "2026-09-27",
+  "status": "DRAFT — эталонные шаблоны резолютивной части; до экспертной проверки (U-18) печатаются с префиксом «Проект рекомендации (до подтверждения инспектором): »"
+ },
+ "note": "Vendored copy of the FREE-topic templates (free_topics) of the review-phase staging file; refreshed by tests/test_free_recommendations.py when the staging file changes. Text origin: AG03_DRAFT until expert review (U-18).",
+ "preliminary_prefix": "Проект рекомендации (до подтверждения инспектором): ",
+ "free_topics": [
+  {
+   "topic": "HEATING",
+   "code_pattern": "^FREE-HEATING-\\d{3}$",
+   "example_code": "FREE-HEATING-001",
+   "seen_in_train": true,
+   "short_name": "Система отопления (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Монтаж систем отопления",
+   "vid_narusheniya": "Отклонение от ПД в части системы отопления: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента системы отопления: {element}",
+    "configuration_change": "Изменение конфигурации системы отопления относительно ПД: {element}",
+    "substitution": "Замена элемента системы отопления без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента системы отопления на {delta}: {element}",
+    "increase": "Увеличение параметра элемента системы отопления на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент системы отопления ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 60.13330.2020). Представить исполнительные схемы отопления и акты испытаний.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "element_presets": {
+    "Тёплый пол": {
+     "vid_narusheniya": "Отсутствие системы тёплых полов, предусмотренной ПД",
+     "recommendation": "Выполнить систему тёплых полов ({location}) в соответствии с ПД либо представить корректировку РД с тепловым расчётом помещений, согласованную с проектировщиком (СП 60.13330.2020). Представить исполнительные схемы отопления и акты испытаний.",
+     "pd_value": "Тёплый пол предусмотрен",
+     "rd_value": "Тёплый пол отсутствует"
+    }
+   },
+   "notes": "Train: G-TR-002 «Не выполнена предусмотренная ПД система тёплых полов в помещениях МГН» (FREE-HEATING-001, MATRIX_GAP_CONFIRMED, WARNING). Тёплые полы не относить к IOS4-077.",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 60.13330.2020 «СНиП 41-01-2003 Отопление, вентиляция и кондиционирование воздуха»",
+     "clause": "документ в целом",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 60.13330.2020",
+     "edition": "СП 60.13330.2020 (приказ Минстроя России № 921/пр от 30.12.2020, введён 01.07.2021) с Поправкой и Изменениями № 1–6 (Изм. № 5 — 17/пр от 17.01.2025; Изм. № 6 — 327/пр от 26.05.2026)",
+     "url": "https://docs.cntd.ru/document/573697256",
+     "source": "norms_staging:M-076"
+    }
+   ]
+  },
+  {
+   "topic": "VENTILATION",
+   "code_pattern": "^FREE-VENTILATION-\\d{3}$",
+   "example_code": "FREE-VENTILATION-001",
+   "seen_in_train": false,
+   "short_name": "Система вентиляции (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Монтаж систем вентиляции",
+   "vid_narusheniya": "Отклонение от ПД в части системы вентиляции: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента системы вентиляции: {element}",
+    "configuration_change": "Изменение конфигурации системы вентиляции относительно ПД: {element}",
+    "substitution": "Замена элемента системы вентиляции без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента системы вентиляции на {delta}: {element}",
+    "increase": "Увеличение параметра элемента системы вентиляции на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент системы вентиляции ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 60.13330.2020). Представить исполнительные схемы вентиляции и паспорта вентиляционных систем.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 60.13330.2020 «СНиП 41-01-2003 Отопление, вентиляция и кондиционирование воздуха»",
+     "clause": "документ в целом",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 60.13330.2020",
+     "edition": "СП 60.13330.2020 (приказ Минстроя России № 921/пр от 30.12.2020, введён 01.07.2021) с Поправкой и Изменениями № 1–6 (Изм. № 5 — 17/пр от 17.01.2025; Изм. № 6 — 327/пр от 26.05.2026)",
+     "url": "https://docs.cntd.ru/document/573697256",
+     "source": "norms_staging:M-078"
+    }
+   ]
+  },
+  {
+   "topic": "WATER",
+   "code_pattern": "^FREE-WATER-\\d{3}$",
+   "example_code": "FREE-WATER-001",
+   "seen_in_train": false,
+   "short_name": "Система водоснабжения (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Монтаж систем водоснабжения",
+   "vid_narusheniya": "Отклонение от ПД в части системы водоснабжения: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента системы водоснабжения: {element}",
+    "configuration_change": "Изменение конфигурации системы водоснабжения относительно ПД: {element}",
+    "substitution": "Замена элемента системы водоснабжения без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента системы водоснабжения на {delta}: {element}",
+    "increase": "Увеличение параметра элемента системы водоснабжения на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент системы водоснабжения ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 30.13330.2020). Представить исполнительные схемы водоснабжения и акты испытаний.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 30.13330.2020 «СНиП 2.04.01-85* Внутренний водопровод и канализация зданий»",
+     "clause": "документ в целом (гидравлический расчёт и выбор диаметров, материалы труб, насосные установки)",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 30.13330.2020",
+     "edition": "СП 30.13330.2020 (приказ Минстроя России № 920/пр от 30.12.2020) с Изменениями № 1–5 (Изм. № 5 — с 25.02.2025)",
+     "url": "https://docs.cntd.ru/document/573741260",
+     "source": "norms_staging:M-071"
+    }
+   ]
+  },
+  {
+   "topic": "SEWER",
+   "code_pattern": "^FREE-SEWER-\\d{3}$",
+   "example_code": "FREE-SEWER-001",
+   "seen_in_train": false,
+   "short_name": "Система канализации (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Монтаж систем канализации",
+   "vid_narusheniya": "Отклонение от ПД в части системы канализации: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента системы канализации: {element}",
+    "configuration_change": "Изменение конфигурации системы канализации относительно ПД: {element}",
+    "substitution": "Замена элемента системы канализации без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента системы канализации на {delta}: {element}",
+    "increase": "Увеличение параметра элемента системы канализации на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент системы канализации ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 30.13330.2020). Представить исполнительные схемы канализации и акты испытаний.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 30.13330.2020 «СНиП 2.04.01-85* Внутренний водопровод и канализация зданий»",
+     "clause": "документ в целом (гидравлический расчёт и выбор диаметров, материалы труб, насосные установки)",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 30.13330.2020",
+     "edition": "СП 30.13330.2020 (приказ Минстроя России № 920/пр от 30.12.2020) с Изменениями № 1–5 (Изм. № 5 — с 25.02.2025)",
+     "url": "https://docs.cntd.ru/document/573741260",
+     "source": "norms_staging:M-074"
+    }
+   ]
+  },
+  {
+   "topic": "ELECTRICAL",
+   "code_pattern": "^FREE-ELECTRICAL-\\d{3}$",
+   "example_code": "FREE-ELECTRICAL-001",
+   "seen_in_train": false,
+   "short_name": "Электроснабжение (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Электромонтажные работы",
+   "vid_narusheniya": "Отклонение от ПД в части системы электроснабжения: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента системы электроснабжения: {element}",
+    "configuration_change": "Изменение конфигурации системы электроснабжения относительно ПД: {element}",
+    "substitution": "Замена элемента системы электроснабжения без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента системы электроснабжения на {delta}: {element}",
+    "increase": "Увеличение параметра элемента системы электроснабжения на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент системы электроснабжения ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 256.1325800.2016). Представить исполнительные схемы и протоколы электроизмерений.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 256.1325800.2016",
+     "clause": "разд. 12 «Защита внутренних электрических сетей напряжением до 1000 В и выбор сечения проводников» (п. 12.1–12.6); разд. 14 (ВРУ, ГРЩ, щиты)",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 256.1325800.2016",
+     "edition": "СП 256.1325800.2016 (приказ Минстроя России № 602/пр от 29.08.2016, введён 02.03.2017) с Изменениями № 1–9 (Изм. № 8 — 808/пр от 29.11.2024; Изм. № 9 — 846/пр от 25.12.2025, с 26.01.2026)",
+     "url": "https://meganorm.ru/mega_doc/norm_update_01032026/pravila/0/sp_256_1325800_2016_svod_pravil_elektroustanovki_zhilykh_i.html",
+     "source": "norms_staging:M-068"
+    }
+   ]
+  },
+  {
+   "topic": "LIGHTING",
+   "code_pattern": "^FREE-LIGHTING-\\d{3}$",
+   "example_code": "FREE-LIGHTING-001",
+   "seen_in_train": false,
+   "short_name": "Освещение (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Монтаж электроосвещения",
+   "vid_narusheniya": "Отклонение от ПД в части системы освещения: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента системы освещения: {element}",
+    "configuration_change": "Изменение конфигурации системы освещения относительно ПД: {element}",
+    "substitution": "Замена элемента системы освещения без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента системы освещения на {delta}: {element}",
+    "increase": "Увеличение параметра элемента системы освещения на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент системы освещения ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 52.13330.2016). Представить исполнительные схемы освещения и сертификаты на светильники.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 52.13330.2016 «Естественное и искусственное освещение»",
+     "clause": "документ в целом (нормы освещённости; конкретный пункт об удельной мощности не верифицировался)",
+     "verification_status": "CONFIRMED",
+     "confidence": "MEDIUM",
+     "matrix_cited": "СП 52.13330.2016",
+     "edition": "СП 52.13330.2016 (приказ Минстроя России № 777/пр от 07.11.2016, введён 08.05.2017) с Изменениями № 1 (699/пр от 20.11.2019) и № 2 (1029/пр от 28.12.2021, с 29.01.2022)",
+     "url": "https://docs.cntd.ru/document/456054197",
+     "source": "norms_staging:M-130"
+    }
+   ]
+  },
+  {
+   "topic": "FIRE",
+   "code_pattern": "^FREE-FIRE-\\d{3}$",
+   "example_code": "FREE-FIRE-001",
+   "seen_in_train": false,
+   "short_name": "Противопожарная защита (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Монтаж систем противопожарной защиты",
+   "vid_narusheniya": "Отклонение от ПД в части системы противопожарной защиты: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента системы противопожарной защиты: {element}",
+    "configuration_change": "Изменение конфигурации системы противопожарной защиты относительно ПД: {element}",
+    "substitution": "Замена элемента системы противопожарной защиты без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента системы противопожарной защиты на {delta}: {element}",
+    "increase": "Увеличение параметра элемента системы противопожарной защиты на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент системы противопожарной защиты ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком. Представить исполнительные схемы и акты испытаний систем противопожарной защиты.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": []
+  },
+  {
+   "topic": "EVACUATION",
+   "code_pattern": "^FREE-EVACUATION-\\d{3}$",
+   "example_code": "FREE-EVACUATION-001",
+   "seen_in_train": false,
+   "short_name": "Пути эвакуации (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Устройство путей эвакуации",
+   "vid_narusheniya": "Отклонение от ПД в части путей эвакуации: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента путей эвакуации: {element}",
+    "configuration_change": "Изменение конфигурации путей эвакуации относительно ПД: {element}",
+    "substitution": "Замена элемента путей эвакуации без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента путей эвакуации на {delta}: {element}",
+    "increase": "Увеличение параметра элемента путей эвакуации на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент путей эвакуации ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 1.13130.2020). Представить исполнительную схему поэтажных планов с обмерами.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 1.13130.2020",
+     "clause": "п. 4.3.3 (общие), п. 6.1.9 (жилые Ф1.3); п. 4.3.4 — только о вычете ширины дверного полотна",
+     "verified_value": "≥ 1,2 м (> 50 чел.); ≥ 1,0 м (прочие); ≥ 0,7 м (к одиночным рабочим местам); Ф1.3: ≥ 1,4 м (коридор ≤ 40 м), ≥ 1,6 м (> 40 м), галерея ≥ 1,2 м",
+     "verification_status": "CORRECTED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 1.13130.2020, п. 4.3.4",
+     "edition": "СП 1.13130.2020 (приказ МЧС России от 19.03.2020 № 194) с Изм. № 1 (приказ МЧС от 21.11.2023 № 1203, с 01.01.2024), № 2 (от 21.08.2024 № 681, с 01.11.2024), № 3 (от 16.06.2025 № 502); статус «Действует» в ФИФ Росстандарта",
+     "url": "https://tiflocentre.ru/documents/sp-1-13130-2020.php",
+     "source": "norms_staging:M-040"
+    }
+   ]
+  },
+  {
+   "topic": "ACCESSIBILITY",
+   "code_pattern": "^FREE-ACCESSIBILITY-\\d{3}$",
+   "example_code": "FREE-ACCESSIBILITY-001",
+   "seen_in_train": false,
+   "short_name": "Доступность для МГН (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Устройство элементов доступности для МГН",
+   "vid_narusheniya": "Отклонение от ПД в части доступности для МГН: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента доступности для МГН: {element}",
+    "configuration_change": "Изменение конфигурации доступности для МГН относительно ПД: {element}",
+    "substitution": "Замена элемента доступности для МГН без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента доступности для МГН на {delta}: {element}",
+    "increase": "Увеличение параметра элемента доступности для МГН на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент доступности для МГН ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 59.13330.2020). Представить исполнительные схемы с фактическими обмерами.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 59.13330.2020, п. 6.2.1",
+     "clause": "п. 6.2.1 (в ред. Изм. № 3)",
+     "verified_value": "ширина путей движения в коридорах, галереях ≥ 1,8 м; допускается 1,5–1,2 м с карманами для разъезда длиной ≥ 2 м при общей ширине ≥ 1,8 м в пределах прямой видимости; по расчёту при ≤ 1 инвалиде на кресле-коляске на этаже — ≥ 1,4 м; переход в другое здание ≥ 2,0 м; высота прохода ≥ 2,1 м",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 59.13330.2020, п. 6.2 (пути движения) (требует проверки)",
+     "edition": "СП 59.13330.2020 (приказ Минстроя России № 904/пр от 30.12.2020, введён 01.07.2021) с Изменениями № 1 (434/пр от 31.05.2022), № 2 (833/пр от 21.11.2023, с 21.12.2023), № 3 (630/пр от 19.09.2024, с 16.10.2024), № 4 (938/пр от 27.12.2024, с 27.02.2025)",
+     "url": "https://tiflocentre.ru/download/sp59-13330-2020.pdf",
+     "source": "norms_staging:M-116"
+    }
+   ]
+  },
+  {
+   "topic": "ARCHITECTURE",
+   "code_pattern": "^FREE-ARCHITECTURE-\\d{3}$",
+   "example_code": "FREE-ARCHITECTURE-001",
+   "seen_in_train": false,
+   "short_name": "Архитектурные решения (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Общестроительные работы",
+   "vid_narusheniya": "Отклонение от ПД в части архитектурных решений: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента архитектурных решений: {element}",
+    "configuration_change": "Изменение конфигурации архитектурных решений относительно ПД: {element}",
+    "substitution": "Замена элемента архитектурных решений без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента архитектурных решений на {delta}: {element}",
+    "increase": "Увеличение параметра элемента архитектурных решений на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент архитектурных решений ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком. Представить исполнительные схемы и АОСР.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": []
+  },
+  {
+   "topic": "STRUCTURE",
+   "code_pattern": "^FREE-STRUCTURE-\\d{3}$",
+   "example_code": "FREE-STRUCTURE-001",
+   "seen_in_train": false,
+   "short_name": "Несущие конструкции (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Возведение несущих конструкций",
+   "vid_narusheniya": "Отклонение от ПД в части несущих конструкций: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента несущих конструкций: {element}",
+    "configuration_change": "Изменение конфигурации несущих конструкций относительно ПД: {element}",
+    "substitution": "Замена элемента несущих конструкций без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента несущих конструкций на {delta}: {element}",
+    "increase": "Увеличение параметра элемента несущих конструкций на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент несущих конструкций ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком. Представить поверочный расчёт проектировщика, исполнительные геодезические схемы и АОСР.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "Федеральный закон № 384-ФЗ, ст. 7",
+     "clause": "ст. 7 (требования механической безопасности)",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "384-ФЗ, ст. 7",
+     "edition": "Действующая редакция",
+     "url": "https://www.consultant.ru/document/cons_doc_LAW_95720/",
+     "source": "norms_staging:M-055"
+    }
+   ]
+  },
+  {
+   "topic": "SITE",
+   "code_pattern": "^FREE-SITE-\\d{3}$",
+   "example_code": "FREE-SITE-001",
+   "seen_in_train": false,
+   "short_name": "Благоустройство участка (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Благоустройство территории",
+   "vid_narusheniya": "Отклонение от ПД в части благоустройства: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента благоустройства: {element}",
+    "configuration_change": "Изменение конфигурации благоустройства относительно ПД: {element}",
+    "substitution": "Замена элемента благоустройства без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента благоустройства на {delta}: {element}",
+    "increase": "Увеличение параметра элемента благоустройства на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент благоустройства ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 82.13330.2016). Представить исполнительную схему благоустройства и АОСР.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 82.13330.2016 «Благоустройство территорий»",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 82.13330.2016",
+     "edition": "СП 82.13330.2016 с Изм. № 1–3; «Действует»",
+     "url": "https://tiflocentre.ru/documents/sp_82.13330.2016_blagoustroystvo_territoriy.php",
+     "source": "norms_staging:M-025"
+    }
+   ]
+  },
+  {
+   "topic": "ROOF",
+   "code_pattern": "^FREE-ROOF-\\d{3}$",
+   "example_code": "FREE-ROOF-001",
+   "seen_in_train": false,
+   "short_name": "Кровля (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Устройство кровли",
+   "vid_narusheniya": "Отклонение от ПД в части кровли: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента кровли: {element}",
+    "configuration_change": "Изменение конфигурации кровли относительно ПД: {element}",
+    "substitution": "Замена элемента кровли без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента кровли на {delta}: {element}",
+    "increase": "Увеличение параметра элемента кровли на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент кровли ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 17.13330.2017). Представить АОСР на устройство слоёв кровли.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 17.13330.2017 «Кровли»",
+     "clause": "п. 4.4б (пароизоляция), разд. 5 (кровли из рулонных/полимерных материалов)",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 17.13330.2017",
+     "edition": "СП 17.13330.2017 с Изм. № 1–5 (Изм. № 5 — приказ Минстроя от 09.12.2024 № 843/пр, с 10.01.2025); «Действует»",
+     "url": "https://meganorm.ru/mega_doc/norm_update_29032025/normy/0/sp_17_13330_2017_svod_pravil_krovli_aktualizirovannaya.html",
+     "source": "norms_staging:M-044"
+    }
+   ]
+  },
+  {
+   "topic": "FACADE",
+   "code_pattern": "^FREE-FACADE-\\d{3}$",
+   "example_code": "FREE-FACADE-001",
+   "seen_in_train": false,
+   "short_name": "Фасады (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Устройство фасадов",
+   "vid_narusheniya": "Отклонение от ПД в части фасадных решений: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента фасадных решений: {element}",
+    "configuration_change": "Изменение конфигурации фасадных решений относительно ПД: {element}",
+    "substitution": "Замена элемента фасадных решений без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента фасадных решений на {delta}: {element}",
+    "increase": "Увеличение параметра элемента фасадных решений на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент фасадных решений ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком. Представить АОСР и паспорта качества на фасадные материалы.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": []
+  },
+  {
+   "topic": "LIFT",
+   "code_pattern": "^FREE-LIFT-\\d{3}$",
+   "example_code": "FREE-LIFT-001",
+   "seen_in_train": false,
+   "short_name": "Лифтовое оборудование (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Монтаж лифтов",
+   "vid_narusheniya": "Отклонение от ПД в части лифтового оборудования: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента лифтового оборудования: {element}",
+    "configuration_change": "Изменение конфигурации лифтового оборудования относительно ПД: {element}",
+    "substitution": "Замена элемента лифтового оборудования без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента лифтового оборудования на {delta}: {element}",
+    "increase": "Увеличение параметра элемента лифтового оборудования на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент лифтового оборудования ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком. Представить документы об оценке соответствия лифтов (ТР ТС 011/2011) и исполнительные схемы шахт.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "ТР ТС 011/2011 «Безопасность лифтов»",
+     "verification_status": "CONFIRMED",
+     "confidence": "HIGH",
+     "matrix_cited": "ТР ТС 011/2011 «Безопасность лифтов»",
+     "edition": "Действует (ЕАЭС)",
+     "url": "https://www.consultant.ru/search/?q=%D0%A2%D0%A0+%D0%A2%D0%A1+011%2F2011",
+     "source": "norms_staging:M-064"
+    }
+   ]
+  },
+  {
+   "topic": "ENERGY",
+   "code_pattern": "^FREE-ENERGY-\\d{3}$",
+   "example_code": "FREE-ENERGY-001",
+   "seen_in_train": false,
+   "short_name": "Энергоэффективность (вне Матрицы)",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Устройство тепловой защиты здания",
+   "vid_narusheniya": "Отклонение от ПД в части тепловой защиты здания: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие предусмотренного ПД элемента тепловой защиты здания: {element}",
+    "configuration_change": "Изменение конфигурации тепловой защиты здания относительно ПД: {element}",
+    "substitution": "Замена элемента тепловой защиты здания без согласования: {element}",
+    "decrease": "Уменьшение параметра элемента тепловой защиты здания на {delta}: {element}",
+    "increase": "Увеличение параметра элемента тепловой защиты здания на {delta}: {element}"
+   },
+   "recommendation": "Восстановить в РД и выполнить предусмотренный ПД элемент тепловой защиты здания ({element}; {location}) либо представить корректировку РД, согласованную с проектировщиком (СП 50.13330.2024). Представить АОСР на утепление и паспорта качества материалов.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": [
+    {
+     "designation": "СП 50.13330.2024",
+     "clause": "п. 5.1–5.2, табл. 3 (базовые требуемые Rо тр по ГСОП), формула (5.1) Rо норм = Rо тр · mp; mp ≥ 0,63 для стен, ≥ 0,80 для прочих, ≥ 1,00 для светопрозрачных (при выполнении п. 10.1)",
+     "verified_value": "Rо норм по табл. 3 в зависимости от ГСОП и типа здания",
+     "verification_status": "CORRECTED",
+     "confidence": "HIGH",
+     "matrix_cited": "СП 50.13330 (действующая редакция)",
+     "edition": "СП 50.13330.2024 «СНиП 23-02-2003 Тепловая защита зданий» (приказ Минстроя России № 327/пр от 15.05.2024, введён 16.06.2024, взамен СП 50.13330.2012)",
+     "url": "https://base.garant.ru/409274974/",
+     "source": "norms_staging:M-125"
+    }
+   ]
+  },
+  {
+   "topic": "GENERIC",
+   "code_pattern": "^FREE-[A-Z]+-\\d{3}$",
+   "example_code": "FREE-OTHER-001",
+   "seen_in_train": false,
+   "short_name": "Выявлено свободным поиском",
+   "criticality_level": "Существенное (предписание) — требует утверждения",
+   "vid_rabot": "Работы, не охваченные Матрицей",
+   "vid_narusheniya": "Отклонение РД (ИД) от ПД, не охваченное Матрицей: {element}",
+   "vid_narusheniya_variants": {
+    "absence": "Отсутствие элемента, предусмотренного ПД: {element}",
+    "configuration_change": "Изменение проектного решения без корректировки ПД: {element}",
+    "substitution": "Замена проектного решения без согласования: {element}",
+    "decrease": "Уменьшение параметра относительно ПД на {delta}: {element}",
+    "increase": "Увеличение параметра относительно ПД на {delta}: {element}"
+   },
+   "recommendation": "Представить пояснения проектировщика о причинах отклонения от ПД ({element}; {location}). Привести РД и выполненные работы в соответствие с ПД либо представить корректировку проектной документации, согласованную с проектировщиком.",
+   "deviation_phrases": {
+    "decrease": "⬇️ Уменьшение на {delta}",
+    "increase": "⬆️ Увеличение на {delta}",
+    "class_downgrade": null,
+    "absence": "❌ Полное отсутствие",
+    "substitution": "🔄 Замена",
+    "configuration_change": "🔄 Изменена конфигурация"
+   },
+   "delta_format": "abs",
+   "notes": "Резервный шаблон: применяется к любому FREE-коду без собственного шаблона темы (в т.ч. FREE-OTHER-*).",
+   "protocol_section": "7.2",
+   "protocol_status": "WARNING",
+   "norm_refs_used": []
+  }
+ ]
+}

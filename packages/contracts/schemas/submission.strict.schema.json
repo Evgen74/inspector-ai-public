@@ -1,0 +1,207 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/submission.strict.schema.json",
+  "title": "ИИ-инспектор: ответ участника (strict)",
+  "description": "Our strict variant of submission.organizer.schema.json (vendored unchanged): only the organizer's fields, all of them present, tightened types and the label/status consistency of 97 §2.6 (integrity rule R13). Every strict answer also validates against the organizer schema. Uniqueness of (parameter_code, location) (R10) and manifest checks (R3–R9, R14) are not expressible here and are enforced by inspector-score. Output of `submission-strict/<object_id>.json`. Owner: AG-04 (exporter), AG-10 (scorer).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "object_id",
+    "checks"
+  ],
+  "properties": {
+    "object_id": {
+      "$ref": "common.schema.json#/$defs/ObjectId"
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Check"
+      }
+    }
+  },
+  "$defs": {
+    "Check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parameter_code",
+        "location",
+        "pd_value",
+        "rd_value",
+        "id_value",
+        "violation_label",
+        "protocol_status",
+        "criticality",
+        "evidence"
+      ],
+      "properties": {
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/SubmissionParameterCode"
+        },
+        "location": {
+          "$ref": "common.schema.json#/$defs/Location"
+        },
+        "pd_value": {
+          "$ref": "common.schema.json#/$defs/StageValue"
+        },
+        "rd_value": {
+          "$ref": "common.schema.json#/$defs/StageValue"
+        },
+        "id_value": {
+          "$ref": "common.schema.json#/$defs/StageValue"
+        },
+        "violation_label": {
+          "enum": [
+            "VIOLATION_PRESENT",
+            "NO_VIOLATION",
+            "MISSING_DOCUMENT",
+            "COMPARISON_IMPOSSIBLE"
+          ]
+        },
+        "protocol_status": {
+          "enum": [
+            "OK",
+            "WARNING",
+            "CRITICAL",
+            "ID_MISSING",
+            "RD_MISSING",
+            "PD_MISSING",
+            "COMPARISON_IMPOSSIBLE"
+          ]
+        },
+        "criticality": {
+          "description": "Exact catalog criticality string (never null in the strict variant).",
+          "enum": [
+            "Критическое (приостановка работ)",
+            "Существенное (предписание)",
+            "Существенное (предписание) — требует утверждения"
+          ]
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Evidence"
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "violation_label": {
+                "const": "VIOLATION_PRESENT"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "protocol_status": {
+                "enum": [
+                  "CRITICAL",
+                  "WARNING"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "violation_label": {
+                "const": "NO_VIOLATION"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "protocol_status": {
+                "enum": [
+                  "OK"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "violation_label": {
+                "const": "MISSING_DOCUMENT"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "protocol_status": {
+                "enum": [
+                  "PD_MISSING",
+                  "RD_MISSING",
+                  "ID_MISSING"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "violation_label": {
+                "const": "COMPARISON_IMPOSSIBLE"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "protocol_status": {
+                "enum": [
+                  "COMPARISON_IMPOSSIBLE"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "parameter_code": {
+                "pattern": "^FREE-"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "criticality": {
+                "const": "Существенное (предписание) — требует утверждения"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "Evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "file_id",
+        "pdf_page_number"
+      ],
+      "properties": {
+        "stage": {
+          "enum": [
+            "PD",
+            "RD",
+            "ID"
+          ]
+        },
+        "file_id": {
+          "$ref": "common.schema.json#/$defs/ManifestFileId"
+        },
+        "pdf_page_number": {
+          "$ref": "common.schema.json#/$defs/PageNumber"
+        }
+      }
+    }
+  }
+}

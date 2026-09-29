@@ -1,0 +1,10 @@
+{
+  "type": "/problems/not-found",
+  "title": "Не найдено",
+  "status": 404,
+  "detail": "Запрошенный ресурс не найден.",
+  "instance": "/x#1",
+  "request_id": "1",
+  "timestamp": "2026-10-02T09:03:11Z",
+  "retryable": false
+}

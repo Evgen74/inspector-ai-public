@@ -1,0 +1,74 @@
+{
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "checks": [
+    {
+      "parameter_code": "IOS4-078",
+      "location": "314",
+      "pd_value": "Конфигурация вентиляции по листу 10 ПД",
+      "rd_value": "Конфигурация вентиляции изменена",
+      "id_value": null,
+      "violation_label": "VIOLATION_PRESENT",
+      "protocol_status": "CRITICAL",
+      "criticality": "Критическое (приостановка работ)",
+      "evidence": [
+        {
+          "stage": "PD",
+          "file_id": "F0171",
+          "pdf_page_number": 88,
+          "document_sheet_number": 10
+        },
+        {
+          "stage": "RD",
+          "file_id": "F0201",
+          "pdf_page_number": 18,
+          "document_sheet_number": 4
+        }
+      ],
+      "comparison_result": "CONFIGURATION_MISMATCH",
+      "location_type": "ROOM",
+      "matrix_scope": "MATRIX",
+      "parameter_mapping_status": "PROVISIONAL_DOMAIN_MAPPING",
+      "finding_id": "G-TR-004-314",
+      "confidence": 0.8
+    },
+    {
+      "parameter_code": "FREE-HEATING-001",
+      "location": "267",
+      "pd_value": "Тёплый пол предусмотрен",
+      "rd_value": "Тёплый пол отсутствует",
+      "id_value": null,
+      "violation_label": "VIOLATION_PRESENT",
+      "protocol_status": "WARNING",
+      "criticality": "Существенное (предписание) — требует утверждения",
+      "evidence": [
+        {
+          "stage": "PD",
+          "file_id": "F0171",
+          "pdf_page_number": 99
+        },
+        {
+          "stage": "RD",
+          "file_id": "F0202",
+          "pdf_page_number": 17
+        }
+      ],
+      "comparison_result": "MISSING_DESIGN_ELEMENT",
+      "location_type": "ROOM",
+      "matrix_scope": "FREE_SEARCH",
+      "parameter_mapping_status": "MATRIX_GAP_CONFIRMED"
+    },
+    {
+      "parameter_code": "IOS2-071",
+      "location": "OBJECT",
+      "pd_value": null,
+      "rd_value": null,
+      "id_value": null,
+      "violation_label": "MISSING_DOCUMENT",
+      "protocol_status": "ID_MISSING",
+      "criticality": "Критическое (приостановка работ)",
+      "evidence": [],
+      "location_type": "OBJECT",
+      "document_status": "PD_RD_AVAILABLE_ID_MISSING"
+    }
+  ]
+}

@@ -1,0 +1,1672 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/protocol.schema.json",
+  "title": "Protocol",
+  "description": "Canonical protocol JSON (97 §2.11, 93 §5): the Приложение 2 body verbatim (header, status line, sections 1–7 with 7.1/7.2), Приложение А (the five ТЗ §9.2 п.4 tables), Приложение Б (evidence cards), Приложение В (input registry, versions, hashes), the signature block and the submission checks of the same run. DOCX, PDF and XML are views of it; rows carry both the machine codes and the rendered Russian cell text, so renderers never re-derive wording. Written to runs/<run_id>/protocol/<object_id>.json. Replaces protocol_lite. Owner: AG-04 (builder and renderer), AG-00 (contract).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "protocol_no",
+    "object",
+    "version",
+    "is_final",
+    "status",
+    "generated_at",
+    "scenario",
+    "versions",
+    "input_manifest_hash",
+    "header",
+    "appendix2",
+    "tz92_tables",
+    "evidence_cards",
+    "input_registry"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "protocol_no": {
+      "type": "string",
+      "minLength": 1,
+      "description": "{YYYY-MM-DD}-{object_code}-{seq} (93 §5.4)."
+    },
+    "run_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "object": {
+      "$ref": "#/$defs/ProtocolObject"
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "is_final": {
+      "type": "boolean",
+      "description": "«окончательная» only for PROTOCOL_FINALIZED."
+    },
+    "status": {
+      "$ref": "enums.schema.json#/$defs/ProtocolStatus"
+    },
+    "process_status": {
+      "oneOf": [
+        {
+          "$ref": "enums.schema.json#/$defs/ProcessStatus"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "generated_at": {
+      "$ref": "common.schema.json#/$defs/Timestamp"
+    },
+    "scenario": {
+      "$ref": "enums.schema.json#/$defs/LoadScenario"
+    },
+    "scenario_base": {
+      "oneOf": [
+        {
+          "$ref": "enums.schema.json#/$defs/ScenarioBase"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "upload_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "pd": {
+          "$ref": "enums.schema.json#/$defs/StageUploadStatus"
+        },
+        "rd": {
+          "$ref": "enums.schema.json#/$defs/StageUploadStatus"
+        },
+        "id": {
+          "$ref": "enums.schema.json#/$defs/StageUploadStatus"
+        }
+      }
+    },
+    "versions": {
+      "$ref": "common.schema.json#/$defs/Versions"
+    },
+    "input_manifest_hash": {
+      "$ref": "common.schema.json#/$defs/Sha256"
+    },
+    "content_sha256": {
+      "oneOf": [
+        {
+          "$ref": "common.schema.json#/$defs/Sha256"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "header": {
+      "$ref": "#/$defs/Header"
+    },
+    "appendix2": {
+      "description": "Body: Приложение 2's seven sections, same titles, columns and order (93 §5.1).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "section1_load_status",
+        "section2_summary",
+        "section3_not_checked_no_id",
+        "section4_critical",
+        "section5_substantial",
+        "section6_ai_suspicions",
+        "section7_resolution"
+      ],
+      "properties": {
+        "section1_load_status": {
+          "description": "РАЗДЕЛ 1. СТАТУС ЗАГРУЗКИ ДОКУМЕНТОВ (the «Тип проверки» line is repeated under the table).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rows"
+          ],
+          "properties": {
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/LoadStatusRow"
+              }
+            },
+            "scenario_line": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        },
+        "section2_summary": {
+          "description": "РАЗДЕЛ 2. СВОДНАЯ СТАТИСТИКА (С ПРОЦЕНТАМИ).",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "rows"
+          ],
+          "properties": {
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SummaryRow"
+              }
+            },
+            "footnotes": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "section3_not_checked_no_id": {
+          "description": "РАЗДЕЛ 3. ПАРАМЕТРЫ, НЕ ПРОВЕРЕННЫЕ ИЗ-ЗА ОТСУТСТВИЯ ИД — {count}.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "count",
+            "rows"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/NotCheckedRow"
+              }
+            }
+          }
+        },
+        "section4_critical": {
+          "description": "РАЗДЕЛ 4. КРИТИЧЕСКИЕ НАРУШЕНИЯ — {count}.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "count",
+            "rows"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ViolationRow"
+              }
+            }
+          }
+        },
+        "section5_substantial": {
+          "description": "РАЗДЕЛ 5. СУЩЕСТВЕННЫЕ НАРУШЕНИЯ — {count}.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "count",
+            "rows"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ViolationRow"
+              }
+            }
+          }
+        },
+        "section6_ai_suspicions": {
+          "description": "РАЗДЕЛ 6. ПОДОЗРЕНИЯ ИИ — {count}.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "count",
+            "rows"
+          ],
+          "properties": {
+            "count": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/SuspicionRow"
+              }
+            }
+          }
+        },
+        "section7_resolution": {
+          "description": "РАЗДЕЛ 7. РЕЗОЛЮТИВНАЯ ЧАСТЬ: 7.1 По критическим нарушениям, 7.2 По существенным нарушениям.",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "critical",
+            "substantial"
+          ],
+          "properties": {
+            "critical": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ResolutionCriticalRow"
+              }
+            },
+            "substantial": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ResolutionSubstantialRow"
+              }
+            }
+          }
+        },
+        "footnotes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "tz92_tables": {
+      "description": "ПРИЛОЖЕНИЕ А. РАЗДЕЛЬНЫЕ ТАБЛИЦЫ (п. 9.2 ТЗ): the five ТЗ §9.2 п.4 tables.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "a1_completeness": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CompletenessRow"
+          }
+        },
+        "a2_candidates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CandidateRow"
+          }
+        },
+        "a3_confirmed": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/CandidateRow"
+          }
+        },
+        "a4_negative_verified": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NegativeRow"
+          }
+        },
+        "a5_hypotheses": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/HypothesisRow"
+          }
+        },
+        "banner_ru": {
+          "type": "string",
+          "description": "Banner on А.2 and А.5: «Не являются нарушениями до решения инспектора»."
+        }
+      }
+    },
+    "evidence_cards": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EvidenceCard"
+      },
+      "description": "ПРИЛОЖЕНИЕ Б. КАРТОЧКИ ДОКАЗАТЕЛЬСТВ."
+    },
+    "input_registry": {
+      "description": "ПРИЛОЖЕНИЕ В. РЕЕСТР ВХОДНЫХ ФАЙЛОВ И ВЕРСИИ (versions and hashes are the top-level `versions`, `input_manifest_hash`, `content_sha256`).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "files"
+      ],
+      "properties": {
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/RegistryRow"
+          }
+        },
+        "parser_versions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "signature": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/Signature"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "submission_checks": {
+      "type": "array",
+      "items": {
+        "$ref": "submission.extended.schema.json#/$defs/Check"
+      },
+      "description": "The exported submission rows of this object (same run)."
+    },
+    "ext": {
+      "$ref": "common.schema.json#/$defs/Extension"
+    }
+  },
+  "$defs": {
+    "ProtocolObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "object_id"
+      ],
+      "properties": {
+        "object_id": {
+          "$ref": "common.schema.json#/$defs/ObjectId"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "address": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supervision_case_no": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "customer": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "contractor": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Header": {
+      "description": "The header block as rendered (Приложение 2 verbatim labels: «Объект:», «Адрес:», «Номер надзорного дела:», «Застройщик:», «Подрядчик:», «Дата формирования:», «Версия протокола:», «Статус:»).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "title",
+        "generated_at_ru",
+        "version_line",
+        "status_line"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "pattern": "^ПРОТОКОЛ АВТОМАТИЗИРОВАННОЙ СВЕРКИ № .+$",
+          "description": "«ПРОТОКОЛ АВТОМАТИЗИРОВАННОЙ СВЕРКИ № {protocol_no}»."
+        },
+        "generated_at_ru": {
+          "type": "string",
+          "description": "«1 июля 2026 г.»"
+        },
+        "version_line": {
+          "type": "string",
+          "description": "«{version} (предварительная)» or «(окончательная)» for PROTOCOL_FINALIZED."
+        },
+        "status_line": {
+          "type": "string",
+          "description": "93 §5.4, e.g. «⚠️ ОЖИДАЕТ ВЕРИФИКАЦИИ (дозагрузка возможна)»."
+        },
+        "scenario_line": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Added line «Тип проверки: {scenario} ({scenario_ru})» (ТЗ §9.2 п.4)."
+        },
+        "recheck_running": {
+          "type": "boolean",
+          "description": "Adds the suffix «· выполняется инкрементальная проверка»."
+        }
+      }
+    },
+    "LoadStatusRow": {
+      "description": "Раздел 1 row: | Тип документа | Статус | Загружено файлов | Ожидается | Комментарий |.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "stage_ru",
+        "status",
+        "status_ru",
+        "files_loaded",
+        "files_loaded_text",
+        "comment"
+      ],
+      "properties": {
+        "stage": {
+          "$ref": "enums.schema.json#/$defs/DocStage"
+        },
+        "stage_ru": {
+          "type": "string",
+          "enum": [
+            "ПД",
+            "РД",
+            "ИД"
+          ]
+        },
+        "status": {
+          "$ref": "enums.schema.json#/$defs/StageUploadStatus"
+        },
+        "status_ru": {
+          "type": "string",
+          "description": "«✅ Полностью» / «🟡 Частично» / «❌ Отсутствует»."
+        },
+        "files_loaded": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "files_loaded_text": {
+          "type": "string",
+          "description": "«8» or «8 из 15» when partial."
+        },
+        "files_expected": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "comment": {
+          "type": "string",
+          "description": "«Все файлы загружены» / «Отсутствуют N файлов» / rejected files with reason."
+        }
+      }
+    },
+    "SummaryRow": {
+      "description": "Раздел 2 row: | Показатель | Количество | % от общего |.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "label_ru",
+        "count",
+        "percent",
+        "percent_text"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "enums.schema.json#/$defs/ProtocolSummaryRow"
+        },
+        "label_ru": {
+          "type": "string",
+          "description": "Verbatim label of ProtocolSummaryRow (enums.yaml label_ru)."
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "percent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "percent_text": {
+          "type": "string",
+          "pattern": "^[0-9]{1,3}(,[0-9])?%$",
+          "description": "Decimal comma, «%» without a space: «84,8%», «100%». Partition rows use largest-remainder rounding (93 §5.3)."
+        }
+      }
+    },
+    "NotCheckedRow": {
+      "description": "Раздел 3 row: | № | Код | Раздел | Параметр | Отсутствующий файл |.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "no",
+        "parameter_code",
+        "section_ru",
+        "parameter_name",
+        "missing_document"
+      ],
+      "properties": {
+        "no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/CanonicalParameterCode"
+        },
+        "parameter_id": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/ParamId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "section_ru": {
+          "type": "string",
+          "description": "Short section, e.g. «КР»."
+        },
+        "parameter_name": {
+          "type": "string",
+          "description": "params.short_name, e.g. «Толщина фундаментной плиты»."
+        },
+        "missing_document": {
+          "type": "string",
+          "description": "Expected ИД document type (93 §5.3 item 4), e.g. «АОСР на устройство фундаментной плиты — не представлен»."
+        }
+      }
+    },
+    "Deviation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "text"
+      ],
+      "properties": {
+        "direction": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DeviationDirection"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "description": "Arrow + verb + magnitude: «⬇️ Понижение класса», «⬇️ Уменьшение на 16%», «❌ Полное отсутствие», «🔄 Изменена конфигурация»."
+        },
+        "magnitude": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "ViolationRow": {
+      "description": "Разделы 4–5 row: | № | Раздел | Параметр (код) | ПД | РД | ИД | Отклонение | Решение инспектора |. Numbering continues from section 4 into section 5 (93 §5.3 item 5).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "no",
+        "section_ru",
+        "parameter_label",
+        "parameter_code",
+        "pd",
+        "rd",
+        "id",
+        "deviation",
+        "inspector_status",
+        "inspector_decision_ru",
+        "card_ref"
+      ],
+      "properties": {
+        "no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "section_ru": {
+          "type": "string"
+        },
+        "parameter_label": {
+          "type": "string",
+          "description": "«{short_name} ({code})» + «, пом. 140, 142» when location-level + «(свободный поиск)» for converted FREE findings."
+        },
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/SubmissionParameterCode"
+        },
+        "parameter_id": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/ParamId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "matrix_scope": {
+          "$ref": "enums.schema.json#/$defs/MatrixScope"
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/Location"
+          }
+        },
+        "pd": {
+          "type": "string",
+          "description": "Rendered cell text: Russian number format («1,0 м», «4×95 мм²»), «—» when the stage is not applicable, «нет данных» when missing."
+        },
+        "rd": {
+          "type": "string",
+          "description": "Rendered cell text: Russian number format («1,0 м», «4×95 мм²»), «—» when the stage is not applicable, «нет данных» when missing."
+        },
+        "id": {
+          "type": "string",
+          "description": "Rendered cell text: Russian number format («1,0 м», «4×95 мм²»), «—» when the stage is not applicable, «нет данных» when missing."
+        },
+        "deviation": {
+          "$ref": "#/$defs/Deviation"
+        },
+        "inspector_status": {
+          "$ref": "enums.schema.json#/$defs/InspectorStatus"
+        },
+        "inspector_decision_ru": {
+          "type": "string",
+          "enum": [
+            "⏳ Ожидает",
+            "✅ Подтверждено",
+            "❌ Отклонено",
+            "❓ Требует уточнения"
+          ]
+        },
+        "card_ref": {
+          "type": "string",
+          "pattern": "^Б\\.[1-9][0-9]*$"
+        },
+        "finding_group_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "criticality_level": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/CriticalityLevel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "SuspicionRow": {
+      "description": "Раздел 6 row: | № | Метод | Описание | ПД | РД | ИД | Решение инспектора | Причина отклонения | Комментарий ИИ |.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "no",
+        "method",
+        "method_ru",
+        "description",
+        "pd",
+        "rd",
+        "id",
+        "inspector_status",
+        "inspector_decision_ru",
+        "rejection_reason",
+        "ai_comment",
+        "card_ref"
+      ],
+      "properties": {
+        "no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "method": {
+          "$ref": "enums.schema.json#/$defs/DiscoveryMethod"
+        },
+        "method_ru": {
+          "type": "string",
+          "description": "DiscoveryMethod label_ru, e.g. «Логический анализ»."
+        },
+        "description": {
+          "type": "string"
+        },
+        "pd": {
+          "type": "string",
+          "description": "Rendered cell text: Russian number format («1,0 м», «4×95 мм²»), «—» when the stage is not applicable, «нет данных» when missing."
+        },
+        "rd": {
+          "type": "string",
+          "description": "Rendered cell text: Russian number format («1,0 м», «4×95 мм²»), «—» when the stage is not applicable, «нет данных» when missing."
+        },
+        "id": {
+          "type": "string",
+          "description": "Rendered cell text: Russian number format («1,0 м», «4×95 мм²»), «—» when the stage is not applicable, «нет данных» when missing."
+        },
+        "parameter_code": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/FreeParameterCode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inspector_status": {
+          "$ref": "enums.schema.json#/$defs/SuspicionInspectorStatus"
+        },
+        "inspector_decision_ru": {
+          "type": "string"
+        },
+        "rejection_reason": {
+          "type": "string",
+          "description": "«—» when none."
+        },
+        "ai_comment": {
+          "type": "string",
+          "description": "«🤖 ИИ СОГЛАСЕН (94%). …» / «—»."
+        },
+        "confidence": {
+          "$ref": "common.schema.json#/$defs/Confidence"
+        },
+        "card_ref": {
+          "type": "string",
+          "pattern": "^Б\\.[1-9][0-9]*$"
+        },
+        "finding_group_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "ResolutionCriticalRow": {
+      "description": "Раздел 7.1 row: | № | Вид работ | Конкретная рекомендация |.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "no",
+        "work_type",
+        "recommendation"
+      ],
+      "properties": {
+        "no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "work_type": {
+          "type": "string",
+          "description": "«{params.work_type} ({code})»."
+        },
+        "recommendation": {
+          "type": "string",
+          "description": "Filled template; preliminary versions carry the prefix «Проект рекомендации (до подтверждения инспектором): »."
+        },
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/SubmissionParameterCode"
+        },
+        "is_draft": {
+          "type": "boolean"
+        },
+        "text_origin": {
+          "$ref": "enums.schema.json#/$defs/TextOrigin"
+        },
+        "template_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_row_no": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "Row № in Раздел 4."
+        }
+      }
+    },
+    "ResolutionSubstantialRow": {
+      "description": "Раздел 7.2 row: | № | Вид нарушения | Конкретная рекомендация |.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "no",
+        "violation_kind",
+        "recommendation"
+      ],
+      "properties": {
+        "no": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "violation_kind": {
+          "type": "string",
+          "description": "«{Отклонение text} {short_name} ({code})», e.g. «Уменьшение площади асфальтобетонного покрытия на 16% (СПЗУ-25)»."
+        },
+        "recommendation": {
+          "type": "string"
+        },
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/SubmissionParameterCode"
+        },
+        "is_draft": {
+          "type": "boolean"
+        },
+        "text_origin": {
+          "$ref": "enums.schema.json#/$defs/TextOrigin"
+        },
+        "template_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_row_no": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "Row № in Раздел 5."
+        }
+      }
+    },
+    "CompletenessRow": {
+      "description": "А.1 Комплектность и сопоставимость: every non-COMPLETE parameter (superset of Раздел 3).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parameter_code",
+        "parameter_name",
+        "protocol_status"
+      ],
+      "properties": {
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/CanonicalParameterCode"
+        },
+        "parameter_name": {
+          "type": "string"
+        },
+        "section_ru": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "protocol_status": {
+          "$ref": "enums.schema.json#/$defs/ProtocolParamStatus"
+        },
+        "completeness_status": {
+          "$ref": "enums.schema.json#/$defs/CompletenessStatus"
+        },
+        "completeness_basis": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/CompletenessBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "missing_stage": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DocStage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "document": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "reason_ru": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "action_ru": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "CandidateRow": {
+      "description": "А.2 Предварительные кандидаты / А.3 Подтверждённые инспектором нарушения.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "card_ref",
+        "parameter_code",
+        "parameter_label",
+        "inspector_status"
+      ],
+      "properties": {
+        "card_ref": {
+          "type": "string",
+          "pattern": "^Б\\.[1-9][0-9]*$"
+        },
+        "finding_group_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/SubmissionParameterCode"
+        },
+        "parameter_label": {
+          "type": "string"
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/Location"
+          }
+        },
+        "expected": {
+          "$ref": "common.schema.json#/$defs/StageValue"
+        },
+        "actual": {
+          "$ref": "common.schema.json#/$defs/StageValue"
+        },
+        "deviation_text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "criticality_level": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/CriticalityLevel"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "risk_level": {
+          "$ref": "enums.schema.json#/$defs/RiskLevel"
+        },
+        "confidence": {
+          "$ref": "common.schema.json#/$defs/Confidence"
+        },
+        "inspector_status": {
+          "$ref": "enums.schema.json#/$defs/InspectorStatus"
+        },
+        "basis_code": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DecisionConfirmBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "clarify_code": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DecisionClarifyBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "comment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decided_at": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "NegativeRow": {
+      "description": "А.4 Проверенные отрицательные результаты (system and inspector NEGATIVE_VERIFIED).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "parameter_code",
+        "parameter_label",
+        "decided_by"
+      ],
+      "properties": {
+        "card_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^Б\\.[1-9][0-9]*$"
+        },
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/SubmissionParameterCode"
+        },
+        "parameter_label": {
+          "type": "string"
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/Location"
+          }
+        },
+        "decided_by": {
+          "$ref": "enums.schema.json#/$defs/DecidedBy"
+        },
+        "reason_code": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DecisionRejectReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reason_ru": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "comment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "ai_comment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decided_at": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "HypothesisRow": {
+      "description": "А.5 Гипотезы свободного поиска (superset of Раздел 6).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "card_ref",
+        "method",
+        "description",
+        "inspector_status"
+      ],
+      "properties": {
+        "card_ref": {
+          "type": "string",
+          "pattern": "^Б\\.[1-9][0-9]*$"
+        },
+        "finding_group_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "parameter_code": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/FreeParameterCode"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "$ref": "enums.schema.json#/$defs/DiscoveryMethod"
+        },
+        "description": {
+          "type": "string"
+        },
+        "confidence": {
+          "$ref": "common.schema.json#/$defs/Confidence"
+        },
+        "normative_base": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "evidence_bind_status": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/EvidenceBindStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "inspector_status": {
+          "$ref": "enums.schema.json#/$defs/SuspicionInspectorStatus"
+        }
+      }
+    },
+    "CardSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stage",
+        "file_id",
+        "pdf_page_number"
+      ],
+      "properties": {
+        "role": {
+          "$ref": "enums.schema.json#/$defs/EvidenceRole"
+        },
+        "stage": {
+          "$ref": "enums.schema.json#/$defs/DocStage"
+        },
+        "file_id": {
+          "$ref": "common.schema.json#/$defs/CitableFileId"
+        },
+        "file_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "file_sha256": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "document_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approval_status": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/ApprovalStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "approval_date": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "pdf_page_number": {
+          "$ref": "common.schema.json#/$defs/PageNumber"
+        },
+        "sheet_number": {
+          "$ref": "common.schema.json#/$defs/SheetNumber"
+        },
+        "geometry": {
+          "$ref": "common.schema.json#/$defs/Geometry"
+        },
+        "geometry_space": {
+          "$ref": "common.schema.json#/$defs/GeometrySpace"
+        },
+        "thumbnail": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Path relative to the run directory (blue frame = expected, red = actual)."
+        },
+        "value_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Value-conflict suspicions: the value this page supports, as displayed («1,7 %»)."
+        }
+      }
+    },
+    "CardInspector": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "$ref": "enums.schema.json#/$defs/InspectorStatus"
+        },
+        "reason_code": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DecisionRejectReason"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "basis_code": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DecisionConfirmBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "clarify_code": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DecisionClarifyBasis"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "comment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "user_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "decided_at": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "EvidenceCard": {
+      "description": "Приложение Б card: every mandatory field of ТЗ §9.2 п.4 (finding_id, код, expected/actual, file_id and SHA-256 of each source, стадия, шифр, редакция, статус утверждения, лист/страница, bbox/polygon, обоснование, уровень риска, решение и причина).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "card_no",
+        "parameter_code",
+        "parameter_label",
+        "locations",
+        "sources",
+        "inspector"
+      ],
+      "properties": {
+        "card_no": {
+          "type": "string",
+          "pattern": "^Б\\.[1-9][0-9]*$"
+        },
+        "finding_group_id": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "finding_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "parameter_code": {
+          "$ref": "common.schema.json#/$defs/SubmissionParameterCode"
+        },
+        "parameter_label": {
+          "type": "string"
+        },
+        "rule_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "locations": {
+          "type": "array",
+          "items": {
+            "$ref": "common.schema.json#/$defs/Location"
+          }
+        },
+        "expected_value": {
+          "$ref": "common.schema.json#/$defs/StageValue"
+        },
+        "actual_value": {
+          "$ref": "common.schema.json#/$defs/StageValue"
+        },
+        "delta": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "{abs, rel, unit, direction}."
+        },
+        "rationale": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "risk_level": {
+          "$ref": "enums.schema.json#/$defs/RiskLevel"
+        },
+        "review_priority": {
+          "$ref": "enums.schema.json#/$defs/ReviewPriority"
+        },
+        "criticality": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/CriticalityString"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "approved_change_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/CardSource"
+          }
+        },
+        "inspector": {
+          "$ref": "#/$defs/CardInspector"
+        },
+        "ai_verdict": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/AiVerdict"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "ai_comment": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stage_values": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "description": "Value-conflict suspicions: the conflicting values per stage as displayed («1,7 % (3 файла); 1 % (1 файл)»); null = the stage has no value.",
+          "additionalProperties": false,
+          "properties": {
+            "PD": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "RD": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "ID": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "RegistryRow": {
+      "description": "Приложение В row: input registry.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_id",
+        "stage",
+        "sha256",
+        "used"
+      ],
+      "properties": {
+        "file_id": {
+          "$ref": "common.schema.json#/$defs/FileId"
+        },
+        "file_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "stage": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DocStage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "manifest_stage": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/ManifestStage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "section": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "document_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "revision": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "approval_status": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/ApprovalStatus"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pages": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "sha256": {
+          "$ref": "common.schema.json#/$defs/Sha256"
+        },
+        "local_status": {
+          "$ref": "enums.schema.json#/$defs/LocalFileStatus"
+        },
+        "used": {
+          "type": "boolean"
+        },
+        "exclusion_reason": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Signature": {
+      "description": "Signature block and finalisation stamp (step-up re-auth + SHA-256 seal, 97 §2.14).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [],
+      "properties": {
+        "inspector_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "inspector_position": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "signed_at": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "finalized_at": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "finalized_by": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "content_sha256": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/Sha256"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

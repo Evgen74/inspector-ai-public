@@ -1,0 +1,298 @@
+# «Инспектор ИИ» — AG-03 curation of the web-verified normative references (M1). Built into params.json
+# (`references`, `norm_verification`, thresholds) and recommendation_templates.json by build_seed.py.
+#
+# Inputs adopted verbatim from docs/analysis/norms_staging (review phase, checked 2026-09-27) into src/norms/:
+#   norms_pz_spzu_ar_kr_pos_pod.json        ← norms_ПЗ_СПЗУ_АР_КР_ПОС_ПОД_M_001_M_067_M_081_M_097_.json
+#   norms_ios_oos_ppm_odi_zu_sm.json         ← norms_ИОС1_5_ООС_ППМ_ОДИ_ЗУ_СМ_M_068_M_080_M_098_M_132_.json
+#   recommendation_templates.staging.json   ← recommendation_templates.json
+# The copies are never edited: every AG-03 decision lives in this file (and in texts.yaml / rules.yaml /
+# regexes.yaml), and the build records the sha256 of every input in `sources`.
+#
+# Policies (documented in seed/README.md):
+# - A reference keeps its verification status (NormRefStatus). NOT_FOUND references are never cited: they are kept
+#   in norm_verification.references_not_found. Additional references found by the verifier enter as ADDED.
+# - Numbers in recommendation texts come only from HIGH-confidence verified records (test-enforced).
+# - Edition choice (90 C-50/CON-40): design norms by the PD approval date (fallback: the check date); process and
+#   as-built norms (ИГД, отходы) by the date of the event (act, trip). A document replaced after the PD approval
+#   date is cited in its previous edition; inline citations of a replaced design norm are rewritten to the previous
+#   designation without clause numbers (clause numbering differs between editions).
+# - Thresholds: the matrix literal is the customer's detection trigger (Приложение 1). It is overridden only when
+#   the verified norm shows it is wrong in a way that matters (D-04: 1,5 м for МГН doors flags nearly every door),
+#   or when the norm is unconditional and stricter and the literal is an evident error (ODI-121 3,5 → 3,6 м). A
+#   softer or conditional literal stays as the trigger; the verified norm and its conditions are recorded in
+#   norm_verification.threshold and cited by the recommendations.
+
+checked_at: '2026-09-27'
+
+inputs:
+  - {file: norms/norms_pz_spzu_ar_kr_pos_pod.json, staging: docs/analysis/norms_staging/norms_ПЗ_СПЗУ_АР_КР_ПОС_ПОД_M_001_M_067_M_081_M_097_.json}
+  - {file: norms/norms_ios_oos_ppm_odi_zu_sm.json, staging: docs/analysis/norms_staging/norms_ИОС1_5_ООС_ППМ_ОДИ_ЗУ_СМ_M_068_M_080_M_098_M_132_.json}
+  - {file: norms/recommendation_templates.staging.json, staging: docs/analysis/norms_staging/recommendation_templates.json}
+
+# NormRefStatus (proposed to AG-00 for enums.yaml): verification status of one normative reference.
+reference_status:
+  CONFIRMED: 'документ действует, пункт и смысл подтверждены (при необходимости уточнён пункт)'
+  CORRECTED: 'документ верный или близкий, но уточнены пункт, значение или обозначение'
+  OUTDATED: 'в Матрице указана утратившая силу редакция; цитируется действующая замена'
+  NOT_FOUND: 'в указанном документе требуемой нормы нет; ссылка не цитируется'
+  ADDED: 'дополнительная ссылка, найденная при верификации'
+
+# NormThresholdStatus (proposed to AG-00): verdict on the matrix threshold. The two staging files use two
+# vocabularies; staging_map folds them into one.
+threshold_status:
+  vocabulary:
+    CONFIRMED: 'числовой порог Матрицы совпадает с нормой'
+    CORRECTED: 'норма задаёт иной порог или условие'
+    CONDITIONAL: 'норма зависит от условия (высота, класс Ф, путь МГН и т. п.)'
+    MATRIX_STRICTER_THAN_NORM: 'порог Матрицы строже нормы — сохраняется как порог Заказчика'
+    CUSTOMER_THRESHOLD: 'порог — решение Заказчика (Матрицы), нормой не установлен'
+    RULE_BASED: 'нечисловое правило (статус во внешней системе, наличие документа)'
+    NOT_NORMATIVE: 'межстадийная сверка ПД↔РД↔ИД без нормативного числа'
+    OBJECT_SPECIFIC: 'предел берётся из объектных документов (ГПЗУ, ТУ, ПД, РНГП)'
+    NO_BASIS_FOUND: 'нормативного основания для порога Матрицы не найдено'
+  staging_map:
+    CONFIRMED: CONFIRMED
+    CORRECTED: CORRECTED
+    CONDITIONAL: CONDITIONAL
+    MATRIX_STRICTER_THAN_NORM: MATRIX_STRICTER_THAN_NORM
+    MATRIX_DEFINED: CUSTOMER_THRESHOLD
+    CUSTOMER_THRESHOLD: CUSTOMER_THRESHOLD
+    RULE_BASED: RULE_BASED
+    NO_NORMATIVE_THRESHOLD: NOT_NORMATIVE
+    NOT_NORMATIVE: NOT_NORMATIVE
+    OBJECT_SPECIFIC: OBJECT_SPECIFIC
+    NO_BASIS_FOUND: NO_BASIS_FOUND
+
+# Edition registry: replaced and expiring documents found by the verification (key findings of both staging files
+# and the OUTDATED references). applies_by: PD_APPROVAL_DATE (design norms) | EVENT_DATE (process, as-built, waste).
+# inline_replace: the renderer rewrites an inline citation of `replaced_by` (with its clause list) to `designation`
+# when the PD was approved before `effective_from`.
+documents:
+  - {designation: 'СП 6.13130.2021', replaced_by: 'СП 6.13130.2025', effective_from: '2026-06-29', basis: 'приказ МЧС России от 29.12.2025 № 1263', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'СП 3.13130.2009', replaced_by: 'СП 3.13130.2026', effective_from: '2026-06-01', basis: 'приказ МЧС России от 26.02.2026 № 133', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'СП 42.13330.2016', replaced_by: 'СП 42.13330.2026', effective_from: '2026-07-12', basis: 'приказ Минстроя России от 11.06.2026 № 368/пр', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'СП 50.13330.2012', replaced_by: 'СП 50.13330.2024', effective_from: '2024-06-16', basis: 'приказ Минстроя России от 15.05.2024 № 327/пр', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'СП 59.13330.2016', replaced_by: 'СП 59.13330.2020', effective_from: '2021-07-01', basis: 'приказ Минстроя России от 30.12.2020 № 904/пр', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'СП 113.13330.2016', replaced_by: 'СП 113.13330.2023', effective_from: '2023-11-06', basis: 'СП 113.13330.2023 введён взамен СП 113.13330.2016', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'СП 367.1325800.2017', replaced_by: 'СП 367.1325800.2025', effective_from: '2026-01-26', basis: 'СП 367.1325800.2025 введён взамен СП 367.1325800.2017', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ 31311-2005', replaced_by: 'ГОСТ 31311-2022', effective_from: '2025-09-01', basis: 'приказ Росстандарта № 333-ст от 18.05.2022', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ Р 53301-2013', replaced_by: 'ГОСТ Р 53301-2019', effective_from: '2023-07-01', basis: 'приказ Росстандарта № 1268-ст от 26.11.2019', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ Р 51630-2000', replaced_by: 'ГОСТ 34682.2-2020', effective_from: '2021-06-01', basis: 'приказы Росстандарта № 1031-ст и № 1032-ст от 06.11.2020 (ГОСТ 34682.1-2020 и 34682.2-2020)', applies_by: PD_APPROVAL_DATE, inline_replace: false}
+  - {designation: 'ГОСТ Р 51261-2017', replaced_by: 'ГОСТ Р 51261-2022', effective_from: '2022-12-01', basis: 'приказ Росстандарта № 528-ст от 23.06.2022', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ Р 51261-2022', replaced_by: 'ГОСТ Р 51261-2025', effective_from: '2026-07-01', basis: 'приказ Росстандарта № 1654-ст от 08.12.2025', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ Р 52875-2018', replaced_by: 'ГОСТ Р 52875-2025', effective_from: '2026-07-01', basis: 'приказ Росстандарта № 1587-ст от 01.12.2025', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ 9573-2012', replaced_by: 'ГОСТ 9573-2025', effective_from: '2026-04-01', basis: 'приказ Росстандарта № 925-ст от 27.08.2025', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ 23166-2021', replaced_by: 'ГОСТ 23166-2024', effective_from: '2024-04-01', basis: 'приказ Росстандарта № 361-ст от 27.03.2024', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ 30674-99', replaced_by: 'ГОСТ 30674-2023', effective_from: '2024-08-01', basis: 'приказ Росстандарта № 1701-ст от 28.12.2023', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ 25772-2021', replaced_by: 'ГОСТ 25772-2025', effective_from: '2026-01-01', basis: 'приказ Росстандарта № 1134-ст от 30.09.2025', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ Р 21.101-2020', replaced_by: 'ГОСТ Р 21.101-2026', effective_from: '2026-04-01', basis: 'приказ Росстандарта от 12.02.2026 № 129-ст', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ 475-2016', replaced_by: 'ГОСТ 475-2026', effective_from: '2026-10-01', basis: 'приказ Росстандарта от 13.05.2026 № 472-ст', applies_by: PD_APPROVAL_DATE, inline_replace: true}
+  - {designation: 'ГОСТ 7473-2010', replaced_by: 'ГОСТ 7473-2026', effective_from: '2026-11-01', basis: 'приказ Росстандарта от 28.07.2026 № 856-ст', applies_by: EVENT_DATE, inline_replace: false}
+  - {designation: 'ГОСТ Р 51872-2019', replaced_by: 'ГОСТ Р 51872-2024', effective_from: '2024-11-01', basis: 'приказ Росстандарта от 22.10.2024 № 1479-ст', applies_by: EVENT_DATE, inline_replace: false}
+  - {designation: 'Приказ Минприроды России от 04.12.2014 № 536', replaced_by: 'Приказ Минприроды России от 31.03.2025 № 158', effective_from: '2025-09-01', basis: 'приказ № 158 признал утратившим силу приказ № 536', applies_by: EVENT_DATE, inline_replace: false}
+  - {designation: 'СанПиН 2.3/2.4.3590-20', valid_until: '2027-01-01', basis: 'постановление Главного государственного санитарного врача РФ от 27.10.2020 № 32', applies_by: EVENT_DATE}
+  - {designation: 'СП 2.4.3648-20', valid_until: '2027-01-01', basis: 'постановление Главного государственного санитарного врача РФ от 28.09.2020 № 28', applies_by: EVENT_DATE}
+  - {designation: 'СанПиН 1.2.3685-21', valid_until: '2027-03-01', basis: 'постановление Главного государственного санитарного врача РФ от 28.01.2021 № 2', applies_by: EVENT_DATE}
+  - {designation: 'ПП РФ от 16.09.2020 № 1479', valid_until: '2027-01-01', basis: 'Правила противопожарного режима действуют до 31.12.2026 включительно', applies_by: EVENT_DATE}
+
+# Procedure changes that are not a document replacement: selected by the date of the event (trip, start of work).
+regime_changes:
+  - id: MOSCOW_OSSIG_2026_07
+    effective_from: '2026-07-01'
+    applies_by: EVENT_DATE
+    params: [OOS-098, OOS-099, OOS-100]
+    basis: 'ПП Москвы от 26.08.2020 № 1386-ПП и ПП Москвы от 16.06.2014 № 335-ПП (АИС «ОССиГ») в порядке, действующем с 01.07.2026; https://stroi.mos.ru/oss'
+    before: 'Разрешение на перемещение ОССиГ — государственная услуга; рейсы фиксируются QR-кодом «Мобильного КПТС» (smart.mos.ru).'
+    after: 'Госуслуга отменена: разрешение формируется автоматически на каждый рейс (срок действия 12 ч) для объекта, включённого в реестр АИС «ОССиГ»; данные о рейсах передаются через внешние информационные системы (КПТС и smart.mos.ru не применяются); перевозчики и ТС зарегистрированы в РНИС г. Москвы.'
+
+# Threshold decisions (see the policy above). Each one changes params.json and is logged in seed_changes.
+threshold_decisions:
+  ODI-121:
+    min_value: 3.6
+    threshold_source: NORMATIVE_OVERRIDE
+    matrix_trigger_value: {min: 3.5}
+    threshold_note: 'Ширина специализированного места для кресла-коляски не менее 3,6 м при длине 6,0 м (6,8 м вдоль проезжей части) — СП 59.13330.2020, п. 5.2.4 (HIGH). Порог Матрицы 3,5 м мягче нормы (D-06), сохранён в matrix_trigger_value.'
+    sub_notes: {ODI-121.b: 'Норма СП 59.13330.2020, п. 5.2.4: ширина не менее 3,6 м (порог Матрицы 3,5 м — ошибка, D-06).'}
+    sub_titles: {ODI-121.b: 'Ширина места для инвалида на кресле-коляске ниже нормы'}
+    reason: 'верификация норм (HIGH): СП 59.13330.2020 п. 5.2.4 — 6,0 × 3,6 м; литерал Матрицы 3,5 м ошибочен'
+  ODI-119:
+    min_value: 1.7
+    threshold_source: NORMATIVE_OVERRIDE
+    matrix_trigger_value: {min: 1.5}
+    conditional: {ODI-119.a: [{if: {var: object.is_reconstruction}, min: 1.5}]}
+    threshold_note: 'Универсальная кабина (новое строительство): меньший размер в плане не менее 1,7 м (1,7 × 2,2 м; при центральном унитазе 2,2 × 2,25 м) — СП 59.13330.2020, п. 6.3.7, табл. 6.1 (HIGH); 1,5 × 1,5 м — только при реконструкции. Порог Матрицы 1,5 м сохранён в matrix_trigger_value.'
+    sub_notes: {ODI-119.a: 'Новое строительство — не менее 1,7 м (СП 59.13330.2020, табл. 6.1); реконструкция (object.is_reconstruction) — 1,5 м.'}
+    reason: 'верификация норм (HIGH): СП 59.13330.2020 табл. 6.1 — 1,7 × 2,2 м для нового строительства; 1,5 м — только реконструкция'
+  PPM-104:
+    conditional: {PPM-104.a: [{if: {'==': [{var: element.evac_people_gt_threshold}, false]}, min: 1.0}]}
+    threshold_note: 'Не менее 1,2 м при числе эвакуирующихся по участку более 50 человек; 1,0 м — в остальных случаях; 0,7 м — проходы к одиночным рабочим местам; высота не менее 2,0 м — СП 1.13130.2020, пп. 4.3.2, 4.3.3 (HIGH). Без сведений о численности — 1,2 м.'
+    sub_notes: {PPM-104.a: '1,2 м — более 50 эвакуирующихся по участку, иначе 1,0 м (СП 1.13130.2020, п. 4.3.3; прежняя ссылка п. 4.3.4 исправлена).'}
+    sub_titles: {PPM-104.a: 'Ширина эвакуационного прохода ниже нормы'}
+    reason: 'верификация норм (HIGH): СП 1.13130.2020 п. 4.3.3 — 1,2 м при > 50 чел., иначе 1,0 м (как AR-040)'
+  ODI-117:
+    threshold_note: 'Ширина дверных проёмов в свету на путях МГН не менее 0,9 м (при реконструкции в несущих конструкциях — 0,8 м; при глубине откоса более 1,0 м — 1,2 м) — СП 59.13330.2020, пп. 6.1.5, 6.2.4 (HIGH). Литерал Матрицы 1,5 м нормой не подтверждается (D-04 закрыт верификацией), сохранён в matrix_trigger_value.'
+    sub_notes: {ODI-117.a: 'Норма 0,9 м в свету (СП 59.13330.2020, пп. 6.1.5, 6.2.4, HIGH); литерал Матрицы 1,5 м не подтверждён (D-04 закрыт).'}
+    reason: 'D-04 закрыт верификацией норм (HIGH): СП 59.13330.2020 пп. 6.1.5, 6.2.4 — 0,9 м'
+  ODI-116:
+    threshold_note: 'Порог Матрицы 1,5 м (1,8 м при встречном движении) — логика СП 59.13330.2016, сохранён как триггер Заказчика. Действующая норма: не менее 1,8 м; 1,2–1,5 м допускается при карманах для разъезда (длина не менее 2 м, общая ширина не менее 1,8 м) — СП 59.13330.2020, п. 6.2.1 (HIGH).'
+    sub_notes: {ODI-116.a: 'Триггер Матрицы 1,5/1,8 м; норма СП 59.13330.2020 п. 6.2.1 — 1,8 м или 1,2–1,5 м с карманами (карманы не извлекаются — порог Матрицы сохранён).'}
+    reason: 'верификация норм: литерал Матрицы мягче нормы и условен (карманы не извлекаются) — сохранён, норма записана'
+  SPZU-030:
+    threshold_note: 'Ширина проездов по пожарно-технической высоте: 3,5 м (до 13 м), 4,2 м (13–46 м), 6,0 м (более 46 м) — СП 4.13130.2013, п. 8.1.4 (нумерация после Изм. № 3; прежний п. 8.6), HIGH. Без высоты — 4,2 м.'
+    sub_notes: {SPZU-030.a: 'Порог по высоте — СП 4.13130.2013, п. 8.1.4 (прежний п. 8.6), HIGH. Без высоты — 4,2 м.'}
+    reason: 'верификация норм: пункт п. 8.6 → п. 8.1.4 (Изм. № 3), значения подтверждены (HIGH)'
+  AR-040:
+    threshold_note: '1,2 м — более 50 эвакуирующихся, иначе 1,0 м (СП 1.13130.2020, п. 4.3.3, HIGH); в жилых зданиях Ф1.3 — 1,4 м при длине коридора до 40 м и 1,6 м при большей длине (п. 6.1.9).'
+    sub_notes: {AR-040.a: '1,2 м — более 50 эвакуирующихся, иначе 1,0 м (СП 1.13130.2020, п. 4.3.3, HIGH; прежняя ссылка п. 4.3.4 исправлена). Ф1.3 — 1,4/1,6 м (п. 6.1.9).'}
+    reason: 'верификация норм: п. 4.3.4 → п. 4.3.3; добавлено условие Ф1.3 (п. 6.1.9)'
+  PPM-105:
+    threshold_note: 'Порог Матрицы 0,9 м строже нормы и сохранён как порог Заказчика; нормативный минимум — 0,8 м, при 50 и более эвакуирующихся — 1,2 м, для выходов из лестничных клеток — не менее ширины марша (СП 1.13130.2020, пп. 4.2.19, 4.2.20, HIGH).'
+    reason: 'верификация норм: MATRIX_STRICTER_THAN_NORM — порог Заказчика сохранён'
+  SPZU-033:
+    threshold_note: 'Пороги Матрицей не заданы. Для ПД, утверждённой с 12.07.2026: наибольший продольный уклон проездов 80 ‰ (СП 42.13330.2026, табл. 8.9, HIGH); для ранее утверждённой ПД — по СП 42.13330.2016. Наименьший продольный уклон по лоткам — по СП 396.1325800.2018, п. 5.6.24 (MEDIUM). Значения задаёт администратор (Normative_Base).'
+    reason: 'верификация норм: действующие значения по СП 42.13330.2026 записаны, выбор редакции — по дате утверждения ПД'
+
+# Parameter patches caused by the verification (texts only; the catalog wins on names and triggers).
+param_patches:
+  OOS-098:
+    external_system: 'АИС «ОССиГ» (в Матрице — «ОСИГ»)'
+    rule_note: 'С 01.07.2026 (по дате начала работ): проверяется включение объекта образования ОССиГ в реестр АИС «ОССиГ» и наличие автоматически сформированных разрешений на рейсы; до 01.07.2026 — открытое разрешение на перемещение ОССиГ (госуслуга). Нет интеграции → MISSING_EVIDENCE «требуются данные АИС «ОССиГ»».'
+    threshold_note: 'Статус во внешней системе АИС «ОССиГ». С 01.07.2026 «открытое разрешение» как отдельная госуслуга не выдаётся: проверяются реестр объектов образования ОССиГ и разрешения на рейсы (ПП Москвы № 1386-ПП, № 335-ПП).'
+    feasibility_note: 'Статус — только во внешней АИС «ОССиГ»; в MVP — проверка наличия выписки АИС «ОССиГ» (реестр объекта, разрешения на рейсы) или электронного паспорта в ИД.'
+    anchors_add: ['АИС «ОССиГ»', 'реестр объектов образования ОССиГ', 'разрешение на рейс']
+    notes_append: 'Верификация норм: опечатка Матрицы «ОСИГ» → «ОССиГ»; с 01.07.2026 порядок изменён (regime MOSCOW_OSSIG_2026_07).'
+    reason: 'изменение порядка контроля ОССиГ в г. Москве с 01.07.2026 (ПП Москвы № 1386-ПП, № 335-ПП; stroi.mos.ru/oss)'
+  OOS-099:
+    external_system: 'РНИС г. Москвы / АИС «ОССиГ»'
+    rule_note: 'Проверяется регистрация перевозчика и ТС в РНИС г. Москвы и передача данных о рейсе в АИС «ОССиГ» (ПП Москвы № 1386-ПП). Требование ГЛОНАСС-оборудования подтверждено только косвенно (MEDIUM).'
+    threshold_note: 'Статус во внешних системах (РНИС г. Москвы, АИС «ОССиГ»).'
+    anchors_add: ['АИС «ОССиГ»', 'РНИС г. Москвы']
+    notes_append: 'Верификация норм: требование — регистрация перевозчика и ТС в РНИС г. Москвы (ПП Москвы № 1386-ПП, MEDIUM).'
+    reason: 'верификация норм: РНИС г. Москвы (ПП Москвы № 1386-ПП)'
+  OOS-100:
+    external_system: 'Мобильный КПТС (рейсы до 01.07.2026); АИС «ОССиГ» через внешние ИС (рейсы с 01.07.2026)'
+    rule_note: 'По дате рейса: до 01.07.2026 — QR-код «Мобильного КПТС»; с 01.07.2026 КПТС и smart.mos.ru не применяются — запись о рейсе в АИС «ОССиГ» по автоматически сформированному разрешению. Нет данных → MISSING_EVIDENCE.'
+    threshold_note: 'Статус во внешней системе: для рейсов с 01.07.2026 — запись о рейсе в АИС «ОССиГ» вместо QR-кода «Мобильного КПТС».'
+    feasibility_note: 'Журнал рейсов — внешние данные (КПТС до 01.07.2026, АИС «ОССиГ» после).'
+    anchors_add: ['АИС «ОССиГ»', 'разрешение на рейс']
+    notes_append: 'Верификация норм: механизм «Мобильный КПТС» применим только к рейсам до 01.07.2026 (regime MOSCOW_OSSIG_2026_07).'
+    reason: 'изменение порядка контроля ОССиГ в г. Москве с 01.07.2026: КПТС не применяется'
+
+# Template patches: additions on top of the staging templates.
+template_patches:
+  AR-051:
+    edition_rules_add: [{pd_approved_before: '2026-01-26', norm_ref: 'СП 367.1325800.2017'}]
+    reason: 'норма в norm_fill (СП 367.1325800.2025) введена 26.01.2026; для ранее утверждённой ПД — СП 367.1325800.2017'
+
+# FREE topics: the staging vocabulary ends with GENERIC; the contract enum FreeTopic calls it OTHER.
+free_topic_map: {GENERIC: OTHER}
+
+# ── Vocabularies of recommendation_templates.json ──────────────────────────────────────────────────────────────────
+# DeviationKind (proposed to AG-00): the kind of deviation that selects the «Отклонение» phrase and the «Вид
+# нарушения» variant. staging_key is the key used by the staging templates; direction is the default
+# DeviationDirection (AG-04 enum) — the renderer takes the actual direction from the phrase's marker.
+deviation_kinds:
+  - {code: DECREASE, staging_key: decrease, label_ru: Уменьшение, direction: DECREASE}
+  - {code: INCREASE, staging_key: increase, label_ru: Увеличение, direction: INCREASE}
+  - {code: CLASS_DOWNGRADE, staging_key: class_downgrade, label_ru: Понижение класса, direction: DECREASE}
+  - {code: ABSENCE, staging_key: absence, label_ru: Отсутствие, direction: ABSENT}
+  - {code: SUBSTITUTION, staging_key: substitution, label_ru: Замена, direction: CHANGED}
+  - {code: CONFIGURATION_CHANGE, staging_key: configuration_change, label_ru: Изменение конфигурации, direction: CHANGED}
+  - {code: NORM_VIOLATION, staging_key: norm_violation, label_ru: Несоответствие норме, direction: DECREASE}
+  - {code: TOLERANCE_EXCEEDED, staging_key: tolerance_exceeded, label_ru: Отклонение сверх допуска, direction: DECREASE}
+  - {code: ZONE_INTRUSION, staging_key: zone_intrusion, label_ru: Нарушение границ зоны, direction: ABSENT}
+
+# BY_SIGN: the numbers decide (actual below ПД → DECREASE, above → INCREASE; unknown → DECREASE).
+discrepancy_to_deviation_kind:
+  VALUE_DECREASED: DECREASE
+  VALUE_INCREASED: INCREASE
+  VALUE_CHANGED: BY_SIGN
+  THRESHOLD_BELOW_MIN: NORM_VIOLATION
+  THRESHOLD_ABOVE_MAX: NORM_VIOLATION
+  TOLERANCE_EXCEEDED: TOLERANCE_EXCEEDED
+  CLASS_DOWNGRADED: CLASS_DOWNGRADE
+  MATERIAL_SUBSTITUTED: SUBSTITUTION
+  ELEMENT_MISSING: ABSENCE
+  ELEMENT_ADDED: CONFIGURATION_CHANGE
+  FUNCTION_CHANGED: CONFIGURATION_CHANGE
+  LAYER_REMOVED: ABSENCE
+  LAYER_CHANGED: CONFIGURATION_CHANGE
+  POSITION_SHIFTED: CONFIGURATION_CHANGE
+  CONFIGURATION_CHANGED: CONFIGURATION_CHANGE
+  COUNT_CHANGED: BY_SIGN
+  TOTAL_CHANGED: BY_SIGN
+  UNDOCUMENTED_WORK: ABSENCE
+comparison_result_to_deviation_kind:
+  CONFIGURATION_MISMATCH: CONFIGURATION_CHANGE
+  MISSING_DESIGN_ELEMENT: ABSENCE
+  VALUE_MISMATCH: BY_SIGN
+  MATERIAL_SUBSTITUTION: SUBSTITUTION
+  EXTRA_ELEMENT: CONFIGURATION_CHANGE
+  TOLERANCE_EXCEEDED: TOLERANCE_EXCEEDED
+violation_type_to_deviation_kind:
+  NUMERIC_DECREASE: DECREASE
+  COUNT_DECREASE: DECREASE
+  NUMERIC_DEVIATION: BY_SIGN
+  NUMERIC_INCREASE: INCREASE
+  CLASS_DOWNGRADE: CLASS_DOWNGRADE
+  ELEMENT_REMOVED: ABSENCE
+  MATERIAL_SUBSTITUTION: SUBSTITUTION
+  CONFIG_CHANGE: CONFIGURATION_CHANGE
+  LAYER_CHANGE: CONFIGURATION_CHANGE
+  GEOMETRY_OFFSET: CONFIGURATION_CHANGE
+  NORM_BOUND_VIOLATION: NORM_VIOLATION
+  RATIO_VIOLATION: NORM_VIOLATION
+  TOLERANCE_EXCEEDED: TOLERANCE_EXCEEDED
+  ZONE_INTRUSION: ZONE_INTRUSION
+  EXTERNAL_NONCOMPLIANCE: ABSENCE
+  INTERNAL_INCONSISTENCY: CONFIGURATION_CHANGE
+# «Отклонение» marker → DeviationDirection (AG-04 enum, Приложение 2 emoji; 🔄 is our addition, 93 §5.4).
+markers: {'⬇️': DECREASE, '⬆️': INCREASE, '❌': ABSENT, '🔄': CHANGED}
+# Delta format codes (staging lower case → seed code).
+delta_formats: {abs: ABS, pct: PCT, count: COUNT, none: NONE}
+# Verification status of a template's norm reference (staging wording → NormRefStatus).
+template_ref_status_map:
+  CONFIRMED: CONFIRMED
+  CORRECTED: CORRECTED
+  'OUTDATED_IN_MATRIX; REPLACEMENT_CITED': OUTDATED
+  ADDITIONAL_VERIFIED: ADDED
+  'NOT_FOUND_FOR_MATRIX_CLAIM; CLAUSE_QUOTED': CORRECTED
+
+# Conventions printed into recommendation_templates.json (the renderer is inspector_common.params).
+template_conventions:
+  codes: 'template_id и code — канонический код каталога (KR-055); в «(…)» Раздела 7 печатается код каталога (для FREE — номер группы, FREE-HEATING-001). Код «AR-14» Приложения 2 ошибочен: это AR-040.'
+  protocol_rows:
+    section_4_5_parameter: '«{short_name} ({code})» плюс «, пом. …» для находок по помещениям (93 §5.4)'
+    section_4_5_deviation: 'deviation_phrases[вид] (иначе фраза вида по умолчанию) с подстановкой {delta}; направление — по маркеру'
+    section_7_1: 'Вид работ = «{work_type} ({code})»; Конкретная рекомендация = recommendation (recommendation_variants[вид] при наличии)'
+    section_7_2: 'Вид нарушения = «{violation_kind_variants[вид:элемент] | violation_kind_variants[вид] | violation_kind} ({code})»; Конкретная рекомендация — как в 7.1'
+    choice_7_1_vs_7_2: 'по criticality_level (protocol_section); FREE — всегда 7.2'
+    preliminary_prefix: 'Проект рекомендации (до подтверждения инспектором): '
+  placeholders:
+    pd_value: 'значение ПД в формате подачи («1,0 м», «4×95 мм²», «B35», «EI-60»)'
+    rd_value: 'значение РД'
+    id_value: 'значение ИД'
+    actual_value: 'отклоняющееся значение: id_value, если ИД представлена и расходится с ПД/РД, иначе rd_value'
+    delta: 'величина отклонения по delta_format шаблона'
+    location: 'место в читаемой форме: «пом. 012», «пом. 140, 142»; иное — по грамматике 93 §2.7; OBJECT не печатается'
+    norm_value: 'нормативное требование с оператором и единицей («не менее 0,9 м в свету»): из нормативной проверки находки, иначе edition_rules по дате утверждения ПД, иначе norm_fill'
+    norm_ref: 'обозначение и пункт нормы: из нормативной проверки, иначе edition_rules, иначе norm_fill'
+    element: 'только FREE: наименование элемента со строчной буквы («тёплый пол»)'
+  rendering_rules:
+    - 'R1. Плейсхолдеры, кроме {delta}, {element}, {norm_value}, {norm_ref}, стоят в скобках; части скобочной группы разделяются «; ».'
+    - 'R2. Если значение недоступно, удаляется часть группы, содержащая его; опустевшая группа удаляется вместе с пробелом перед ней.'
+    - 'R3. Недоступный плейсхолдер вне скобок удаляется вместе с предшествующим «на », «: », « — », «, » или пробелом.'
+    - 'R4. norm_value/norm_ref: значение нормативной проверки, иначе правило редакции для ПД, утверждённой до pd_approved_before, иначе norm_fill.'
+    - 'R5. Числа — с десятичной запятой; «%» в {delta} без пробела («16%»), в нормативном тексте — с пробелом («1,5 %», «80 ‰»).'
+    - 'R6. Если {delta} формата COUNT имеет форму one (1, 21, …), «Отсутствуют» перед ней заменяется на «Отсутствует».'
+    - 'R7. После «на» форма one берётся из count_noun.one_acc («на 1 квартиру»).'
+    - 'R8. К «Вид работ» (7.1) и «Вид нарушения» (7.2) добавляется « ({code})».'
+    - 'R9. Цитаты норм, заменённых после даты утверждения ПД (реестр documents, inline_replace), переписываются на прежнюю редакцию без номеров пунктов.'
+  delta_formats:
+    ABS: '|ПД − факт| в единицах параметра с точностью исходных значений («0,3 м»)'
+    PCT: '|Δ| / ПД × 100, один знак после запятой (округление половины вверх) без «,0» («7,7%», «12,5%»). Образец Приложения 2 печатает 15,9 и 28,9 как «16%» и «29%» — непоследовательно с «7,7%» и «12,5%»; правило одно.'
+    COUNT: 'целое число + count_noun по правилу русского счёта («2 узла»)'
+    NONE: 'величина не выводится («⬇️ Понижение класса», «⬇️ Занижение сечения»)'
+  variant_keys: 'violation_kind_variants / recommendation_variants / deviation_phrases — по кодам DeviationKind; ключ «DECREASE:бетон» — вариант по элементу (element_key).'
+  norm_policy: 'Числа в текстах — только из верифицированных записей с уверенностью HIGH (проверяется при сборке и тестом). Ссылки MEDIUM приводятся без чисел. Пороги Заказчика (CUSTOMER_THRESHOLD), значения NO_BASIS_FOUND и LOW в рекомендации не выносятся. Для заменённых документов цитируется действующая редакция, прежняя — через edition_rules и реестр documents по дате утверждения ПД.'
+  status: 'DRAFT — эталонные шаблоны резолютивной части; до экспертной проверки (U-18) печатаются с префиксом «Проект рекомендации (до подтверждения инспектором): ».'

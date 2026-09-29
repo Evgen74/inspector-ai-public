@@ -1,0 +1,19 @@
+{
+  "decision_id": "D-000002",
+  "finding_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-140",
+  "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-MISS-01",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "run_id": "m1-tyumen-e2e",
+  "decided_by": "inspector-01",
+  "decided_role": "INSPECTOR",
+  "decided_at": "2026-10-01T10:00:00Z",
+  "decision": "NEGATIVE_VERIFIED",
+  "effective_status": "NEGATIVE_VERIFIED",
+  "reason_code": "OTHER",
+  "comment": "Иное.",
+  "comment_source": "EDITED",
+  "ai_verdict": "AGREE",
+  "ai_confidence": 0.94,
+  "ai_comment": "🤖 ИИ СОГЛАСЕН (94%). Причина обоснована.",
+  "gold_effect": "NEGATIVE_DRAFT"
+}

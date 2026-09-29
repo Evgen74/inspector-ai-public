@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/inventory_report.schema.json",
+  "title": "InventoryReport",
+  "description": "DRAFT (owner AG-01, proposed for packages/contracts). Per-object inventory written by `inspector-batch inventory` to runs/<run_id>/inventory/<object_id>.json: manifest rows resolved to local files (LocalFileStatus), sha256 verification, PDF page counts and first-page fingerprints, stage resolution, archive members (never citable), DWG/DOCX twins, duplicates and integrity flags (codes from errors.yaml).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema", "schema_version", "run_id", "object_id", "split", "hidden_test", "generated_at", "input_manifest_hash", "config", "config_hash", "versions", "manifest", "counts", "files", "archives", "duplicates", "integrity_flags", "timings_s"],
+  "properties": {
+    "schema": {"const": "inventory_report"},
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "minLength": 1},
+    "object_id": {"type": "string", "minLength": 1, "maxLength": 64},
+    "split": {"enum": ["TRAIN_PUBLIC", "TEST_HIDDEN", null]},
+    "hidden_test": {"type": "boolean"},
+    "generated_at": {"type": "string", "format": "date-time"},
+    "input_manifest_hash": {"$ref": "#/$defs/Sha256"},
+    "config": {"type": "object"},
+    "config_hash": {"$ref": "#/$defs/Sha256"},
+    "versions": {"type": "object", "required": ["inventory_version"], "additionalProperties": {"type": ["string", "null"]}},
+    "manifest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "sha256", "checksum_ok", "rows_read", "rows_registered", "excluded_file_ids", "unknown_open_values", "flags"],
+      "properties": {
+        "path": {"type": ["string", "null"]},
+        "sha256": {"oneOf": [{"$ref": "#/$defs/Sha256"}, {"type": "null"}]},
+        "checksum_ok": {"type": ["boolean", "null"]},
+        "rows_read": {"type": "integer", "minimum": 0},
+        "rows_registered": {"type": "integer", "minimum": 0},
+        "excluded_file_ids": {"type": "array", "items": {"type": "string"}},
+        "unknown_open_values": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
+        "flags": {"type": "array", "items": {"$ref": "#/$defs/Flag"}}
+      }
+    },
+    "counts": {
+      "type": "object",
+      "required": ["files_total", "files_present", "files_recovered", "files_missing_on_disk", "sha256_verified", "by_manifest_stage", "by_stage_resolved", "pdf_files", "pdf_pages_manifest_total", "pdf_pages_actual_total", "citable_files", "archives", "archive_members_total", "dwg_total", "stage_resolution", "exact_duplicate_groups", "near_duplicate_groups", "integrity_flags", "integrity_flags_by_code"],
+      "additionalProperties": {"type": ["integer", "object"]}
+    },
+    "files": {"type": "array", "items": {"$ref": "#/$defs/File"}},
+    "archives": {"type": "array", "items": {"$ref": "#/$defs/Archive"}},
+    "duplicates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exact", "near", "first_page_matches"],
+      "properties": {
+        "exact": {"type": "array", "items": {"type": "object", "required": ["sha256", "file_ids"], "properties": {"sha256": {"$ref": "#/$defs/Sha256"}, "file_ids": {"type": "array", "minItems": 2, "items": {"type": "string"}}}}},
+        "near": {"type": "array", "items": {"type": "object", "required": ["basis", "pages", "fingerprint", "file_ids"], "properties": {"basis": {"enum": ["text", "image"]}, "pages": {"type": "integer", "minimum": 0}, "fingerprint": {"$ref": "#/$defs/Sha256"}, "file_ids": {"type": "array", "minItems": 2, "items": {"type": "string"}}}}},
+        "first_page_matches": {"type": "array", "items": {"type": "object", "required": ["fingerprint", "files"]}}
+      }
+    },
+    "integrity_flags": {"type": "array", "items": {"$ref": "#/$defs/Flag"}},
+    "timings_s": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}}
+  },
+  "$defs": {
+    "Sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "LocalFileStatus": {"enum": ["PRESENT", "RECOVERED", "MISSING_ON_DISK"]},
+    "ManifestStage": {"enum": ["PD", "RD", "ID", "RD_ID_MIXED", "UNKNOWN"]},
+    "DocStage": {"enum": ["PD", "RD", "ID"]},
+    "MetaSource": {"enum": ["REGISTRY", "DRAFT_CONFIRMED", "EXTRACTED_UNCONFIRMED"]},
+    "ArchiveMemberRole": {"enum": ["PDF_TWIN_SOURCE", "CONTEXT_ONLY", "FOREIGN_OBJECT", "DUPLICATE", "IGNORED"]},
+    "Confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "Flag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "title", "detail", "details", "file_id", "member"],
+      "properties": {
+        "code": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$", "description": "A code from packages/contracts/errors.yaml."},
+        "severity": {"enum": ["error", "warning", "info"]},
+        "title": {"type": "string"},
+        "detail": {"type": "string"},
+        "details": {"type": "object"},
+        "file_id": {"type": ["string", "null"]},
+        "member": {"type": ["string", "null"]},
+        "note_ru": {"type": "string"}
+      }
+    },
+    "Twin": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_id", "confidence", "basis"],
+      "properties": {"file_id": {"type": "string"}, "confidence": {"$ref": "#/$defs/Confidence"}, "basis": {"type": "object"}}
+    },
+    "StageResolution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_stage", "stage_resolved", "source", "confidence", "candidates", "scores", "signals", "signals_stage", "signals_confidence", "conflict", "skipped_reason"],
+      "properties": {
+        "manifest_stage": {"$ref": "#/$defs/ManifestStage"},
+        "stage_resolved": {"oneOf": [{"$ref": "#/$defs/DocStage"}, {"type": "null"}]},
+        "source": {"oneOf": [{"$ref": "#/$defs/MetaSource"}, {"type": "null"}]},
+        "confidence": {"oneOf": [{"$ref": "#/$defs/Confidence"}, {"type": "null"}]},
+        "candidates": {"type": "array", "items": {"$ref": "#/$defs/DocStage"}},
+        "scores": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
+        "signals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["rule", "stage", "where", "weight"],
+            "properties": {"rule": {"type": "string"}, "stage": {"$ref": "#/$defs/DocStage"}, "where": {"enum": ["folder", "name", "text"]}, "weight": {"type": "number"}, "match": {"type": "string"}}
+          }
+        },
+        "signals_stage": {"oneOf": [{"$ref": "#/$defs/DocStage"}, {"type": "null"}]},
+        "signals_confidence": {"oneOf": [{"$ref": "#/$defs/Confidence"}, {"type": "null"}]},
+        "conflict": {"type": "boolean"},
+        "skipped_reason": {"type": ["string", "null"]}
+      }
+    },
+    "Pdf": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["page_count", "encrypted", "repaired", "error", "first_page_chars", "first_page_text_hash", "first_page_image_hash"],
+      "properties": {
+        "page_count": {"type": ["integer", "null"], "minimum": 0},
+        "encrypted": {"type": "boolean"},
+        "repaired": {"type": "boolean"},
+        "error": {"type": ["string", "null"]},
+        "first_page_chars": {"type": "integer", "minimum": 0},
+        "first_page_text_hash": {"oneOf": [{"$ref": "#/$defs/Sha256"}, {"type": "null"}]},
+        "first_page_image_hash": {"oneOf": [{"$ref": "#/$defs/Sha256"}, {"type": "null"}]}
+      }
+    },
+    "File": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_id", "relative_path", "name", "folder", "extension", "size_bytes", "sha256", "manifest_stage", "section", "annotation_status", "dataset_role", "duplicate_group", "pdf_pages_manifest", "pdf_pages", "local_status", "found_via", "local_path", "sha256_verified", "media_type", "dwg_version", "dwg_release", "pdf", "twin", "archive_members", "stage", "stage_resolved", "citable", "not_citable_reasons", "flags"],
+      "properties": {
+        "file_id": {"type": "string", "pattern": "^(F[0-9]{4}|U[0-9a-f]{8}-[0-9]{4})$"},
+        "relative_path": {"type": "string", "minLength": 1},
+        "name": {"type": "string"},
+        "folder": {"type": "string"},
+        "extension": {"type": "string"},
+        "size_bytes": {"type": "integer", "minimum": 0},
+        "sha256": {"$ref": "#/$defs/Sha256"},
+        "manifest_stage": {"$ref": "#/$defs/ManifestStage"},
+        "section": {"type": "string"},
+        "annotation_status": {"type": "string"},
+        "dataset_role": {"type": "string"},
+        "duplicate_group": {"type": ["string", "null"]},
+        "pdf_pages_manifest": {"type": ["integer", "null"], "minimum": 0},
+        "pdf_pages": {"type": ["integer", "null"], "minimum": 0},
+        "local_status": {"$ref": "#/$defs/LocalFileStatus"},
+        "found_via": {"enum": ["manifest_path", "normalized_name", "recovery_ledger", "sha256_search", "not_found"]},
+        "local_path": {"type": ["string", "null"]},
+        "sha256_verified": {"type": ["boolean", "null"]},
+        "media_type": {"type": ["string", "null"]},
+        "dwg_version": {"type": ["string", "null"]},
+        "dwg_release": {"type": ["string", "null"]},
+        "pdf": {"oneOf": [{"$ref": "#/$defs/Pdf"}, {"type": "null"}]},
+        "twin": {"oneOf": [{"$ref": "#/$defs/Twin"}, {"type": "null"}]},
+        "archive_members": {"type": ["integer", "null"], "minimum": 0},
+        "stage": {"$ref": "#/$defs/StageResolution"},
+        "stage_resolved": {"oneOf": [{"$ref": "#/$defs/DocStage"}, {"type": "null"}]},
+        "citable": {"type": "boolean"},
+        "not_citable_reasons": {"type": "array", "items": {"type": "string"}},
+        "flags": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}}
+      }
+    },
+    "Member": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["member_id", "path", "name_encoding", "format_chars_removed", "size", "compressed_size", "extension", "media_type", "dwg_version", "dwg_release", "sha256", "encrypted", "role", "citable", "flags", "twin_file_id", "twin_confidence", "sheet_number", "twin_page_hint", "duplicate_of_file_id", "duplicate_of_member"],
+      "properties": {
+        "member_id": {"type": "string", "pattern": "^(F[0-9]{4}|U[0-9a-f]{8}-[0-9]{4})!.+$", "description": "Virtual id «<file_id>!<path>» (97 §2.8); never citable."},
+        "path": {"type": "string"},
+        "raw_name": {"type": "string"},
+        "name_encoding": {"enum": ["utf-8", "cp866", "ascii", "unicode"]},
+        "format_chars_removed": {"type": "integer", "minimum": 0},
+        "size": {"type": ["integer", "null"], "minimum": 0},
+        "compressed_size": {"type": ["integer", "null"], "minimum": 0},
+        "extension": {"type": "string"},
+        "media_type": {"type": ["string", "null"]},
+        "dwg_version": {"type": ["string", "null"]},
+        "dwg_release": {"type": ["string", "null"]},
+        "sha256": {"oneOf": [{"$ref": "#/$defs/Sha256"}, {"type": "null"}]},
+        "encrypted": {"type": "boolean"},
+        "role": {"$ref": "#/$defs/ArchiveMemberRole"},
+        "citable": {"const": false},
+        "flags": {"type": "array", "items": {"type": "string"}},
+        "twin_file_id": {"type": ["string", "null"]},
+        "twin_confidence": {"oneOf": [{"$ref": "#/$defs/Confidence"}, {"type": "null"}]},
+        "sheet_number": {"type": ["integer", "null"]},
+        "twin_page_hint": {"type": ["integer", "null"], "minimum": 1},
+        "twin_member": {"type": "string"},
+        "duplicate_of_file_id": {"type": ["string", "null"]},
+        "duplicate_of_member": {"type": ["string", "null"]}
+      }
+    },
+    "Archive": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_id", "name", "format", "backend", "archive_size", "members_total", "dirs", "declared_uncompressed", "read_bytes", "compression_ratio", "encrypted", "truncated", "bomb_suspected", "bomb_reason", "error", "name_encodings", "names_with_format_chars", "media_types", "dwg_versions", "roles", "twin", "dwg_members", "page_offset", "members"],
+      "properties": {
+        "file_id": {"type": "string"},
+        "name": {"type": "string"},
+        "format": {"type": "string"},
+        "backend": {"enum": ["zipfile", "libarchive"]},
+        "archive_size": {"type": "integer", "minimum": 0},
+        "members_total": {"type": "integer", "minimum": 0},
+        "dirs": {"type": "integer", "minimum": 0},
+        "declared_uncompressed": {"type": "integer", "minimum": 0},
+        "read_bytes": {"type": "integer", "minimum": 0},
+        "compression_ratio": {"type": ["number", "null"]},
+        "encrypted": {"type": "boolean"},
+        "truncated": {"type": "boolean"},
+        "bomb_suspected": {"type": "boolean"},
+        "bomb_reason": {"type": ["string", "null"]},
+        "error": {"type": ["string", "null"]},
+        "name_encodings": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "names_with_format_chars": {"type": "integer", "minimum": 0},
+        "media_types": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "dwg_versions": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "roles": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "twin": {"oneOf": [{"$ref": "#/$defs/Twin"}, {"type": "null"}]},
+        "dwg_members": {"type": "integer", "minimum": 0},
+        "page_offset": {"type": ["integer", "null"]},
+        "members": {"type": "array", "items": {"$ref": "#/$defs/Member"}}
+      }
+    }
+  }
+}

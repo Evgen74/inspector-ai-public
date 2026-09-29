@@ -1,0 +1,125 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/eval/n_gold_label_set.schema.json",
+  "title": "N-GOLD label set (format 2)",
+  "description": "Team labels of the unlabeled train object (95 §5.3), badged «разметка команды». Format 2 extends docs/analysis/95_novoslob_label_seed.json: every seed field is kept; items gain `source`, `scorable`, `annotations` (one per labeller pass, agent or human) and `adjudication`. `label` is the adjudicated label the scorer uses; UNSURE, null and non-scorable items are listed but never scored. Vocabularies local to this file (LabelItemSource, LabellerKind, LabelConfidence, AdjudicationMethod) are proposed for packages/contracts (AG-00); the label vocabulary is ViolationLabel ∪ {UNSURE} (a test pins it to enums.yaml). Owner: AG-10.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["meta", "candidates"],
+  "properties": {
+    "meta": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["object_id", "format_version", "label_values"],
+      "properties": {
+        "format": {"const": "n_gold_label_set"},
+        "format_version": {"const": 2},
+        "object_id": {"type": "string", "minLength": 1},
+        "label_values": {"type": "array", "items": {"$ref": "#/$defs/Label"}},
+        "protocol": {"type": "string"}
+      }
+    },
+    "candidates": {"type": "array", "items": {"$ref": "#/$defs/Item"}}
+  },
+  "$defs": {
+    "Label": {"enum": ["VIOLATION_PRESENT", "NO_VIOLATION", "MISSING_DOCUMENT", "COMPARISON_IMPOSSIBLE", "UNSURE"]},
+    "LabelItemSource": {
+      "description": "Where the item came from (95 §5.3 composition).",
+      "enum": ["SEED", "SYSTEM_CANDIDATE", "RANDOM_NEGATIVE", "STAGE_AVAILABILITY", "FREE_INTEGRITY"]
+    },
+    "LabellerKind": {"enum": ["AGENT", "HUMAN"]},
+    "LabelConfidence": {"enum": ["HIGH", "MEDIUM", "LOW"]},
+    "AdjudicationMethod": {
+      "description": "SINGLE: one labeller; AGREEMENT: every labeller agrees; HUMAN_PRECEDENCE: a human label overrides a disagreeing agent label; UNRESOLVED: labellers of the same kind disagree (label becomes UNSURE).",
+      "enum": ["SINGLE", "AGREEMENT", "HUMAN_PRECEDENCE", "UNRESOLVED"]
+    },
+    "Evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["stage", "file_id", "pdf_page_number"],
+      "properties": {
+        "stage": {"enum": ["PD", "RD", "ID"]},
+        "file_id": {"type": "string", "pattern": "^F[0-9]{4}$"},
+        "pdf_page_number": {"type": "integer", "minimum": 1},
+        "document_sheet_number": {"type": ["string", "integer", "null"]}
+      }
+    },
+    "PageRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_id", "pdf_page_number"],
+      "properties": {
+        "file_id": {"type": "string", "pattern": "^F[0-9]{4}$"},
+        "pdf_page_number": {"type": "integer", "minimum": 1},
+        "how": {"type": "string", "description": "What was looked at: full page, tiles, a clip, the text layer."}
+      }
+    },
+    "StageValue": {"type": ["string", "number", "null"]},
+    "Annotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["labeller", "labeller_kind", "label", "labelled_at"],
+      "properties": {
+        "labeller": {"type": "string", "minLength": 1},
+        "labeller_kind": {"$ref": "#/$defs/LabellerKind"},
+        "protocol": {"type": "string"},
+        "blind": {"type": "boolean", "description": "true when the labeller saw only the blind packet (no system outputs, no earlier labels)."},
+        "blind_note": {"type": ["string", "null"]},
+        "label": {"$ref": "#/$defs/Label"},
+        "scorable": {"type": "boolean"},
+        "parameter_code": {"type": ["string", "null"]},
+        "location": {"type": ["string", "null"]},
+        "location_type": {"type": ["string", "null"]},
+        "evidence": {"type": ["array", "null"], "items": {"$ref": "#/$defs/Evidence"}},
+        "pd_value": {"$ref": "#/$defs/StageValue"},
+        "rd_value": {"$ref": "#/$defs/StageValue"},
+        "id_value": {"$ref": "#/$defs/StageValue"},
+        "protocol_status": {"type": ["string", "null"]},
+        "comparison_result": {"type": ["string", "null"]},
+        "confidence": {"$ref": "#/$defs/LabelConfidence"},
+        "reasoning": {"type": "string"},
+        "pages_viewed": {"type": "array", "items": {"$ref": "#/$defs/PageRef"}},
+        "spot_check": {"type": "boolean"},
+        "labelled_at": {"type": "string", "minLength": 1}
+      }
+    },
+    "Adjudication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["method", "decided_by"],
+      "properties": {
+        "method": {"$ref": "#/$defs/AdjudicationMethod"},
+        "decided_by": {"type": "string"},
+        "labellers": {"type": "array", "items": {"type": "string"}},
+        "disagreement": {"type": "boolean"}
+      }
+    },
+    "Item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "parameter_code", "location", "evidence", "label"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9-]*[0-9]$"},
+        "source": {"$ref": "#/$defs/LabelItemSource"},
+        "scorable": {"type": "boolean", "description": "false: not a submission check (integrity notes, data problems); listed, never scored."},
+        "parameter_code": {"type": "string", "minLength": 1},
+        "location": {"type": "string", "minLength": 1},
+        "location_type": {"type": ["string", "null"]},
+        "pd_value": {"$ref": "#/$defs/StageValue"},
+        "rd_value": {"$ref": "#/$defs/StageValue"},
+        "id_value": {"$ref": "#/$defs/StageValue"},
+        "evidence": {"type": "array", "items": {"$ref": "#/$defs/Evidence"}},
+        "protocol_status": {"type": ["string", "null"]},
+        "comparison_result": {"type": ["string", "null"]},
+        "finding_group_id": {"type": ["string", "null"]},
+        "system_hypothesis": {"type": ["string", "null"]},
+        "why_interesting": {"type": ["string", "null"]},
+        "label": {"oneOf": [{"$ref": "#/$defs/Label"}, {"type": "null"}]},
+        "label_comment": {"type": ["string", "null"]},
+        "seed_original": {"type": "object", "description": "Seed values replaced by an adopted annotation (audit trail)."},
+        "annotations": {"type": "array", "items": {"$ref": "#/$defs/Annotation"}},
+        "adjudication": {"oneOf": [{"$ref": "#/$defs/Adjudication"}, {"type": "null"}]}
+      }
+    }
+  }
+}

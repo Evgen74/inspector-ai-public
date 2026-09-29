@@ -1,0 +1,30 @@
+# Organizer data — never commit
+/data/
+/data_utf8/
+/data_recovered/
+/ТЗ/
+# Models, caches, run artifacts
+/.models/
+/.cache/
+/runs/
+*.onnx
+# Python / Node
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+node_modules/
+dist/
+.turbo/
+# OS / editors
+.DS_Store
+.idea/
+.vscode/
+# Local env
+.env
+
+# Claude Code agent worktrees
+/.claude/worktrees/

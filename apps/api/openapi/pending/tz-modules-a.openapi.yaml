@@ -1,0 +1,276 @@
+# «Инспектор ИИ» — REST additions of ТЗ modules 6 (РиН), 8 (нормативная база), 10 (отчёт по дообучению); owner AG-08.
+# PENDING ADOPTION by AG-00 (same mechanism as the other files in this directory). Response bodies are described loosely
+# (TzAObject); the web client types live in apps/web/src/features/{normative,rin,ml}.
+openapi: 3.0.3
+info:
+  title: «Инспектор ИИ» — модули 6, 8, 10
+  version: 0.1.0-m2
+tags:
+  - {name: normative, description: 'Нормативная база: матрица 132 параметров, пороги, версии'}
+  - {name: rin, description: 'ИАИС «РиН»: заглушка обмена'}
+  - {name: ml-report, description: 'Еженедельный отчёт по дообучению'}
+paths:
+  /normative/params:
+    get:
+      operationId: listNormativeParams
+      tags: [normative]
+      summary: 'Матрица параметров с учётом правок администратора'
+      x-owner: AG-08
+      x-permission: matrix.read
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: q, in: query, schema: {type: string, maxLength: 200}}
+        - {name: section, in: query, schema: {type: string, maxLength: 200}}
+        - {name: criticality, in: query, schema: {type: string, maxLength: 200}}
+        - {name: active, in: query, schema: {type: string, maxLength: 200}}
+      responses:
+        '200':
+          description: Параметры и версия матрицы
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /normative/params/{param_code}:
+    put:
+      operationId: updateNormativeParam
+      tags: [normative]
+      summary: 'Изменить порог и активность параметра (новая версия матрицы)'
+      x-owner: AG-08
+      x-permission: params.manage
+      x-audit-action: PARAM_UPDATED
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, PROCESS_NOT_FOUND, HIDDEN_TEST_ACCESS_DENIED, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: param_code, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 32}}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TzAObject'}
+      responses:
+        '200':
+          description: Параметр и новая версия матрицы
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /normative/documents:
+    get:
+      operationId: listNormativeDocuments
+      tags: [normative]
+      summary: 'Нормативные документы, на которые ссылается матрица'
+      x-owner: AG-08
+      x-permission: matrix.read
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /normative/versions:
+    get:
+      operationId: listMatrixVersions
+      tags: [normative]
+      summary: 'Версии матрицы (правки администратора)'
+      x-owner: AG-08
+      x-permission: matrix.read
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /processes/{process_id}/rin/send:
+    post:
+      operationId: sendToRin
+      tags: [rin]
+      summary: 'Отправить результаты в РиН (только PROTOCOL_FINALIZED)'
+      x-owner: AG-08
+      x-permission: rin.send
+      x-audit-action: RIN_SYNC_REQUESTED
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, PROCESS_NOT_FOUND, HIDDEN_TEST_ACCESS_DENIED, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: process_id, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TzAObject'}
+      responses:
+        '202':
+          description: Доставка создана; статус PENDING_SYNC / SYNCED / SYNC_FAILED
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /processes/{process_id}/rin:
+    get:
+      operationId: getRinSync
+      tags: [rin]
+      summary: 'Статус синхронизации с РиН и журнал попыток'
+      x-owner: AG-08
+      x-permission: protocol.read
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, PROCESS_NOT_FOUND, HIDDEN_TEST_ACCESS_DENIED, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: process_id, in: path, required: true, schema: {type: string, format: uuid}}
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /objects/{object_id}/rin-sync:
+    get:
+      operationId: listObjectRinSync
+      tags: [rin]
+      summary: 'Статусы синхронизации с РиН по проверкам объекта'
+      x-owner: AG-08
+      x-permission: protocol.read
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {$ref: '#/components/parameters/ObjectIdPath'}
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /mock-rin/inspection/{process_id}:
+    post:
+      operationId: mockRinInspection
+      tags: [rin]
+      summary: 'Заглушка РиН: приём пакета нарушений'
+      x-owner: AG-08
+      x-permission: rin.send
+      x-audit-action: RIN_SYNC_RESULT
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, PROCESS_NOT_FOUND, HIDDEN_TEST_ACCESS_DENIED, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: process_id, in: path, required: true, schema: {type: string, format: uuid}}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/TzAObject'}
+      responses:
+        '200':
+          description: Пакет принят (simulate_fail=true даёт 503)
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /ml/reports/weekly:
+    get:
+      operationId: getWeeklyMlReport
+      tags: [ml-report]
+      summary: 'Еженедельный отчёт по дообучению (JSON)'
+      x-owner: AG-08
+      x-permission: retraining.read
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: from, in: query, schema: {type: string, maxLength: 200}}
+        - {name: to, in: query, schema: {type: string, maxLength: 200}}
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TzAObject'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /ml/reports/weekly.html:
+    get:
+      operationId: getWeeklyMlReportHtml
+      tags: [ml-report]
+      summary: 'Еженедельный отчёт по дообучению (печатная HTML-версия)'
+      x-owner: AG-08
+      x-permission: retraining.read
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: from, in: query, schema: {type: string, maxLength: 200}}
+        - {name: to, in: query, schema: {type: string, maxLength: 200}}
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            text/html:
+              schema: {type: string}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+components:
+  schemas:
+    TzAObject:
+      type: object
+      additionalProperties: true

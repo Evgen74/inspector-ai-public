@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/seed/comparison_rule.schema.json",
+  "title": "Comparison-rule DSL (params.comparison_rule)",
+  "description": "B03 DSL (03 §3.4) with the 90/97 rulings: candidate_policy and direction on every atomic rule (90 C-56, 97 §2.10), no INTERNAL_CONSISTENCY and no SUSPICION (90 C-53), context_detect for additions/relocations (97 §2.10). Owner: AG-03. Vocabularies local to the DSL are defined in $defs and proposed for enums.yaml (open issue).",
+  "oneOf": [
+    {"$ref": "#/$defs/Atomic"},
+    {"$ref": "#/$defs/Composite"}
+  ],
+  "$defs": {
+    "Composite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_type", "combine", "sub_checks", "on_trigger", "on_pass"],
+      "properties": {
+        "rule_type": {"const": "COMPOSITE"},
+        "combine": {"const": "ATOMIC_FINDINGS"},
+        "sub_checks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"allOf": [{"$ref": "#/$defs/Atomic"}, {"required": ["sub_id", "title"]}]}
+        },
+        "note": {"type": "string"},
+        "on_trigger": {"const": "CANDIDATE"},
+        "on_pass": {"const": "NEGATIVE_VERIFIED"}
+      }
+    },
+    "Atomic": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_type", "violation_type", "operator", "direction", "candidate_policy", "on_trigger", "on_pass"],
+      "properties": {
+        "sub_id": {"$ref": "#/$defs/SubId"},
+        "title": {"type": "string", "minLength": 1},
+        "rule_type": {"$ref": "../schemas/enums.schema.json#/$defs/RuleType"},
+        "violation_type": {"$ref": "../schemas/enums.schema.json#/$defs/ViolationType"},
+        "operator": {"$ref": "#/$defs/RuleOperator"},
+        "direction": {"$ref": "#/$defs/RuleDirection"},
+        "candidate_policy": {"$ref": "../schemas/enums.schema.json#/$defs/CandidatePolicy"},
+        "compare": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["expected", "actual"],
+            "properties": {
+              "expected": {"enum": ["PD", "RD"]},
+              "actual": {"enum": ["RD", "ID"]}
+            }
+          }
+        },
+        "evaluate_on": {"type": "array", "minItems": 1, "items": {"$ref": "../schemas/enums.schema.json#/$defs/DocStage"}},
+        "tolerance": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "abs": {"type": ["number", "null"], "minimum": 0},
+            "rel": {"type": ["number", "null"], "minimum": 0},
+            "rounding": {"enum": ["SOURCE_PRECISION", "NONE"]}
+          }
+        },
+        "tolerance_source": {"enum": ["SHEET_THEN_NORMATIVE", "SHEET_ONLY", "NORMATIVE_ONLY"]},
+        "bounds": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": {"$ref": "#/$defs/ThresholdRef"},
+            "max": {"$ref": "#/$defs/ThresholdRef"},
+            "conditional": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["if"],
+                "properties": {
+                  "if": {"type": "object", "description": "JSONLogic over object/element facts (IAI-Logic v1)"},
+                  "min": {"type": "number"},
+                  "max": {"type": "number"}
+                }
+              }
+            }
+          }
+        },
+        "unit": {"type": "string"},
+        "aggregation": {"enum": ["OBJECT"]},
+        "element_key": {"type": ["string", "null"]},
+        "element": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+        "detect": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/DetectKind"}, "uniqueItems": true},
+        "context_detect": {
+          "description": "Kinds that are collected as context and never emitted (97 §2.10: additions and relocations are context).",
+          "type": "array",
+          "items": {"$ref": "#/$defs/DetectKind"},
+          "uniqueItems": true
+        },
+        "compare_attributes": {"type": "array", "items": {"type": "string"}},
+        "attribute_tolerance": {"type": "object"},
+        "scale": {"$ref": "#/$defs/OrdinalScale"},
+        "vocabulary": {"enum": ["FENCE_TYPE", "DOOR_SWING", "PIPE_MATERIAL", "SEWER_PIPE_MATERIAL", "DEMOLITION_METHOD", "LUMINAIRE_TECH", "free_text"]},
+        "numerator": {"type": "string"},
+        "denominator": {"type": "string"},
+        "min_ratio": {"type": "number"},
+        "min_abs": {"type": ["number", "null"]},
+        "max_distance_m": {"type": "number", "minimum": 0},
+        "external_system": {"type": "string"},
+        "degrade_to": {"const": "MISSING_EVIDENCE"},
+        "compare_what": {"type": "string"},
+        "min_confidence": {"type": "number", "minimum": 0, "maximum": 1},
+        "low_confidence_status": {"const": "NOT_COMPARABLE"},
+        "low_confidence_basis": {"const": "LOW_CONFIDENCE_SEMANTIC"},
+        "abstain_if": {"type": "array", "items": {"$ref": "#/$defs/AbstainReason"}, "uniqueItems": true},
+        "note": {"type": "string"},
+        "on_trigger": {"const": "CANDIDATE"},
+        "on_pass": {"const": "NEGATIVE_VERIFIED"}
+      },
+      "allOf": [
+        {"if": {"properties": {"rule_type": {"const": "SET_DIFF"}}}, "then": {"required": ["detect"]}},
+        {"if": {"properties": {"rule_type": {"const": "ORDINAL_COMPARE"}}}, "then": {"required": ["scale"], "properties": {"direction": {"const": "DOWNGRADE"}}}},
+        {"if": {"properties": {"rule_type": {"const": "NORMATIVE_BOUND"}}}, "then": {"required": ["evaluate_on"], "properties": {"candidate_policy": {"const": "TRIGGER"}}}},
+        {"if": {"properties": {"rule_type": {"const": "SEMANTIC_DIFF"}}}, "then": {"required": ["min_confidence", "low_confidence_status", "low_confidence_basis"]}},
+        {"if": {"properties": {"rule_type": {"const": "EXTERNAL_STATUS"}}}, "then": {"required": ["external_system", "degrade_to"]}}
+      ]
+    },
+    "SubId": {
+      "description": "Catalog code plus a sub-check letter, e.g. PZ-003.b (97 §2.9).",
+      "type": "string",
+      "pattern": "^(PZ|SPZU|AR|KR|IOS[1-5]|POS|POD|OOS|PPM|ODI|ZU|SM)-[0-9]{3}\\.[a-z]$"
+    },
+    "ThresholdRef": {
+      "description": "A number, the FR index set, or a reference: $min_value/$max_value (Module 8 knob), $object.<fact> (ГПЗУ/ТУ), $derived.<name> (normative_base lookup) — 03 §3.4.1.",
+      "oneOf": [
+        {"type": "number"},
+        {"type": "string", "pattern": "^FR$"},
+        {"type": "string", "pattern": "^\\$(min_value|max_value|object\\.[a-z_]+|derived\\.[a-z_]+)$"}
+      ]
+    },
+    "RuleDirection": {
+      "$ref": "../schemas/enums.schema.json#/$defs/RuleDirection",
+      "description": "Violating direction (97 §2.10). DSL vocabulary, proposed enum RuleDirection. Contract enum RuleDirection ($ref, «contracts are law»); the enum copy is kept for the drift test.",
+      "enum": ["ANY", "DECREASE", "INCREASE", "DOWNGRADE"]
+    },
+    "RuleOperator": {
+      "$ref": "../schemas/enums.schema.json#/$defs/RuleOperator",
+      "description": "03 §3.4.1 operators (SUM_NE/FORMULA_NE left with INTERNAL_CONSISTENCY, 90 C-53). Contract enum RuleOperator ($ref, «contracts are law»); the enum copy is kept for the drift test.",
+      "enum": ["ABS_DELTA_GT", "REL_DELTA_GT", "OUTSIDE_BOUNDS", "ORDINAL_LOWER", "ORDINAL_NE", "NE", "SET_DIFF", "LAYER_DIFF", "PRESENT_IN_EXPECTED_ABSENT_IN_ACTUAL", "ABS_DEVIATION_GT_TOLERANCE", "DIST_GT", "INTERSECTS_FORBIDDEN_ZONE", "RATIO_LT", "STATUS_NOT_OK", "SEMANTIC_CONTRADICTION"]
+    },
+    "DetectKind": {
+      "$ref": "../schemas/enums.schema.json#/$defs/DetectKind",
+      "description": "SET_DIFF kinds (MISSING/ADDED/CHANGED) and LAYER_STACK kinds. Contract enum DetectKind ($ref, «contracts are law»); the enum copy is kept for the drift test.",
+      "enum": ["MISSING", "ADDED", "CHANGED", "LAYER_REMOVED", "THICKNESS_DECREASED", "MATERIAL_CHANGED", "LAYER_ADDED"]
+    },
+    "OrdinalScale": {
+      "$ref": "../schemas/enums.schema.json#/$defs/OrdinalScale",
+      "description": "03 §3.2 enum_scales dictionaries (data owned by AG-03). Contract enum OrdinalScale ($ref, «contracts are law»); the enum copy is kept for the drift test.",
+      "enum": ["CONCRETE_B", "STEEL_GRADE", "REBAR_CLASS", "FIRE_RESISTANCE_DEGREE", "CONSTRUCTIVE_FIRE_HAZARD_CLASS", "KM_CLASS", "ENERGY_CLASS", "RELIABILITY_CATEGORY", "EI_LIMIT", "FIRE_RESISTANCE_LIMIT_R", "CABLE_FIRE_INDEX", "WASTE_HAZARD_CLASS"]
+    },
+    "AbstainReason": {
+      "$ref": "../schemas/enums.schema.json#/$defs/AbstainReason",
+      "description": "03 §3.4.1 abstain_if codes (→ NOT_COMPARABLE with this reason). Contract enum AbstainReason ($ref, «contracts are law»); the enum copy is kept for the drift test.",
+      "enum": ["UNIT_MISMATCH", "VALUE_NOT_FOUND", "AMBIGUOUS_VALUE", "UNKNOWN_SCALE_VALUE", "ELEMENT_KEY_UNRESOLVED", "SHEETS_NOT_MATCHED", "ASSEMBLY_NOT_MATCHED", "TOLERANCE_NOT_FOUND", "CRS_MISMATCH", "HEIGHT_SYSTEM_MISMATCH", "PRICE_LEVEL_MISMATCH", "VAT_BASIS_MISMATCH", "METHOD_MISMATCH", "GEOMETRY_NOT_EXTRACTED", "EXTERNAL_DATA_UNAVAILABLE", "TEXT_NOT_FOUND"]
+    }
+  }
+}

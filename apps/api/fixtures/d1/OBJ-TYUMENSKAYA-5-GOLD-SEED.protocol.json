@@ -1,0 +1,819 @@
+{
+  "schema_version": 1,
+  "protocol_no": "2026-09-28-TYUMEN5-1",
+  "run_id": "d1-fixture-tyumen",
+  "object": {
+    "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+    "name": "Жилой дом",
+    "address": "г. Москва, ул. Тюменская, д. 5",
+    "supervision_case_no": null,
+    "customer": null,
+    "contractor": null
+  },
+  "version": 1,
+  "is_final": false,
+  "status": "IN_VERIFICATION",
+  "process_status": "READY",
+  "generated_at": "2026-09-28T09:00:00Z",
+  "scenario": "PD_RD_ONLY",
+  "scenario_base": "PD_RD_ONLY",
+  "upload_status": {
+    "pd": "PD_UPLOADED",
+    "rd": "RD_UPLOADED",
+    "id": "ID_MISSING"
+  },
+  "versions": {
+    "pipeline_version": "0.2.0+m1",
+    "matrix_version": "1.1.0",
+    "contract_version": "0.1.0"
+  },
+  "input_manifest_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "content_sha256": null,
+  "header": {
+    "title": "ПРОТОКОЛ АВТОМАТИЗИРОВАННОЙ СВЕРКИ № 2026-09-28-TYUMEN5-1",
+    "generated_at_ru": "28 сентября 2026 г.",
+    "version_line": "1 (предварительная)",
+    "status_line": "⚠️ ОЖИДАЕТ ВЕРИФИКАЦИИ (дозагрузка возможна)",
+    "scenario_line": "Тип проверки: PD_RD_ONLY (Только ПД и РД)",
+    "recheck_running": false
+  },
+  "appendix2": {
+    "section1_load_status": {
+      "rows": [
+        {
+          "stage": "PD",
+          "stage_ru": "ПД",
+          "status": "PD_UPLOADED",
+          "status_ru": "✅ Полностью",
+          "files_loaded": 47,
+          "files_loaded_text": "47",
+          "files_expected": 47,
+          "comment": "Все файлы загружены"
+        },
+        {
+          "stage": "RD",
+          "stage_ru": "РД",
+          "status": "RD_UPLOADED",
+          "status_ru": "✅ Полностью",
+          "files_loaded": 4,
+          "files_loaded_text": "4",
+          "files_expected": 4,
+          "comment": "Все файлы загружены"
+        },
+        {
+          "stage": "ID",
+          "stage_ru": "ИД",
+          "status": "ID_MISSING",
+          "status_ru": "❌ Отсутствует",
+          "files_loaded": 0,
+          "files_loaded_text": "0",
+          "files_expected": null,
+          "comment": "Исполнительная документация по объекту не представлена"
+        }
+      ],
+      "scenario_line": "Тип проверки: PD_RD_ONLY (Только ПД и РД)"
+    },
+    "section2_summary": {
+      "rows": [
+        {
+          "key": "TOTAL_PARAMS",
+          "label_ru": "Всего параметров в Матрице",
+          "count": 132,
+          "percent": 100,
+          "percent_text": "100%"
+        },
+        {
+          "key": "CHECKED_OK",
+          "label_ru": "Проверено успешно (есть ПД, РД, ИД)",
+          "count": 20,
+          "percent": 15.15,
+          "percent_text": "15,1%"
+        },
+        {
+          "key": "NOT_CHECKED_NO_ID",
+          "label_ru": "Не проверено (отсутствует ИД)",
+          "count": 64,
+          "percent": 48.48,
+          "percent_text": "48,5%"
+        },
+        {
+          "key": "NOT_LOADED_TECH_ERRORS",
+          "label_ru": "Не загружены документы (технические ошибки)",
+          "count": 0,
+          "percent": 0.0,
+          "percent_text": "0%"
+        },
+        {
+          "key": "NOT_CHECKED_NO_PD_RD",
+          "label_ru": "Не проверено (отсутствует ПД/РД)",
+          "count": 48,
+          "percent": 36.36,
+          "percent_text": "36,4%"
+        },
+        {
+          "key": "VIOLATIONS_TOTAL",
+          "label_ru": "Выявлено нарушений (всего)",
+          "count": 3,
+          "percent": 2.27,
+          "percent_text": "2,3%"
+        },
+        {
+          "key": "VIOLATIONS_CRITICAL",
+          "label_ru": "─ Критических (приостановка)",
+          "count": 3,
+          "percent": 2.27,
+          "percent_text": "2,3%"
+        },
+        {
+          "key": "VIOLATIONS_SUBSTANTIAL",
+          "label_ru": "─ Существенных (предписание)",
+          "count": 0,
+          "percent": 0.0,
+          "percent_text": "0%"
+        },
+        {
+          "key": "AI_SUSPICIONS",
+          "label_ru": "Подозрений ИИ (свободный поиск)",
+          "count": 1,
+          "percent": 0.76,
+          "percent_text": "0,8%"
+        }
+      ],
+      "footnotes": [
+        "с учётом сценария PD_RD_ONLY: сравнение выполнено по доступным стадиям",
+        "До подтверждения инспектором расхождения являются кандидатами и не являются основанием для приостановки работ или выдачи предписания (п. 9.2 ТЗ)"
+      ]
+    },
+    "section3_not_checked_no_id": {
+      "count": 1,
+      "rows": [
+        {
+          "no": 1,
+          "parameter_code": "IOS2-071",
+          "parameter_id": 71,
+          "section_ru": "ИОС2",
+          "parameter_name": "Диаметры стояков В1/Т3",
+          "missing_document": "Исполнительная схема стояков В1/Т3 — не представлена"
+        }
+      ]
+    },
+    "section4_critical": {
+      "count": 3,
+      "rows": [
+        {
+          "no": 1,
+          "section_ru": "ИОС4",
+          "parameter_label": "Характеристики вентиляторов (IOS4-079), пом. 012 [карточка Б.1]",
+          "parameter_code": "IOS4-079",
+          "parameter_id": 79,
+          "matrix_scope": "MATRIX",
+          "locations": [
+            "012"
+          ],
+          "pd": "Конфигурация приточных установок по листу 26 ПД",
+          "rd": "Иная конфигурация на плане ОВ1, помещение 012",
+          "id": "—",
+          "deviation": {
+            "direction": "CHANGED",
+            "text": "🔄 Изменена конфигурация"
+          },
+          "inspector_status": "PENDING",
+          "inspector_decision_ru": "⏳ Ожидает",
+          "card_ref": "Б.1",
+          "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-079-CFG-01",
+          "finding_ids": [
+            "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-079-PDRD-012"
+          ],
+          "criticality_level": "CRITICAL_SUSPEND"
+        },
+        {
+          "no": 2,
+          "section_ru": "ИОС4",
+          "parameter_label": "Воздуховоды общеобменной вентиляции (IOS4-078), пом. 140, 142 [карточка Б.3]",
+          "parameter_code": "IOS4-078",
+          "parameter_id": 78,
+          "matrix_scope": "MATRIX",
+          "locations": [
+            "140",
+            "142"
+          ],
+          "pd": "Вытяжная вентиляция предусмотрена",
+          "rd": "Вытяжная вентиляция отсутствует",
+          "id": "—",
+          "deviation": {
+            "direction": "ABSENT",
+            "text": "❌ Полное отсутствие"
+          },
+          "inspector_status": "PENDING",
+          "inspector_decision_ru": "⏳ Ожидает",
+          "card_ref": "Б.3",
+          "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-MISS-01",
+          "finding_ids": [
+            "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-140",
+            "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-142"
+          ],
+          "criticality_level": "CRITICAL_SUSPEND"
+        },
+        {
+          "no": 3,
+          "section_ru": "ИОС4",
+          "parameter_label": "Воздуховоды общеобменной вентиляции (IOS4-078), пом. 147, 198, 314 [карточка Б.4]",
+          "parameter_code": "IOS4-078",
+          "parameter_id": 78,
+          "matrix_scope": "MATRIX",
+          "locations": [
+            "147",
+            "198",
+            "314"
+          ],
+          "pd": "Конфигурация вентиляции по листу 10 ПД",
+          "rd": "Конфигурация вентиляции изменена",
+          "id": "—",
+          "deviation": {
+            "direction": "CHANGED",
+            "text": "🔄 Изменена конфигурация"
+          },
+          "inspector_status": "PENDING",
+          "inspector_decision_ru": "⏳ Ожидает",
+          "card_ref": "Б.4",
+          "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-CFG-01",
+          "finding_ids": [
+            "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-147",
+            "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-198",
+            "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-314"
+          ],
+          "criticality_level": "CRITICAL_SUSPEND"
+        }
+      ]
+    },
+    "section5_substantial": {
+      "count": 0,
+      "rows": []
+    },
+    "section6_ai_suspicions": {
+      "count": 1,
+      "rows": [
+        {
+          "no": 1,
+          "method": "GRAPHIC_DIFF",
+          "method_ru": "Графическое сравнение",
+          "description": "Не выполнена предусмотренная ПД система тёплых полов в помещениях МГН 267, 270, 271, 272",
+          "pd": "Тёплый пол предусмотрен",
+          "rd": "Тёплый пол отсутствует",
+          "id": "—",
+          "parameter_code": "FREE-HEATING-001",
+          "inspector_status": "PENDING",
+          "inspector_decision_ru": "⏳ Ожидает",
+          "rejection_reason": "—",
+          "ai_comment": "—",
+          "confidence": 0.9,
+          "card_ref": "Б.2",
+          "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-FREE-HEATING-001"
+        }
+      ]
+    },
+    "section7_resolution": {
+      "critical": [
+        {
+          "no": 1,
+          "work_type": "Монтаж вентиляционного оборудования (IOS4-079)",
+          "recommendation": "Проект рекомендации (до подтверждения инспектором): Установить вентиляционное оборудование с характеристиками и в составе по ПД в венткамере 012; представить паспорта оборудования и протоколы аэродинамических испытаний.",
+          "parameter_code": "IOS4-079",
+          "is_draft": true,
+          "text_origin": "AG03_DRAFT",
+          "template_id": "IOS4-079",
+          "source_row_no": 1
+        },
+        {
+          "no": 2,
+          "work_type": "Монтаж систем вентиляции (IOS4-078)",
+          "recommendation": "Проект рекомендации (до подтверждения инспектором): Выполнить системы вентиляции (сечения и трассировку воздуховодов, местные отсосы) в помещениях 140, 142 в соответствии с ПД; представить аэродинамический расчёт и паспорта систем.",
+          "parameter_code": "IOS4-078",
+          "is_draft": true,
+          "text_origin": "AG03_DRAFT",
+          "template_id": "IOS4-078",
+          "source_row_no": 2
+        },
+        {
+          "no": 3,
+          "work_type": "Монтаж систем вентиляции (IOS4-078)",
+          "recommendation": "Проект рекомендации (до подтверждения инспектором): Выполнить системы вентиляции (сечения и трассировку воздуховодов, местные отсосы) в помещениях 147, 198, 314 в соответствии с ПД; представить аэродинамический расчёт и паспорта систем.",
+          "parameter_code": "IOS4-078",
+          "is_draft": true,
+          "text_origin": "AG03_DRAFT",
+          "template_id": "IOS4-078",
+          "source_row_no": 3
+        }
+      ],
+      "substantial": []
+    },
+    "footnotes": []
+  },
+  "tz92_tables": {
+    "a1_completeness": [
+      {
+        "parameter_code": "IOS2-071",
+        "parameter_name": "Диаметры стояков В1/Т3",
+        "section_ru": "ИОС2",
+        "protocol_status": "ID_MISSING",
+        "completeness_status": "MISSING_EVIDENCE",
+        "completeness_basis": "MANDATORY_SOURCE_MISSING",
+        "missing_stage": "ID",
+        "document": "Исполнительная схема стояков В1/Т3",
+        "reason_ru": "ИД не представлена",
+        "action_ru": "Дозагрузить ИД"
+      }
+    ],
+    "a2_candidates": [
+      {
+        "card_ref": "Б.1",
+        "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-079-CFG-01",
+        "finding_ids": [
+          "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-079-PDRD-012"
+        ],
+        "parameter_code": "IOS4-079",
+        "parameter_label": "Характеристики вентиляторов (IOS4-079)",
+        "locations": [
+          "012"
+        ],
+        "expected": "Конфигурация приточных установок по листу 26 ПД",
+        "actual": "Иная конфигурация на плане ОВ1, помещение 012",
+        "deviation_text": "🔄 Изменена конфигурация",
+        "criticality_level": "CRITICAL_SUSPEND",
+        "risk_level": "HIGH",
+        "confidence": 0.8,
+        "inspector_status": "PENDING"
+      },
+      {
+        "card_ref": "Б.3",
+        "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-MISS-01",
+        "finding_ids": [
+          "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-140",
+          "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-142"
+        ],
+        "parameter_code": "IOS4-078",
+        "parameter_label": "Воздуховоды общеобменной вентиляции (IOS4-078)",
+        "locations": [
+          "140",
+          "142"
+        ],
+        "expected": "Вытяжная вентиляция предусмотрена",
+        "actual": "Вытяжная вентиляция отсутствует",
+        "deviation_text": "❌ Полное отсутствие",
+        "criticality_level": "CRITICAL_SUSPEND",
+        "risk_level": "HIGH",
+        "confidence": 0.8,
+        "inspector_status": "PENDING"
+      },
+      {
+        "card_ref": "Б.4",
+        "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-CFG-01",
+        "finding_ids": [
+          "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-147",
+          "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-198",
+          "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-314"
+        ],
+        "parameter_code": "IOS4-078",
+        "parameter_label": "Воздуховоды общеобменной вентиляции (IOS4-078)",
+        "locations": [
+          "147",
+          "198",
+          "314"
+        ],
+        "expected": "Конфигурация вентиляции по листу 10 ПД",
+        "actual": "Конфигурация вентиляции изменена",
+        "deviation_text": "🔄 Изменена конфигурация",
+        "criticality_level": "CRITICAL_SUSPEND",
+        "risk_level": "HIGH",
+        "confidence": 0.8,
+        "inspector_status": "PENDING"
+      }
+    ],
+    "a3_confirmed": [],
+    "a4_negative_verified": [],
+    "a5_hypotheses": [
+      {
+        "card_ref": "Б.2",
+        "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-FREE-HEATING-001",
+        "parameter_code": "FREE-HEATING-001",
+        "method": "GRAPHIC_DIFF",
+        "description": "Не выполнена предусмотренная ПД система тёплых полов в помещениях МГН 267, 270, 271, 272",
+        "confidence": 0.9,
+        "normative_base": "СП 59.13330.2020 (доступность для МГН)",
+        "evidence_bind_status": "BOUND",
+        "inspector_status": "PENDING"
+      }
+    ],
+    "banner_ru": "Не являются нарушениями до решения инспектора"
+  },
+  "evidence_cards": [
+    {
+      "card_no": "Б.1",
+      "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-079-CFG-01",
+      "finding_ids": [
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-079-PDRD-012"
+      ],
+      "parameter_code": "IOS4-079",
+      "parameter_label": "Характеристики вентиляторов (IOS4-079)",
+      "rule_version": "IOS4-079@1",
+      "locations": [
+        "012"
+      ],
+      "expected_value": "Конфигурация приточных установок по листу 26 ПД",
+      "actual_value": "Иная конфигурация на плане ОВ1, помещение 012",
+      "delta": null,
+      "rationale": "В ПД (лист 26, принципиальная схема теплоснабжения приточных установок) в венткамере 012 предусмотрены установки П2, П2.1, П3, П8, П9, П10, П15, П17, П18; на плане подвала ОВ1 РД (лист 4) состав и расположение установок в помещении 012 иные.",
+      "risk_level": "HIGH",
+      "review_priority": "HIGH",
+      "criticality": "Критическое (приостановка работ)",
+      "approved_change_ref": "NONE",
+      "sources": [
+        {
+          "role": "EXPECTED",
+          "stage": "PD",
+          "file_id": "F0171",
+          "file_name": "V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+          "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+          "document_code": null,
+          "revision": null,
+          "approval_status": null,
+          "pdf_page_number": 104,
+          "sheet_number": 26,
+          "geometry": {
+            "boxes": [
+              [
+                0.6971,
+                0.2742,
+                0.8884,
+                0.5741
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        },
+        {
+          "role": "ACTUAL",
+          "stage": "RD",
+          "file_id": "F0201",
+          "file_name": "АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+          "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+          "document_code": "АНО-150321-1-РД-ОВ1",
+          "revision": "4",
+          "approval_status": null,
+          "pdf_page_number": 17,
+          "sheet_number": 4,
+          "geometry": {
+            "boxes": [
+              [
+                0.8093,
+                0.4748,
+                0.9508,
+                0.604
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        }
+      ],
+      "inspector": {
+        "status": "PENDING"
+      },
+      "ai_verdict": null,
+      "ai_comment": null
+    },
+    {
+      "card_no": "Б.2",
+      "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-FREE-HEATING-001",
+      "finding_ids": [
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-FREE-HEATING-001-PDRD-267",
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-FREE-HEATING-001-PDRD-270",
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-FREE-HEATING-001-PDRD-271",
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-FREE-HEATING-001-PDRD-272"
+      ],
+      "parameter_code": "FREE-HEATING-001",
+      "parameter_label": "Тёплые полы в помещениях МГН (FREE-HEATING-001)",
+      "rule_version": "FREE-HEATING-001@1",
+      "locations": [
+        "267",
+        "270",
+        "271",
+        "272"
+      ],
+      "expected_value": "Тёплый пол предусмотрен",
+      "actual_value": "Тёплый пол отсутствует",
+      "delta": null,
+      "rationale": "В ПД (лист 21) и пояснительной записке тёплые полы предусмотрены в помещениях МГН 267, 270, 271, 272; на плане 2 этажа ОВ2.1 РД (лист 4) тёплых полов нет — над 270, 272 облако изменения «Изм. №3».",
+      "risk_level": "MEDIUM",
+      "review_priority": "MEDIUM",
+      "criticality": "Существенное (предписание) — требует утверждения",
+      "approved_change_ref": "NONE",
+      "sources": [
+        {
+          "role": "EXPECTED",
+          "stage": "PD",
+          "file_id": "F0171",
+          "file_name": "V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+          "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+          "document_code": null,
+          "revision": null,
+          "approval_status": null,
+          "pdf_page_number": 99,
+          "sheet_number": 21,
+          "geometry": {
+            "boxes": [
+              [
+                0.2832,
+                0.3502,
+                0.3406,
+                0.5082
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        },
+        {
+          "role": "ACTUAL",
+          "stage": "RD",
+          "file_id": "F0202",
+          "file_name": "АНО-150321-1-РД-ОВ2.1_изм. 3_в1.pdf",
+          "file_sha256": "632379a0e541f0c81e6b03e5528946730b4433939c796db4fdc1e5c3fc8b71ee",
+          "document_code": "АНО-150321-1-РД-ОВ2.1",
+          "revision": "3",
+          "approval_status": null,
+          "pdf_page_number": 17,
+          "sheet_number": 4,
+          "geometry": {
+            "boxes": [
+              [
+                0.3355,
+                0.6534,
+                0.4425,
+                0.7089
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        }
+      ],
+      "inspector": {
+        "status": "PENDING"
+      },
+      "ai_verdict": null,
+      "ai_comment": null
+    },
+    {
+      "card_no": "Б.3",
+      "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-MISS-01",
+      "finding_ids": [
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-140",
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-142"
+      ],
+      "parameter_code": "IOS4-078",
+      "parameter_label": "Воздуховоды общеобменной вентиляции (IOS4-078)",
+      "rule_version": "IOS4-078@1",
+      "locations": [
+        "140",
+        "142"
+      ],
+      "expected_value": "Вытяжная вентиляция предусмотрена",
+      "actual_value": "Вытяжная вентиляция отсутствует",
+      "delta": null,
+      "rationale": "В ПД (лист 10) для помещений 140, 142 предусмотрены местные вытяжные системы; на плане ОВ1 РД (лист 5) вытяжка в этих помещениях отсутствует.",
+      "risk_level": "HIGH",
+      "review_priority": "HIGH",
+      "criticality": "Критическое (приостановка работ)",
+      "approved_change_ref": "NONE",
+      "sources": [
+        {
+          "role": "EXPECTED",
+          "stage": "PD",
+          "file_id": "F0171",
+          "file_name": "V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+          "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+          "document_code": null,
+          "revision": null,
+          "approval_status": null,
+          "pdf_page_number": 88,
+          "sheet_number": 10,
+          "geometry": {
+            "boxes": [
+              [
+                0.1671,
+                0.5751,
+                0.2637,
+                0.6884
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        },
+        {
+          "role": "ACTUAL",
+          "stage": "RD",
+          "file_id": "F0201",
+          "file_name": "АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+          "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+          "document_code": "АНО-150321-1-РД-ОВ1",
+          "revision": "4",
+          "approval_status": null,
+          "pdf_page_number": 18,
+          "sheet_number": 5,
+          "geometry": {
+            "boxes": [
+              [
+                0.8625,
+                0.1067,
+                0.9585,
+                0.2244
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        }
+      ],
+      "inspector": {
+        "status": "PENDING"
+      },
+      "ai_verdict": null,
+      "ai_comment": null
+    },
+    {
+      "card_no": "Б.4",
+      "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-CFG-01",
+      "finding_ids": [
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-147",
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-198",
+        "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-314"
+      ],
+      "parameter_code": "IOS4-078",
+      "parameter_label": "Воздуховоды общеобменной вентиляции (IOS4-078)",
+      "rule_version": "IOS4-078@1",
+      "locations": [
+        "147",
+        "198",
+        "314"
+      ],
+      "expected_value": "Конфигурация вентиляции по листу 10 ПД",
+      "actual_value": "Конфигурация вентиляции изменена",
+      "delta": null,
+      "rationale": "Конфигурация вентиляции помещений 147, 198, 314 на плане ОВ1 РД отличается от ПД (лист 10). Помещение 314 изображено на листе 7 РД (стр. 20); по правилу опорной страницы группа ссылается на стр. 18.",
+      "risk_level": "HIGH",
+      "review_priority": "HIGH",
+      "criticality": "Критическое (приостановка работ)",
+      "approved_change_ref": "NONE",
+      "sources": [
+        {
+          "role": "EXPECTED",
+          "stage": "PD",
+          "file_id": "F0171",
+          "file_name": "V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+          "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+          "document_code": null,
+          "revision": null,
+          "approval_status": null,
+          "pdf_page_number": 88,
+          "sheet_number": 10,
+          "geometry": {
+            "boxes": [
+              [
+                0.3177,
+                0.575,
+                0.3856,
+                0.6808
+              ],
+              [
+                0.6932,
+                0.5685,
+                0.7542,
+                0.6857
+              ],
+              [
+                0.7117,
+                0.2917,
+                0.7815,
+                0.4138
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        },
+        {
+          "role": "ACTUAL",
+          "stage": "RD",
+          "file_id": "F0201",
+          "file_name": "АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+          "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+          "document_code": "АНО-150321-1-РД-ОВ1",
+          "revision": "4",
+          "approval_status": null,
+          "pdf_page_number": 18,
+          "sheet_number": 5,
+          "geometry": {
+            "boxes": [
+              [
+                0.8358,
+                0.2626,
+                0.9364,
+                0.322
+              ],
+              [
+                0.6915,
+                0.128,
+                0.8047,
+                0.1784
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        },
+        {
+          "role": "SUPPORTING_ACTUAL",
+          "stage": "RD",
+          "file_id": "F0201",
+          "file_name": "АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+          "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+          "document_code": "АНО-150321-1-РД-ОВ1",
+          "revision": "4",
+          "approval_status": null,
+          "pdf_page_number": 20,
+          "sheet_number": 7,
+          "geometry": {
+            "boxes": [
+              [
+                0.6842,
+                0.0512,
+                0.7849,
+                0.1091
+              ]
+            ]
+          },
+          "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+        }
+      ],
+      "inspector": {
+        "status": "PENDING"
+      },
+      "ai_verdict": null,
+      "ai_comment": null
+    }
+  ],
+  "input_registry": {
+    "files": [
+      {
+        "file_id": "F0171",
+        "file_name": "V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+        "stage": "PD",
+        "manifest_stage": "PD",
+        "section": "ИОС4",
+        "document_code": null,
+        "revision": null,
+        "approval_status": null,
+        "pages": 177,
+        "sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+        "local_status": "PRESENT",
+        "used": true,
+        "exclusion_reason": null
+      },
+      {
+        "file_id": "F0201",
+        "file_name": "АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+        "stage": "RD",
+        "manifest_stage": "RD_ID_MIXED",
+        "section": "ИОС4",
+        "document_code": "АНО-150321-1-РД-ОВ1",
+        "revision": "4",
+        "approval_status": null,
+        "pages": 676,
+        "sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+        "local_status": "PRESENT",
+        "used": true,
+        "exclusion_reason": null
+      },
+      {
+        "file_id": "F0202",
+        "file_name": "АНО-150321-1-РД-ОВ2.1_изм. 3_в1.pdf",
+        "stage": "RD",
+        "manifest_stage": "RD_ID_MIXED",
+        "section": "ИОС4",
+        "document_code": "АНО-150321-1-РД-ОВ2.1",
+        "revision": "3",
+        "approval_status": null,
+        "pages": 36,
+        "sha256": "632379a0e541f0c81e6b03e5528946730b4433939c796db4fdc1e5c3fc8b71ee",
+        "local_status": "PRESENT",
+        "used": true,
+        "exclusion_reason": null
+      }
+    ],
+    "parser_versions": {
+      "docproc": "2.2.0",
+      "layout": "0.1.0",
+      "tables": "0.1.0"
+    }
+  },
+  "signature": null,
+  "submission_checks": [],
+  "ext": {
+    "note": "Демонстрационный протокол D1 (AG-08): собран из примера контракта, эталона Тюменской 5 и зарегистрированных зон разметки (95); показатели Раздела 2 иллюстративные. Заменяется протоколом inspector-batch export (AG-04)."
+  }
+}

@@ -1,0 +1,1588 @@
+{
+ "meta": {
+  "purpose": "Seed candidates for the self-labelled internal check on OBJ-NOVOSLOBODSKAYA (unlabeled TRAIN_PUBLIC). label fields are to be filled by the user; system_hypothesis is ours, not gold.",
+  "report": "docs/analysis/95_corpus_train_objects.md",
+  "label_values": [
+   "VIOLATION_PRESENT",
+   "NO_VIOLATION",
+   "MISSING_DOCUMENT",
+   "COMPARISON_IMPOSSIBLE",
+   "UNSURE"
+  ],
+  "object_id": "OBJ-NOVOSLOBODSKAYA",
+  "format": "n_gold_label_set",
+  "format_version": 2,
+  "protocol": "services/ml/packages/inspector_eval/LABELLING_PROTOCOL.md (N-GOLD-AGENT-v1)",
+  "rules": "label = ViolationLabel or UNSURE; UNSURE and null labels are excluded from metrics but listed. Edit parameter_code, location and evidence in place to correct them. Optional protocol_status for MISSING_DOCUMENT. Freeze with `inspector-score devset freeze N-GOLD`; relabelling after the freeze fails (TEST_SET_HASH_MISMATCH)."
+ },
+ "candidates": [
+  {
+   "id": "NS-C01",
+   "parameter_code": "KR-055",
+   "location": "БСС-1н в/о 4-2.8/А-Х1",
+   "pd_value": "В15 П4 F200 W8",
+   "rd_value": "В15, F200, W8",
+   "id_value": "БСТ В15 П4 F150(I) W8; одна партия В15П4F(I)150W6",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 24
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0005",
+     "pdf_page_number": 6
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0005",
+     "pdf_page_number": 7
+    }
+   ],
+   "system_hypothesis": "KR-055 → NO_VIOLATION by the trigger text (strength class В15 unchanged); the frost/water marks F150<F200 (and W6<W8 for one batch) are a candidate FREE-search finding (e.g. FREE-CONCRETE-001) or CLARIFICATION_REQUIRED because the PD contradicts itself (p17 F200 W8 vs p24 F100 W6)",
+   "why_interesting": "real ID↔RD mismatch outside the literal trigger; tests directional triggers, PD self-conflict and the matrix-vs-free-search routing",
+   "label": "NO_VIOLATION",
+   "label_comment": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». Strength class В15 on every stage: PD КР1 ПЗ п.5 (F0105 p17) «для свай «пустышек» БСС В15 П4 F200 W8»; RD СВГ общие указания п.23 (F0137 p1) «Сваи-пустышки … из бетона класса В15, F200, W8»; ИД АОСР №1Н-БСС (F0005, работы «Устройство неармированных свай БСС-1н в/о 4-2.8/А-Х1», реестр pp.6–7) — all batches «БСТ В15 П4 F150(I) W8», one batch «В15П4F(I)150W6» (№02-000003691 от 13.02.2026). No class reduction → NO_VIOLATION for KR-055. Out of this key: (1) the frost/water marks are lower in ИД than in RD (F150 < F200; W6 < W8 for one batch) — a separate FREE-STRUCTURE candidate (95 Q4, needs the user's domain call), never KR-055; (2) the PD contradicts itself: p17 В15 П4 F200 W8 vs the concrete schedule on p24 «Бетон мелкозернистый В15 П4 F100 W6» (539,7 м³ для свай «пустышек»). Location written as printed in the act (the seed's parenthetical gloss dropped).",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». Strength class В15 on every stage: PD КР1 ПЗ п.5 (F0105 p17) «для свай «пустышек» БСС В15 П4 F200 W8»; RD СВГ общие указания п.23 (F0137 p1) «Сваи-пустышки … из бетона класса В15, F200, W8»; ИД АОСР №1Н-БСС (F0005, работы «Устройство неармированных свай БСС-1н в/о 4-2.8/А-Х1», реестр pp.6–7) — all batches «БСТ В15 П4 F150(I) W8», one batch «В15П4F(I)150W6» (№02-000003691 от 13.02.2026). No class reduction → NO_VIOLATION for KR-055. Out of this key: (1) the frost/water marks are lower in ИД than in RD (F150 < F200; W6 < W8 for one batch) — a separate FREE-STRUCTURE candidate (95 Q4, needs the user's domain call), never KR-055; (2) the PD contradicts itself: p17 В15 П4 F200 W8 vs the concrete schedule on p24 «Бетон мелкозернистый В15 П4 F100 W6» (539,7 м³ для свай «пустышек»). Location written as printed in the act (the seed's parenthetical gloss dropped).",
+     "pages_viewed": [
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 17,
+       "how": "text layer + image"
+      },
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 24,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0005",
+       "pdf_page_number": 1,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0005",
+       "pdf_page_number": 2,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0005",
+       "pdf_page_number": 6,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0005",
+       "pdf_page_number": 7,
+       "how": "image + text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-055",
+     "location": "БСС-1н в/о 4-2.8/А-Х1",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 17
+      },
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 24
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0005",
+       "pdf_page_number": 6
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0005",
+       "pdf_page_number": 7
+      }
+     ],
+     "pd_value": "В15 П4 F200 W8",
+     "rd_value": "В15, F200, W8",
+     "id_value": "БСТ В15 П4 F150(I) W8; одна партия В15П4F(I)150W6",
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location": "БСС-1н (сваи-«пустышки») в/о 4-2.8/А-Х1",
+    "location_type": null,
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0105",
+      "pdf_page_number": 17
+     },
+     {
+      "stage": "PD",
+      "file_id": "F0105",
+      "pdf_page_number": 24
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0137",
+      "pdf_page_number": 1
+     },
+     {
+      "stage": "ID",
+      "file_id": "F0005",
+      "pdf_page_number": 7
+     }
+    ],
+    "pd_value": "В15 П4 F200 W8 (текст КР1, p17); В15 П4 F100 W6 (ведомость КР1, p24)",
+    "rd_value": "В15, F200, W8 (СВГ, п.23)",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C02",
+   "parameter_code": "KR-055",
+   "location": "БСС-1н в/о 4-2.8/А.1-Х1",
+   "pd_value": "В15 П4 F200 W8",
+   "rd_value": "В15, F200, W8",
+   "id_value": "БСТ В15 П4 F150(I) W8",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0007",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "same as NS-C01",
+   "label": "NO_VIOLATION",
+   "label_comment": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». АОСР №2Н-БСС (F0007: «Устройство неармированных свай БСС-1н в/о 4-2.8/А.1-Х1»), реестр pp.5–7: every concrete batch «БСТ В15 П4 F150(I) W8» (no W6 batch in this act). PD p17 and RD p1 п.23 require В15 (F200, W8). Class unchanged → NO_VIOLATION; F150 < F200 is the FREE-STRUCTURE candidate described in NS-C01.",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». АОСР №2Н-БСС (F0007: «Устройство неармированных свай БСС-1н в/о 4-2.8/А.1-Х1»), реестр pp.5–7: every concrete batch «БСТ В15 П4 F150(I) W8» (no W6 batch in this act). PD p17 and RD p1 п.23 require В15 (F200, W8). Class unchanged → NO_VIOLATION; F150 < F200 is the FREE-STRUCTURE candidate described in NS-C01.",
+     "pages_viewed": [
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 17,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0007",
+       "pdf_page_number": 1,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0007",
+       "pdf_page_number": 2,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0007",
+       "pdf_page_number": 5,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0007",
+       "pdf_page_number": 6,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0007",
+       "pdf_page_number": 7,
+       "how": "text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-055",
+     "location": "БСС-1н в/о 4-2.8/А.1-Х1",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 17
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0007",
+       "pdf_page_number": 5
+      }
+     ],
+     "pd_value": "В15 П4 F200 W8",
+     "rd_value": "В15, F200, W8",
+     "id_value": "БСТ В15 П4 F150(I) W8",
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location_type": null,
+    "pd_value": "as NS-C01",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C03",
+   "parameter_code": "KR-055",
+   "location": "БСС-1н в/о Х-2.8/А-Д",
+   "pd_value": "В15 П4 F200 W8",
+   "rd_value": "В15, F200, W8",
+   "id_value": "БСТ В15 П4 F150(I) W8; одна партия В15П4F(I)150W6",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0009",
+     "pdf_page_number": 5
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0009",
+     "pdf_page_number": 6
+    }
+   ],
+   "system_hypothesis": "same as NS-C01",
+   "label": "NO_VIOLATION",
+   "label_comment": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». АОСР №3Н-БСС (F0009: «Устройство неармированных свай БСС-1н в/о Х-2.8/А-Д»), реестр pp.5–6: batches «БСТ В15 П4 F150(I) W8» and one batch «В15П4F(I)150W6» (№11-000009352 от 21.03.2026, p6 row 9) — the seed listed only W8. Class В15 = PD p17 = RD p1 п.23 → NO_VIOLATION for KR-055; F/W reductions belong to the FREE-STRUCTURE candidate.",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». АОСР №3Н-БСС (F0009: «Устройство неармированных свай БСС-1н в/о Х-2.8/А-Д»), реестр pp.5–6: batches «БСТ В15 П4 F150(I) W8» and one batch «В15П4F(I)150W6» (№11-000009352 от 21.03.2026, p6 row 9) — the seed listed only W8. Class В15 = PD p17 = RD p1 п.23 → NO_VIOLATION for KR-055; F/W reductions belong to the FREE-STRUCTURE candidate.",
+     "pages_viewed": [
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 17,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0009",
+       "pdf_page_number": 1,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0009",
+       "pdf_page_number": 5,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0009",
+       "pdf_page_number": 6,
+       "how": "image + text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-055",
+     "location": "БСС-1н в/о Х-2.8/А-Д",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 17
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0009",
+       "pdf_page_number": 5
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0009",
+       "pdf_page_number": 6
+      }
+     ],
+     "pd_value": "В15 П4 F200 W8",
+     "rd_value": "В15, F200, W8",
+     "id_value": "БСТ В15 П4 F150(I) W8; одна партия В15П4F(I)150W6",
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location_type": null,
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0105",
+      "pdf_page_number": 17
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0137",
+      "pdf_page_number": 1
+     },
+     {
+      "stage": "ID",
+      "file_id": "F0009",
+      "pdf_page_number": 5
+     }
+    ],
+    "pd_value": "as NS-C01",
+    "id_value": "БСТ В15 П4 F150(I) W8",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C04",
+   "parameter_code": "KR-055",
+   "location": "БСС-1А в/о 4-2.8/А-Х1",
+   "pd_value": "В25 П4 F200 W8",
+   "rd_value": "В25, F200, W8",
+   "id_value": "БСТ В25 П4F(I)200W8",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0004",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION",
+   "label": "NO_VIOLATION",
+   "label_comment": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». Armed secant piles: PD p17 «бетон для армируемых свай класса В25 П4 F200 W8» (also p24 schedule В25 П4 F200 W8); RD p1 п.23 «армированные сваи из бетона класса В25, F200, W8»; АОСР №1А-БСС (F0004: «Устройство армированных свай БСС-1А в/о 4-2.8/А-Х1») p5: «БСТ В25 П4F(I)200W8». Equal on all stages → NO_VIOLATION (negative control).",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». Armed secant piles: PD p17 «бетон для армируемых свай класса В25 П4 F200 W8» (also p24 schedule В25 П4 F200 W8); RD p1 п.23 «армированные сваи из бетона класса В25, F200, W8»; АОСР №1А-БСС (F0004: «Устройство армированных свай БСС-1А в/о 4-2.8/А-Х1») p5: «БСТ В25 П4F(I)200W8». Equal on all stages → NO_VIOLATION (negative control).",
+     "pages_viewed": [
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 17,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0004",
+       "pdf_page_number": 1,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0004",
+       "pdf_page_number": 2,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0004",
+       "pdf_page_number": 5,
+       "how": "text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-055",
+     "location": "БСС-1А в/о 4-2.8/А-Х1",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 17
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0004",
+       "pdf_page_number": 5
+      }
+     ],
+     "pd_value": "В25 П4 F200 W8",
+     "rd_value": "В25, F200, W8",
+     "id_value": "БСТ В25 П4F(I)200W8",
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location": "БСС-1А (армированные сваи) в/о 4-2.8/А-Х1",
+    "location_type": null,
+    "id_value": "БСТ В25 П4 F(I)200 W8",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C05",
+   "parameter_code": "KR-055",
+   "location": "Стена в грунте, захватка №8",
+   "pd_value": "В25 F200 W8",
+   "rd_value": "В25, F200, W8",
+   "id_value": "БСТ В25 П4F(I)200W8",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0014",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION",
+   "label": "NO_VIOLATION",
+   "label_comment": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». «Стена в грунте»: PD p17 п.2 «бетон класса В25 F200 W8»; RD p1 п.23 «стена в грунте из бетона класса B25, F200, W8»; АОСР №10БЗ (F0014: «Бетонирование захватки №8») p5 «БСТ В25 П4F(I)200W8», исполнительная схема p3 «бетон B25W8F200», 97,055 м³. Equal → NO_VIOLATION (negative control). Location as printed in the act, with the element name.",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». «Стена в грунте»: PD p17 п.2 «бетон класса В25 F200 W8»; RD p1 п.23 «стена в грунте из бетона класса B25, F200, W8»; АОСР №10БЗ (F0014: «Бетонирование захватки №8») p5 «БСТ В25 П4F(I)200W8», исполнительная схема p3 «бетон B25W8F200», 97,055 м³. Equal → NO_VIOLATION (negative control). Location as printed in the act, with the element name.",
+     "pages_viewed": [
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 17,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0014",
+       "pdf_page_number": 1,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0014",
+       "pdf_page_number": 2,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0014",
+       "pdf_page_number": 3,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0014",
+       "pdf_page_number": 5,
+       "how": "text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-055",
+     "location": "Стена в грунте, захватка №8",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 17
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0014",
+       "pdf_page_number": 5
+      }
+     ],
+     "pd_value": "В25 F200 W8",
+     "rd_value": "В25, F200, W8",
+     "id_value": "БСТ В25 П4F(I)200W8",
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location": "«Стена в грунте», захватка №8",
+    "location_type": null,
+    "id_value": "БСТ В25 П4 F(I)200 W8",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C06",
+   "parameter_code": "KR-055",
+   "location": "Форшахта в/о 1.1-9/А-Х2",
+   "pd_value": "В15 (F и W не регламентируются)",
+   "rd_value": "В15 (F и W не регламентируются)",
+   "id_value": "БСТ В15П4F(I)150W6",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 13
+    },
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 23
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0069",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION (ID exceeds requirement)",
+   "label": "NO_VIOLATION",
+   "label_comment": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». Форшахта (temporary guide wall, dismantled per PD p23 «Демонтаж ж.б. конструкций форшахты»): PD p13 «бетон класса В15 (F и W не регламентируются)», PD p23 schedule «Устройство форшахты бетон В15 F100 W4»; RD p1 п.23 «Конструкция форшахты из бетона класса B15 (F и W не регламентируются)»; АОСР №1БФ (F0069: «Бетонирование форшахты в/о 1.1-9/А-Х2») p5 «БСТ В15П4F(I)150W6». Class unchanged; F/W at or above every requirement → NO_VIOLATION.",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "Trigger KR-055: «Понижение класса бетона несущих элементов … в РД/ИД». Форшахта (temporary guide wall, dismantled per PD p23 «Демонтаж ж.б. конструкций форшахты»): PD p13 «бетон класса В15 (F и W не регламентируются)», PD p23 schedule «Устройство форшахты бетон В15 F100 W4»; RD p1 п.23 «Конструкция форшахты из бетона класса B15 (F и W не регламентируются)»; АОСР №1БФ (F0069: «Бетонирование форшахты в/о 1.1-9/А-Х2») p5 «БСТ В15П4F(I)150W6». Class unchanged; F/W at or above every requirement → NO_VIOLATION.",
+     "pages_viewed": [
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 13,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 23,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0069",
+       "pdf_page_number": 1,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0069",
+       "pdf_page_number": 2,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0069",
+       "pdf_page_number": 5,
+       "how": "text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-055",
+     "location": "Форшахта в/о 1.1-9/А-Х2",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 13
+      },
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 23
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0069",
+       "pdf_page_number": 5
+      }
+     ],
+     "pd_value": "В15 (F и W не регламентируются)",
+     "rd_value": "В15 (F и W не регламентируются)",
+     "id_value": "БСТ В15П4F(I)150W6",
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location_type": null,
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0105",
+      "pdf_page_number": 13
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0137",
+      "pdf_page_number": 1
+     },
+     {
+      "stage": "ID",
+      "file_id": "F0069",
+      "pdf_page_number": 5
+     }
+    ],
+    "pd_value": "В15 (F и W не регламентируются) p13; В15 F100 W4 (ведомость p23)",
+    "id_value": "БСТ В15 П4 F(I)150 W6",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C07",
+   "parameter_code": "PZ-009",
+   "location": "OBJECT",
+   "pd_value": "0,000 = 159,95",
+   "rd_value": "0,000 = 159,95",
+   "id_value": null,
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0101",
+     "pdf_page_number": 13
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0145",
+     "pdf_page_number": 4
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION",
+   "label": "NO_VIOLATION",
+   "label_comment": "PZ-009 trigger: «Несоответствие абсолютной отметки нуля на чертежах РД геоподоснове ПД» (a PD↔RD pairwise rule, ИД not required). PD ПЗ F0101 p13 «За относительную отметку 0,000 принята абсолютная отметка 159,95 м»; RD СВГ F0137 p1 п.27 and RD РС F0145 p4 п.15 «За относительную отметку 0,000 принята абс. отм. 159,95 м» (КЖ1.1.1 F0140 p3 п.3 also 159.95). Equal → NO_VIOLATION / OK. Object-level parameter → location «OBJECT» (93 §2.7) instead of the seed's «Здание».",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "PZ-009 trigger: «Несоответствие абсолютной отметки нуля на чертежах РД геоподоснове ПД» (a PD↔RD pairwise rule, ИД not required). PD ПЗ F0101 p13 «За относительную отметку 0,000 принята абсолютная отметка 159,95 м»; RD СВГ F0137 p1 п.27 and RD РС F0145 p4 п.15 «За относительную отметку 0,000 принята абс. отм. 159,95 м» (КЖ1.1.1 F0140 p3 п.3 also 159.95). Equal → NO_VIOLATION / OK. Object-level parameter → location «OBJECT» (93 §2.7) instead of the seed's «Здание».",
+     "pages_viewed": [
+      {
+       "file_id": "F0101",
+       "pdf_page_number": 13,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0145",
+       "pdf_page_number": 4,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0140",
+       "pdf_page_number": 3,
+       "how": "image"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "PZ-009",
+     "location": "OBJECT",
+     "location_type": "OBJECT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0101",
+       "pdf_page_number": 13
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0145",
+       "pdf_page_number": 4
+      }
+     ],
+     "pd_value": "0,000 = 159,95",
+     "rd_value": "0,000 = 159,95",
+     "id_value": null,
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location": "Здание",
+    "location_type": null,
+    "rd_value": "0,000 = 159,95 (СВГ, РС, КЖ1.1.1)",
+    "protocol_status": null
+   },
+   "location_type": "OBJECT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C08",
+   "parameter_code": "KR-061",
+   "location": "Стена в грунте",
+   "pd_value": "600 мм",
+   "rd_value": "600 мм",
+   "id_value": "600 мм (захватка №8)",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 13
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0014",
+     "pdf_page_number": 3
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION (mapping of СВГ to KR-061 «несущие монолитные стены» is itself debatable)",
+   "label": "NO_VIOLATION",
+   "label_comment": "KR-061 trigger: «Уменьшение толщины стен …». PD КР1 F0105 p13 «\"стена в грунте\" толщиной 600 мм»; RD F0137 p1 п.3 «монолитной стены в грунте траншейного типа толщиной 600 мм»; ИД исполнительная схема №10БЗ (F0014 p3, захватка №8, разрез 1-1) 600. Equal → NO_VIOLATION. Confidence MEDIUM only because of the mapping: the СВГ is the pit retaining wall, separated from the building's own outer walls by a technical gap (PD p24 «200 тех.зазор»; КР2 p53 says 150 мм), so KR-061 «несущие монолитные стены (ядра жесткости)» may not apply at all; either way a VIOLATION_PRESENT here is wrong. The seed's ID value («to read from …») was a placeholder; replaced with the value read from the scheme.",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "MEDIUM",
+     "reasoning": "KR-061 trigger: «Уменьшение толщины стен …». PD КР1 F0105 p13 «\"стена в грунте\" толщиной 600 мм»; RD F0137 p1 п.3 «монолитной стены в грунте траншейного типа толщиной 600 мм»; ИД исполнительная схема №10БЗ (F0014 p3, захватка №8, разрез 1-1) 600. Equal → NO_VIOLATION. Confidence MEDIUM only because of the mapping: the СВГ is the pit retaining wall, separated from the building's own outer walls by a technical gap (PD p24 «200 тех.зазор»; КР2 p53 says 150 мм), so KR-061 «несущие монолитные стены (ядра жесткости)» may not apply at all; either way a VIOLATION_PRESENT here is wrong. The seed's ID value («to read from …») was a placeholder; replaced with the value read from the scheme.",
+     "pages_viewed": [
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 13,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 3,
+       "how": "image"
+      },
+      {
+       "file_id": "F0014",
+       "pdf_page_number": 3,
+       "how": "image + text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-061",
+     "location": "Стена в грунте",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 13
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0014",
+       "pdf_page_number": 3
+      }
+     ],
+     "pd_value": "600 мм",
+     "rd_value": "600 мм",
+     "id_value": "600 мм (захватка №8)",
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location": "«Стена в грунте» (ограждение котлована)",
+    "location_type": null,
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0105",
+      "pdf_page_number": 13
+     },
+     {
+      "stage": "PD",
+      "file_id": "F0112",
+      "pdf_page_number": 23
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0137",
+      "pdf_page_number": 1
+     }
+    ],
+    "pd_value": "толщина 600 мм",
+    "rd_value": "толщина 600 мм",
+    "id_value": "to read from исполнительные схемы захваток",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C09",
+   "parameter_code": "KR-061 / PZ-009 (elevations)",
+   "location": "Стена в грунте, захватка №8",
+   "pd_value": "159,48 - верх СВГ; 134,50 - низ СВГ",
+   "rd_value": "верх бетонирования СВГ 159,48 (участок по оси Д); низ 134,50",
+   "id_value": "верх каркаса 159.45; верх бетонирования 159,50; низ 134,50",
+   "evidence": [
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 3
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0013",
+     "pdf_page_number": 3
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0014",
+     "pdf_page_number": 3
+    }
+   ],
+   "system_hypothesis": "expert call: cage and over-pour above design top are normal practice; FP trap for naive elevation diff",
+   "label": "NO_VIOLATION",
+   "label_comment": "Not a scorable key: no catalog parameter covers the top-of-wall elevation (PZ-009 is the 0.000 datum, KR-061 the wall thickness). Facts: захватка №8 lies on the north wall at axes 1.1/Д (situation plan of F0014 p3). There the design top of the СВГ is 159,48, not 158,90: RD F0137 p1 п.4 «отметки верха бетонирования «стены в грунте» составляют 158,90 м и 159,48 м», RD plan F0137 p3 marks «159,48 отм. верха СВГ» along axis Д (158,90 on the west wall), PD F0105 p24 likewise. ИД: армирование F0013 p3 «Верх каркаса 159.45, низ каркаса 134.50»; бетонирование F0014 p3 «Верх бетонирования 159,50, низ 134,50, верх форшахты 159.80». Deviations −0,03 / +0,02 m are within RD п.18 (±3 см), and the top 500–600 мм is cut off anyway (PD p24 «Срубка шламового слоя … на высоту 500-600 мм»). The seed premise (design top 158,90) is wrong for this захватка. Keep as a FREE-STRUCTURE false-positive trap for manual review; scorable=false.",
+   "source": "SEED",
+   "scorable": false,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "Not a scorable key: no catalog parameter covers the top-of-wall elevation (PZ-009 is the 0.000 datum, KR-061 the wall thickness). Facts: захватка №8 lies on the north wall at axes 1.1/Д (situation plan of F0014 p3). There the design top of the СВГ is 159,48, not 158,90: RD F0137 p1 п.4 «отметки верха бетонирования «стены в грунте» составляют 158,90 м и 159,48 м», RD plan F0137 p3 marks «159,48 отм. верха СВГ» along axis Д (158,90 on the west wall), PD F0105 p24 likewise. ИД: армирование F0013 p3 «Верх каркаса 159.45, низ каркаса 134.50»; бетонирование F0014 p3 «Верх бетонирования 159,50, низ 134,50, верх форшахты 159.80». Deviations −0,03 / +0,02 m are within RD п.18 (±3 см), and the top 500–600 мм is cut off anyway (PD p24 «Срубка шламового слоя … на высоту 500-600 мм»). The seed premise (design top 158,90) is wrong for this захватка. Keep as a FREE-STRUCTURE false-positive trap for manual review; scorable=false.",
+     "pages_viewed": [
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 3,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 24,
+       "how": "image"
+      },
+      {
+       "file_id": "F0013",
+       "pdf_page_number": 3,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0014",
+       "pdf_page_number": 3,
+       "how": "image + text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "scorable": false,
+     "location": "Стена в грунте, захватка №8",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 3
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0013",
+       "pdf_page_number": 3
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0014",
+       "pdf_page_number": 3
+      }
+     ],
+     "pd_value": "159,48 - верх СВГ; 134,50 - низ СВГ",
+     "rd_value": "верх бетонирования СВГ 159,48 (участок по оси Д); низ 134,50",
+     "id_value": "верх каркаса 159.45; верх бетонирования 159,50; низ 134,50"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location": "Захватка №8",
+    "location_type": null,
+    "evidence": [
+     {
+      "stage": "RD",
+      "file_id": "F0137",
+      "pdf_page_number": 1
+     },
+     {
+      "stage": "ID",
+      "file_id": "F0013",
+      "pdf_page_number": 3
+     },
+     {
+      "stage": "ID",
+      "file_id": "F0014",
+      "pdf_page_number": 3
+     }
+    ],
+    "pd_value": "низ свай 134,50",
+    "rd_value": "верх бетонирования БСС 158,90; низ 134,50",
+    "id_value": "Верх каркаса 159.45; низ каркаса 134.50; бетонирование на отм. 159.50"
+   },
+   "location_type": "ELEMENT"
+  },
+  {
+   "id": "NS-C10",
+   "parameter_code": "PZ-001",
+   "location": "OBJECT",
+   "pd_value": "1225,8 м² (наземная часть 767,0; подземная за контуром надземной 458,8)",
+   "rd_value": null,
+   "id_value": null,
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0101",
+     "pdf_page_number": 9
+    },
+    {
+     "stage": "PD",
+     "file_id": "F0126",
+     "pdf_page_number": 10
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION: ПЗУ «767,0*» is the ground part only; FP trap for total-vs-component comparison",
+   "label": "COMPARISON_IMPOSSIBLE",
+   "label_comment": "PZ-001 (Площадь застройки): PD ПЗ F0101 p9 «Площадь застройки, в т.ч.: 1225,8 кв. м; 2.1 наземной части 767,0; 2.2 подземной части, выходящая за контур надземной части 458,8»; PD ПЗУ F0126 p10 balance «Площадь застройки* 767,0 (54,7 %)», 767,0 + 634,0 = 1401,0 = site area, i.e. the balance counts the above-ground footprint. Component-matched values agree: no discrepancy. Only the PD stage exists for this parameter (no ГП/ПП РД in the package — RD files are КЖ, СВГ, РС, ВП, ДР — and no БТИ/акт выноса осей in ИД) → 93 §3.3 rule 1: COMPARISON_IMPOSSIBLE. Confidence MEDIUM on the status (an alternative reading is MISSING_DOCUMENT/RD_MISSING); HIGH that VIOLATION_PRESENT would be a false positive.",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "COMPARISON_IMPOSSIBLE",
+     "confidence": "MEDIUM",
+     "reasoning": "PZ-001 (Площадь застройки): PD ПЗ F0101 p9 «Площадь застройки, в т.ч.: 1225,8 кв. м; 2.1 наземной части 767,0; 2.2 подземной части, выходящая за контур надземной части 458,8»; PD ПЗУ F0126 p10 balance «Площадь застройки* 767,0 (54,7 %)», 767,0 + 634,0 = 1401,0 = site area, i.e. the balance counts the above-ground footprint. Component-matched values agree: no discrepancy. Only the PD stage exists for this parameter (no ГП/ПП РД in the package — RD files are КЖ, СВГ, РС, ВП, ДР — and no БТИ/акт выноса осей in ИД) → 93 §3.3 rule 1: COMPARISON_IMPOSSIBLE. Confidence MEDIUM on the status (an alternative reading is MISSING_DOCUMENT/RD_MISSING); HIGH that VIOLATION_PRESENT would be a false positive.",
+     "pages_viewed": [
+      {
+       "file_id": "F0101",
+       "pdf_page_number": 9,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0126",
+       "pdf_page_number": 10,
+       "how": "image + text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "PZ-001",
+     "location": "OBJECT",
+     "location_type": "OBJECT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0101",
+       "pdf_page_number": 9
+      },
+      {
+       "stage": "PD",
+       "file_id": "F0126",
+       "pdf_page_number": 10
+      }
+     ],
+     "pd_value": "1225,8 м² (наземная часть 767,0; подземная за контуром надземной 458,8)",
+     "rd_value": null,
+     "id_value": null,
+     "protocol_status": "COMPARISON_IMPOSSIBLE"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location": "Здание",
+    "location_type": null,
+    "pd_value": "ПЗ: 1225,8 м² (наземная 767,0 + подземная 458,8)",
+    "protocol_status": null
+   },
+   "location_type": "OBJECT",
+   "protocol_status": "COMPARISON_IMPOSSIBLE"
+  },
+  {
+   "id": "NS-C11",
+   "parameter_code": "KR-057",
+   "location": "Стена в грунте, захватка №8",
+   "pd_value": "А500С, А240",
+   "rd_value": "А500С, А240",
+   "id_value": "А500С d28, А500С d16, А240С d20, А240 d8",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 14
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0013",
+     "pdf_page_number": 5
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0013",
+     "pdf_page_number": 19
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION; tests «А240С»≡«А240» normalization",
+   "label": "NO_VIOLATION",
+   "label_comment": "KR-057 trigger: «Замена класса арматуры на менее пластичный (например, А500С на А400)». PD КР1 F0105 p14 «основная рабочая арматура А500С, конструктивная А240 по ГОСТ 34028-2016»; RD F0137 p1 п.23 «Арматура класса А500С и класса А240»; АОСР «Армирование захватки №8» (F0013) реестр p5: А500С d28, А240С d20, А240С d8, «А500 d16». The d16 certificate №1886/26 (scan p19) reads «А500С/S500» (the реестр dropped the «С»); the d8 certificate №608759 (p17) reads A240; the d28 certificate №608440 (p15) A500C. No class substitution → NO_VIOLATION. Normalisation needed: «А240С» ≡ «А240», «А500» in a реестр may abbreviate «А500С».",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "KR-057 trigger: «Замена класса арматуры на менее пластичный (например, А500С на А400)». PD КР1 F0105 p14 «основная рабочая арматура А500С, конструктивная А240 по ГОСТ 34028-2016»; RD F0137 p1 п.23 «Арматура класса А500С и класса А240»; АОСР «Армирование захватки №8» (F0013) реестр p5: А500С d28, А240С d20, А240С d8, «А500 d16». The d16 certificate №1886/26 (scan p19) reads «А500С/S500» (the реестр dropped the «С»); the d8 certificate №608759 (p17) reads A240; the d28 certificate №608440 (p15) A500C. No class substitution → NO_VIOLATION. Normalisation needed: «А240С» ≡ «А240», «А500» in a реестр may abbreviate «А500С».",
+     "pages_viewed": [
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 14,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0105",
+       "pdf_page_number": 13,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0137",
+       "pdf_page_number": 1,
+       "how": "image + text layer"
+      },
+      {
+       "file_id": "F0013",
+       "pdf_page_number": 1,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0013",
+       "pdf_page_number": 5,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0013",
+       "pdf_page_number": 13,
+       "how": "image"
+      },
+      {
+       "file_id": "F0013",
+       "pdf_page_number": 15,
+       "how": "image"
+      },
+      {
+       "file_id": "F0013",
+       "pdf_page_number": 17,
+       "how": "image"
+      },
+      {
+       "file_id": "F0013",
+       "pdf_page_number": 19,
+       "how": "image"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-057",
+     "location": "Стена в грунте, захватка №8",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0105",
+       "pdf_page_number": 14
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0137",
+       "pdf_page_number": 1
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0013",
+       "pdf_page_number": 5
+      },
+      {
+       "stage": "ID",
+       "file_id": "F0013",
+       "pdf_page_number": 19
+      }
+     ],
+     "pd_value": "А500С, А240",
+     "rd_value": "А500С, А240",
+     "id_value": "А500С d28, А500С d16, А240С d20, А240 d8",
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location": "Армирование захваток СВГ",
+    "location_type": null,
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0105",
+      "pdf_page_number": 14
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0137",
+      "pdf_page_number": 1
+     },
+     {
+      "stage": "ID",
+      "file_id": "F0013",
+      "pdf_page_number": 5
+     }
+    ],
+    "id_value": "А500С, А240С (сертификаты Северсталь)",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C12",
+   "parameter_code": "FREE-DOC-xxx (document integrity)",
+   "location": "ТХ3 текстовая часть",
+   "pd_value": "ссылки на разделы СГ-2404-63-П-ИОС5.5.3/5.5.4/5.5.9/5.5.10/5.5.11/5.5.12",
+   "rd_value": null,
+   "id_value": null,
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0110",
+     "pdf_page_number": 28
+    }
+   ],
+   "system_hypothesis": "SUSPICION only (copy-paste of foreign cipher), not a matrix finding",
+   "label": "UNSURE",
+   "label_comment": "The defect is real: ТХ3 ПЗ (F0110 p28, лист 22 of «НВС-2025/03-ТХ3.ПЗ»), section «Диспетчеризация лифтов», refers to «СГ-2404-63-П-ИОС5.5.3, …5.5.9, …5.5.10, …5.5.4, …5.5.11, …5.5.12» — ciphers of another project (this object's ciphers are НВС-2025/03-…). It is a documentation-quality (copy-paste) defect inside one PD volume, not a PD↔RD↔ИД discrepancy of any of the 132 parameters, and FREE-<TOPIC> has no documentation topic (FREE-OTHER would be a stretch). Route: document-integrity suspicion (not exported). No scorable key → scorable=false; label UNSURE records that no violation label applies.",
+   "source": "SEED",
+   "scorable": false,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "UNSURE",
+     "confidence": "HIGH",
+     "reasoning": "The defect is real: ТХ3 ПЗ (F0110 p28, лист 22 of «НВС-2025/03-ТХ3.ПЗ»), section «Диспетчеризация лифтов», refers to «СГ-2404-63-П-ИОС5.5.3, …5.5.9, …5.5.10, …5.5.4, …5.5.11, …5.5.12» — ciphers of another project (this object's ciphers are НВС-2025/03-…). It is a documentation-quality (copy-paste) defect inside one PD volume, not a PD↔RD↔ИД discrepancy of any of the 132 parameters, and FREE-<TOPIC> has no documentation topic (FREE-OTHER would be a stretch). Route: document-integrity suspicion (not exported). No scorable key → scorable=false; label UNSURE records that no violation label applies.",
+     "pages_viewed": [
+      {
+       "file_id": "F0110",
+       "pdf_page_number": 28,
+       "how": "image + text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "scorable": false,
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0110",
+       "pdf_page_number": 28
+      }
+     ],
+     "pd_value": "ссылки на разделы СГ-2404-63-П-ИОС5.5.3/5.5.4/5.5.9/5.5.10/5.5.11/5.5.12",
+     "rd_value": null,
+     "id_value": null
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "pd_value": "ссылки на разделы «СГ-2404-63-П-ИОС5.5.3 / 5.5.9 / 5.5.10» другого проекта"
+   }
+  },
+  {
+   "id": "NS-C14",
+   "parameter_code": "KR-058",
+   "location": "Фундаментная плита",
+   "pd_value": "1000 и 1200 мм",
+   "rd_value": "1200 и 1500 мм",
+   "id_value": null,
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0106",
+     "pdf_page_number": 53
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0140",
+     "pdf_page_number": 3
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION (trigger is «уменьшение»; RD is thicker) — FP trap for undirected diffs",
+   "label": "NO_VIOLATION",
+   "label_comment": "KR-058 trigger: «Уменьшение проектной толщины плиты в РД или по факту заливки (ИД)». PD КР2 F0106 p53 «Толщина фундаментной плиты … 1000мм и 1200мм», top −13,750; RD КЖ1.1.1 F0140 p3 (Общие данные, п.4) «плиты толщиной 1200 и 1500 мм с отметкой низа -14.950 и -15.250», top −13.750 (sheets 4–14). The RD is thicker (+200/+300 мм, bottom lowered) → the directional trigger is not met → NO_VIOLATION. Confidence MEDIUM on the status only: the slab's ИД (АОСР/геодезическая схема плиты) is not in the package; our reading is that the slab has not been cast yet (ИД covers pit works up to June 2026), so ИД is not yet required (93 §3.3 PHASE_BASED) → OK; the alternative is MISSING_DOCUMENT/ID_MISSING.",
+   "source": "SEED",
+   "scorable": true,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "MEDIUM",
+     "reasoning": "KR-058 trigger: «Уменьшение проектной толщины плиты в РД или по факту заливки (ИД)». PD КР2 F0106 p53 «Толщина фундаментной плиты … 1000мм и 1200мм», top −13,750; RD КЖ1.1.1 F0140 p3 (Общие данные, п.4) «плиты толщиной 1200 и 1500 мм с отметкой низа -14.950 и -15.250», top −13.750 (sheets 4–14). The RD is thicker (+200/+300 мм, bottom lowered) → the directional trigger is not met → NO_VIOLATION. Confidence MEDIUM on the status only: the slab's ИД (АОСР/геодезическая схема плиты) is not in the package; our reading is that the slab has not been cast yet (ИД covers pit works up to June 2026), so ИД is not yet required (93 §3.3 PHASE_BASED) → OK; the alternative is MISSING_DOCUMENT/ID_MISSING.",
+     "pages_viewed": [
+      {
+       "file_id": "F0106",
+       "pdf_page_number": 53,
+       "how": "text layer"
+      },
+      {
+       "file_id": "F0140",
+       "pdf_page_number": 3,
+       "how": "image + text layer"
+      }
+     ],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "parameter_code": "KR-058",
+     "location": "Фундаментная плита",
+     "location_type": "ELEMENT",
+     "evidence": [
+      {
+       "stage": "PD",
+       "file_id": "F0106",
+       "pdf_page_number": 53
+      },
+      {
+       "stage": "RD",
+       "file_id": "F0140",
+       "pdf_page_number": 3
+      }
+     ],
+     "pd_value": "1000 и 1200 мм",
+     "rd_value": "1200 и 1500 мм",
+     "id_value": null,
+     "protocol_status": "OK"
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   },
+   "seed_original": {
+    "location_type": null,
+    "pd_value": "1000 и 1200 мм (КР2 p53)",
+    "rd_value": "1200 и 1500 мм, низ −14.950/−15.250 (КЖ1.1.1 p3)",
+    "protocol_status": null
+   },
+   "location_type": "ELEMENT",
+   "protocol_status": "OK"
+  },
+  {
+   "id": "NS-C13",
+   "parameter_code": "(integrity)",
+   "location": "АОСР «РЗ» ×16 и «РФ» ×3",
+   "pd_value": null,
+   "rd_value": null,
+   "id_value": "listed in document_manifest but absent in the local copy",
+   "evidence": [],
+   "system_hypothesis": "local data problem, NOT MISSING_DOCUMENT for the object; re-extract before labelling",
+   "label": "NO_VIOLATION",
+   "label_comment": "Data note, not a check. The 19 АОСР that were missing locally (РЗ ×16: F0015, F0018, F0021, F0024, F0027, F0030, F0033, F0036, F0039, F0042, F0045, F0049, F0052, F0055, F0064, F0067; РФ ×3: F0071, F0077, F0080) are RECOVERED with sha256 verified (M0 inventory runs/m0-int-inventory-all: 145/145 verified, 0 missing). So no MISSING_DOCUMENT may be emitted for them; label NO_VIOLATION records «not missing». No pages viewed: the basis is the inventory report. scorable=false.",
+   "source": "SEED",
+   "scorable": false,
+   "annotations": [
+    {
+     "labeller": "AG-10",
+     "labeller_kind": "AGENT",
+     "protocol": "N-GOLD-AGENT-v1",
+     "blind": false,
+     "blind_note": "Not blind: before labelling, the labeller (AG-10) had read the seed file (95 §4.4 hypotheses and seed values). Every value below was re-read from the pages listed in pages_viewed; the seed values were not copied (corrections: NS-C03 ID W6 batch, NS-C08 ID value, NS-C09 design top mark, NS-C11 certificate).",
+     "label": "NO_VIOLATION",
+     "confidence": "HIGH",
+     "reasoning": "Data note, not a check. The 19 АОСР that were missing locally (РЗ ×16: F0015, F0018, F0021, F0024, F0027, F0030, F0033, F0036, F0039, F0042, F0045, F0049, F0052, F0055, F0064, F0067; РФ ×3: F0071, F0077, F0080) are RECOVERED with sha256 verified (M0 inventory runs/m0-int-inventory-all: 145/145 verified, 0 missing). So no MISSING_DOCUMENT may be emitted for them; label NO_VIOLATION records «not missing». No pages viewed: the basis is the inventory report. scorable=false.",
+     "pages_viewed": [],
+     "labelled_at": "2026-09-28T12:00:00Z",
+     "scorable": false
+    }
+   ],
+   "adjudication": {
+    "method": "SINGLE",
+    "decided_by": "AG-10",
+    "labellers": [
+     "AG-10"
+    ],
+    "disagreement": false
+   }
+  }
+ ]
+}

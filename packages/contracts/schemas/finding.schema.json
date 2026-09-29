@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/finding.schema.json",
+  "title": "Finding",
+  "description": "One atomic check result (one parameter × one location), produced by the comparison engine and the FREE path, before export. Split from a FindingGroup (finding_group.schema.json), whose anchor pages it reuses. Written as JSONL to runs/<run_id>/findings/<object_id>.jsonl. The submission row is a projection of it. Status fields follow 90 §3.2.4 and the 97 §2.6 mapping. Owner: AG-04 (FREE-* rows: AG-07).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "finding_id",
+    "object_id",
+    "matrix_scope",
+    "parameter_code",
+    "location",
+    "location_type",
+    "violation_label",
+    "protocol_status",
+    "criticality",
+    "evidence"
+  ],
+  "properties": {
+    "finding_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 96,
+      "description": "Stable id, e.g. «OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-079-PDRD-012»; split children «{parent}.{n}»."
+    },
+    "finding_group_id": {"type": ["string", "null"], "description": "Group this atomic check was split from (one anchor page per stage per group)."},
+    "object_id": {"$ref": "common.schema.json#/$defs/ObjectId"},
+    "run_id": {"type": ["string", "null"]},
+    "matrix_scope": {"$ref": "enums.schema.json#/$defs/MatrixScope"},
+    "parameter_code": {"$ref": "common.schema.json#/$defs/SubmissionParameterCode"},
+    "parameter_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/ParamId"}, {"type": "null"}]},
+    "parameter_mapping_status": {"$ref": "enums.schema.json#/$defs/ParameterMappingStatus"},
+    "alt_parameter_codes": {
+      "type": "array",
+      "items": {"$ref": "common.schema.json#/$defs/CanonicalParameterCode"},
+      "description": "Runner-up codes considered by the top-2 hedge."
+    },
+    "hedge_of_finding_id": {"type": ["string", "null"], "description": "Set on the hedge twin of another finding (97 §2.8)."},
+    "location": {"$ref": "common.schema.json#/$defs/Location"},
+    "location_type": {"$ref": "enums.schema.json#/$defs/LocationType"},
+    "pd_value": {"$ref": "common.schema.json#/$defs/StageValue"},
+    "rd_value": {"$ref": "common.schema.json#/$defs/StageValue"},
+    "id_value": {"$ref": "common.schema.json#/$defs/StageValue"},
+    "axis": {"$ref": "enums.schema.json#/$defs/ComparisonAxis"},
+    "comparison_result": {"oneOf": [{"$ref": "enums.schema.json#/$defs/ComparisonResult"}, {"type": "null"}]},
+    "discrepancy_type": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DiscrepancyType"}, {"type": "null"}]},
+    "violation_type": {"oneOf": [{"$ref": "enums.schema.json#/$defs/ViolationType"}, {"type": "null"}]},
+    "completeness_status": {"$ref": "enums.schema.json#/$defs/CompletenessStatus"},
+    "completeness_basis": {"oneOf": [{"$ref": "enums.schema.json#/$defs/CompletenessBasis"}, {"type": "null"}]},
+    "finding_status": {"oneOf": [{"$ref": "enums.schema.json#/$defs/FindingStatus"}, {"type": "null"}]},
+    "inspector_status": {"oneOf": [{"$ref": "enums.schema.json#/$defs/InspectorStatus"}, {"type": "null"}]},
+    "violation_label": {"$ref": "enums.schema.json#/$defs/ViolationLabel"},
+    "protocol_status": {"$ref": "enums.schema.json#/$defs/ProtocolParamStatus"},
+    "criticality": {"$ref": "common.schema.json#/$defs/CriticalityString"},
+    "criticality_level": {"oneOf": [{"$ref": "enums.schema.json#/$defs/CriticalityLevel"}, {"type": "null"}]},
+    "review_priority": {"$ref": "enums.schema.json#/$defs/ReviewPriority"},
+    "risk_level": {"$ref": "enums.schema.json#/$defs/RiskLevel"},
+    "document_status": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DocumentStatus"}, {"type": "null"}]},
+    "confidence": {"$ref": "common.schema.json#/$defs/Confidence"},
+    "evidence": {
+      "type": "array",
+      "items": {"$ref": "evidence_ref.schema.json"},
+      "description": "Ordered PD, RD, ID; 1–2 items per stage."
+    },
+    "hedge_kind": {"oneOf": [{"$ref": "enums.schema.json#/$defs/HedgeKind"}, {"type": "null"}], "description": "Why the hedge twin exists (matrix near-duplicate kind)."},
+    "element_noun": {"type": ["string", "null"], "description": "Element noun of the value templates (93 §3.5), e.g. «Тёплый пол»."},
+    "discovery_method": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DiscoveryMethod"}, {"type": "null"}], "description": "FREE-* findings: the hypothesis method (Приложение 2 §6 «Метод»)."},
+    "evidence_bind_status": {"oneOf": [{"$ref": "enums.schema.json#/$defs/EvidenceBindStatus"}, {"type": "null"}], "description": "FREE-* findings: the B07 evidence gate; only bound ones are exported."},
+    "recommendation": {"oneOf": [{"$ref": "finding_group.schema.json#/$defs/Recommendation"}, {"type": "null"}]},
+    "card_no": {"type": ["string", "null"], "pattern": "^Б\\.[1-9][0-9]*$", "description": "Evidence card in Приложение Б, e.g. «Б.3» (shared by the atomic findings of one group)."},
+    "rule_code": {"type": ["string", "null"]},
+    "rule_version": {"type": ["string", "null"]},
+    "sub_id": {"type": ["string", "null"], "description": "Sub-check of the parameter rule, e.g. «KR-055.b»."},
+    "delta": {"type": ["object", "null"], "description": "{abs, rel, unit, direction} of the discrepancy."},
+    "rationale": {"type": ["string", "null"], "description": "Russian, one or two sentences, shown in the evidence card."},
+    "decision_trace": {"type": ["object", "null"], "description": "Every issue considered for the status (90 §3.2.4)."},
+    "ext": {"$ref": "common.schema.json#/$defs/Extension"}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"matrix_scope": {"const": "FREE_SEARCH"}}, "required": ["matrix_scope"]},
+      "then": {"properties": {"parameter_code": {"$ref": "common.schema.json#/$defs/FreeParameterCode"}, "parameter_id": {"type": "null"}}},
+      "else": {"properties": {"parameter_code": {"$ref": "common.schema.json#/$defs/CanonicalParameterCode"}}}
+    },
+    {
+      "if": {"properties": {"violation_label": {"const": "VIOLATION_PRESENT"}}, "required": ["violation_label"]},
+      "then": {"properties": {"protocol_status": {"enum": ["CRITICAL", "WARNING"]}}}
+    },
+    {
+      "if": {"properties": {"violation_label": {"const": "NO_VIOLATION"}}, "required": ["violation_label"]},
+      "then": {"properties": {"protocol_status": {"enum": ["OK"]}}}
+    },
+    {
+      "if": {"properties": {"violation_label": {"const": "MISSING_DOCUMENT"}}, "required": ["violation_label"]},
+      "then": {"properties": {"protocol_status": {"enum": ["PD_MISSING", "RD_MISSING", "ID_MISSING"]}}}
+    },
+    {
+      "if": {"properties": {"violation_label": {"const": "COMPARISON_IMPOSSIBLE"}}, "required": ["violation_label"]},
+      "then": {"properties": {"protocol_status": {"enum": ["COMPARISON_IMPOSSIBLE"]}}}
+    }
+  ]
+}

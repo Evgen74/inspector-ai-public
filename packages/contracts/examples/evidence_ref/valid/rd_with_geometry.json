@@ -1,0 +1,19 @@
+{
+  "stage": "RD",
+  "file_id": "F0201",
+  "pdf_page_number": 17,
+  "document_sheet_number": 3,
+  "is_anchor": true,
+  "role": "ACTUAL",
+  "geometry": {
+    "boxes": [
+      [
+        0.41,
+        0.22,
+        0.58,
+        0.37
+      ]
+    ]
+  },
+  "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+}

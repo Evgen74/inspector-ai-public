@@ -1,0 +1,23 @@
+# Optional: the organizer data (read-only) for the train objects. Uploads work without it.
+#
+#   INSPECTOR_DATA_HOST_PATH=/path/to/data_utf8 docker compose -f docker-compose.yml -f docker-compose.data.yml up -d
+#
+# The path is the decoded mirror that holds ПАКЕТ_УЧАСТНИКАМ_БЕЗ_ОТВЕТОВ_v2.0/ and ХАКАТОН_УЧАСТНИКАМ_ГОТОВО_К_ПЕРЕДАЧЕ/.
+# After the first start with the data run the demo-account seed again so the inspector is assigned to the train objects:
+#   docker compose -f docker-compose.yml -f docker-compose.data.yml run --rm migrate
+x-data-mount: &data-mount
+  - ${INSPECTOR_DATA_HOST_PATH:?set INSPECTOR_DATA_HOST_PATH to the data_utf8 directory}:/data/organizer:ro
+
+services:
+  migrate:
+    volumes: *data-mount
+    environment:
+      INSPECTOR_DATA_ROOT: /data/organizer
+  api:
+    volumes: *data-mount
+    environment:
+      INSPECTOR_DATA_ROOT: /data/organizer
+  ml-api:
+    volumes: *data-mount
+    environment:
+      INSPECTOR_DATA_ROOT: /data/organizer

@@ -1,0 +1,196 @@
+{
+  "file_id": "F0104",
+  "object_id": "OBJ-NOVOSLOBODSKAYA",
+  "pdf_page_number": 22,
+  "method": "Visual transcription by AG-02C from a 200-dpi render of the explication (another author and CAD system than Тюменская: subtotals and group titles share one merged band). Text layer and parser output were not consulted for the values.",
+  "created": "2026-09-28",
+  "row_fields": [
+    "kind",
+    "room_no",
+    "name",
+    "area_raw",
+    "category"
+  ],
+  "tables": [
+    {
+      "caption": "Экспликация помещений -3-го этажа",
+      "rows": [
+        [
+          "SECTION_HEADER",
+          null,
+          "Автостоянка",
+          null,
+          null
+        ],
+        [
+          "DATA",
+          "-3.1",
+          "Автостоянка",
+          "840,7",
+          null
+        ],
+        [
+          "DATA",
+          "-3.2",
+          "Тамбур-шлюз",
+          "4,9",
+          null
+        ],
+        [
+          "DATA",
+          "-3.3",
+          "Тамбур-шлюз",
+          "4,9",
+          null
+        ],
+        [
+          "SUBTOTAL",
+          null,
+          null,
+          "850,5",
+          null
+        ],
+        [
+          "SECTION_HEADER",
+          null,
+          "МОП",
+          null,
+          null
+        ],
+        [
+          "DATA",
+          "-3.4",
+          "Тамбур-шлюз",
+          "3,0",
+          null
+        ],
+        [
+          "DATA",
+          "-3.5",
+          "Лестничная клетка ЛК3",
+          "15,2",
+          null
+        ],
+        [
+          "DATA",
+          "-3.6",
+          "Лестничная клетка ЛК4",
+          "13,4",
+          null
+        ],
+        [
+          "DATA",
+          "-3.7",
+          "Тамбур-шлюз",
+          "4,1",
+          null
+        ],
+        [
+          "SUBTOTAL",
+          null,
+          null,
+          "35,7",
+          null
+        ],
+        [
+          "SECTION_HEADER",
+          null,
+          "Служба эксплуатации",
+          null,
+          null
+        ],
+        [
+          "DATA",
+          "-3.14",
+          "Склад",
+          "4,9",
+          null
+        ],
+        [
+          "DATA",
+          "-3.15",
+          "Комната отдыха валет паркинга и водителей",
+          "8,3",
+          null
+        ],
+        [
+          "DATA",
+          "-3.16",
+          "Санузел",
+          "1,7",
+          null
+        ],
+        [
+          "SUBTOTAL",
+          null,
+          null,
+          "14,9",
+          null
+        ],
+        [
+          "SECTION_HEADER",
+          null,
+          "Технические помещения",
+          null,
+          null
+        ],
+        [
+          "DATA",
+          "-3.8",
+          "Помещение СС",
+          "17,9",
+          null
+        ],
+        [
+          "DATA",
+          "-3.9",
+          "Венткамера",
+          "42,2",
+          null
+        ],
+        [
+          "DATA",
+          "-3.10",
+          "Венткамера приточная общеобменная, приточная противодымная",
+          "43,2",
+          null
+        ],
+        [
+          "DATA",
+          "-3.11",
+          "Помещение оборудования лифтов",
+          "6,1",
+          null
+        ],
+        [
+          "DATA",
+          "-3.12",
+          "КНС",
+          "5,7",
+          null
+        ],
+        [
+          "DATA",
+          "-3.13",
+          "Помещение для хранения гликоля",
+          "14,5",
+          null
+        ],
+        [
+          "SUBTOTAL",
+          null,
+          null,
+          "129,6",
+          null
+        ],
+        [
+          "TOTAL",
+          null,
+          null,
+          "1030,7",
+          null
+        ]
+      ]
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "layout_version": "1",
+  "run_id": "m1-tyumen-e2e",
+  "generated_at": "2026-10-01T10:30:00Z",
+  "objects": [
+    "OBJ-TYUMENSKAYA-5-GOLD-SEED"
+  ],
+  "commands": [
+    "inventory",
+    "recognize",
+    "layout",
+    "tables",
+    "compare",
+    "export",
+    "score"
+  ],
+  "artifacts": [
+    {
+      "kind": "SUBMISSION_ZIP",
+      "path": "run_manifest.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-01",
+        "command": "inventory"
+      },
+      "schema_name": "run_manifest"
+    },
+    {
+      "kind": "TOKENS_INDEX",
+      "path": "tokens/index.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-02A",
+        "command": "recognize"
+      },
+      "schema_name": "tokens_index"
+    },
+    {
+      "kind": "LAYOUT",
+      "path": "layout/F0202.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-02B",
+        "command": "layout"
+      },
+      "file_id": "F0202",
+      "schema_name": "layout_artifacts"
+    },
+    {
+      "kind": "TABLES",
+      "path": "tables/F0201.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-02C",
+        "command": "tables"
+      },
+      "file_id": "F0201",
+      "schema_name": "table_artifacts"
+    },
+    {
+      "kind": "FINDING_GROUPS",
+      "path": "findings/OBJ-TYUMENSKAYA-5-GOLD-SEED.groups.jsonl",
+      "format": "JSONL",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-04",
+        "command": "compare"
+      },
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "records": 4,
+      "schema_name": "finding_group"
+    },
+    {
+      "kind": "FINDINGS",
+      "path": "findings/OBJ-TYUMENSKAYA-5-GOLD-SEED.jsonl",
+      "format": "JSONL",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-04",
+        "command": "compare"
+      },
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "records": 138,
+      "schema_name": "finding"
+    },
+    {
+      "kind": "PROTOCOL_JSON",
+      "path": "protocol/OBJ-TYUMENSKAYA-5-GOLD-SEED.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-04",
+        "command": "export"
+      },
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "schema_name": "protocol"
+    },
+    {
+      "kind": "SUBMISSION",
+      "path": "submission/OBJ-TYUMENSKAYA-5-GOLD-SEED.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-04",
+        "command": "export"
+      },
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "records": 141,
+      "schema_name": "submission.extended"
+    },
+    {
+      "kind": "SUBMISSION_STRICT",
+      "path": "submission-strict/OBJ-TYUMENSKAYA-5-GOLD-SEED.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-04",
+        "command": "export"
+      },
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "records": 141,
+      "schema_name": "submission.strict"
+    },
+    {
+      "kind": "SUBMISSION_SIDECAR",
+      "path": "submission/OBJ-TYUMENSKAYA-5-GOLD-SEED.sidecar.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-04",
+        "command": "export"
+      },
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "schema_name": "submission_sidecar"
+    },
+    {
+      "kind": "SCORE",
+      "path": "score/score.json",
+      "format": "JSON",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "size_bytes": 1024,
+      "producer": {
+        "agent": "AG-10",
+        "command": "score"
+      },
+      "schema_name": null
+    }
+  ],
+  "page_tokens": [
+    {
+      "file_id": "F0201",
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "dir": "tokens/F0201",
+      "pages": 34,
+      "size_bytes": 2048000
+    }
+  ]
+}

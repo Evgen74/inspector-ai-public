@@ -1,0 +1,55 @@
+{
+  "description": "Golden vectors for inspector_common.hashing (Python) and any TS port. canonical_json: sorted keys, separators (',',':'), UTF-8, no ASCII escaping.",
+  "sha256_bytes": [
+    {
+      "input_utf8": "",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "input_utf8": "abc",
+      "sha256": "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"
+    }
+  ],
+  "canonical_json": [
+    {
+      "input": {
+        "b": [
+          1,
+          2,
+          {
+            "я": "ё"
+          }
+        ],
+        "a": null,
+        "c": true,
+        "threshold": 0.85
+      },
+      "canonical": "{\"a\":null,\"b\":[1,2,{\"я\":\"ё\"}],\"c\":true,\"threshold\":0.85}",
+      "sha256": "8a91a33900ea29c26233ba920442c5f6461f966f7d085367bf98126a646cde32"
+    }
+  ],
+  "input_manifest_hash": [
+    {
+      "rows": [
+        {
+          "file_id": "F0002",
+          "object_id": "OBJ-X",
+          "sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "relative_path": "Объект/РД/лист 2.pdf",
+          "pdf_pages": 4,
+          "duplicate_group": null
+        },
+        {
+          "file_id": "F0001",
+          "object_id": "OBJ-X",
+          "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "relative_path": "Объект/ПД/том 1.pdf",
+          "pdf_pages": 18,
+          "duplicate_group": null
+        }
+      ],
+      "expected": "b65b74ef6b265a160211dd3d3dcfca55e430939a75694eb91f31572d01188984",
+      "note": "rows sorted by file_id, canonical JSON per row, joined with \\n"
+    }
+  ]
+}

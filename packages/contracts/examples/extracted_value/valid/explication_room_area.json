@@ -1,0 +1,47 @@
+{
+  "value_id": "F0201-p18-EXPL-r12-area",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "file_id": "F0201",
+  "file_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+  "stage": "RD",
+  "page_no": 18,
+  "page_basis": "PDF_NATIVE",
+  "sheet_label": "4",
+  "param_id": null,
+  "param_code": null,
+  "fact_key": "room.area",
+  "location": "1.109",
+  "location_type": "ROOM",
+  "value_raw": "30,4",
+  "value_norm": {
+    "type": "number",
+    "value": 30.4,
+    "unit": "m2"
+  },
+  "unit_raw": "м²",
+  "method": "TABLE",
+  "text_source": "TEXT_LAYER",
+  "confidence": 0.99,
+  "quality_flag": "OK",
+  "is_ambiguous": false,
+  "candidate_rank": 1,
+  "geometry": {
+    "boxes": [
+      [
+        0.71,
+        0.33,
+        0.74,
+        0.345
+      ]
+    ]
+  },
+  "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1",
+  "table_ref": {
+    "table_id": "EXPL-1",
+    "table_type": "EXPLICATION",
+    "row": 12,
+    "col": 3
+  },
+  "pipeline_version": "0.1.0+dev",
+  "matrix_version": null
+}

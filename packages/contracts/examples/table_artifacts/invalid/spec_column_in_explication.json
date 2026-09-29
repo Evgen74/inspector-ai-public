@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "file_id": "F0201",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "file_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+  "stage": "RD",
+  "pipeline_version": "tables-0.1.0",
+  "generated_at": "2026-10-01T09:05:00Z",
+  "tables": [
+    {
+      "table_id": "F0201-p18-EXPLICATION-1",
+      "table_type": "EXPLICATION",
+      "title": "Экспликация помещений",
+      "pages": [
+        18
+      ],
+      "bboxes": [
+        {
+          "pdf_page_number": 18,
+          "bbox": [
+            0.7,
+            0.1,
+            0.98,
+            0.5
+          ]
+        }
+      ],
+      "columns": [
+        {
+          "key": "room_no",
+          "header_raw": "Номер помещения"
+        },
+        {
+          "key": "name",
+          "header_raw": "Наименование"
+        },
+        {
+          "key": "area_m2",
+          "header_raw": "Площадь, м²",
+          "unit": "м²"
+        }
+      ],
+      "rows": [
+        {
+          "row_no": 1,
+          "kind": "DATA",
+          "cells": {
+            "room_no": {
+              "raw": "140",
+              "value": "140"
+            },
+            "name": {
+              "raw": "Санузел",
+              "value": "Санузел"
+            },
+            "area_m2": {
+              "raw": "3,2",
+              "value": 3.2,
+              "unit": "м²"
+            },
+            "quantity": {
+              "raw": "2",
+              "value": 2
+            }
+          },
+          "pdf_page_number": 18
+        },
+        {
+          "row_no": 2,
+          "kind": "DATA",
+          "cells": {
+            "room_no": {
+              "raw": "147",
+              "value": "147"
+            },
+            "name": {
+              "raw": "Помещение уборочного инвентаря",
+              "value": "Помещение уборочного инвентаря"
+            },
+            "area_m2": {
+              "raw": "30,4",
+              "value": 30.4,
+              "unit": "м²"
+            }
+          },
+          "pdf_page_number": 18
+        },
+        {
+          "row_no": 3,
+          "kind": "SUBZONE",
+          "parent_row_no": 2,
+          "cells": {
+            "name": {
+              "raw": "в том числе",
+              "value": "в том числе"
+            },
+            "area_m2": {
+              "raw": "30,4",
+              "value": 30.4,
+              "unit": "м²"
+            }
+          },
+          "pdf_page_number": 18
+        }
+      ],
+      "checks": [
+        {
+          "kind": "SUBZONE_DOUBLE_COUNT",
+          "passed": false,
+          "expected": 33.6,
+          "actual": 64.0,
+          "rows": [
+            2,
+            3
+          ],
+          "detail": "Подзона «в том числе» (30,4 м²) учтена в итоге дважды."
+        }
+      ],
+      "sheet_number": 5,
+      "text_source": "TEXT_LAYER",
+      "confidence": 0.97,
+      "parser_version": "header-anchored-1"
+    }
+  ]
+}

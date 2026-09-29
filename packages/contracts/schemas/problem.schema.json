@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/problem.schema.json",
+  "title": "Problem",
+  "description": "RFC 9457 application/problem+json envelope with the members of 10 §3.2. `code` is a code of errors.yaml. Owner: AG-00.",
+  "type": "object",
+  "required": ["type", "title", "status", "detail", "instance", "code", "request_id", "timestamp", "retryable"],
+  "properties": {
+    "type": {"type": "string", "pattern": "^/problems/[a-z0-9-]+$"},
+    "title": {"type": "string", "minLength": 1},
+    "status": {"type": "integer", "minimum": 400, "maximum": 599},
+    "detail": {"type": "string", "minLength": 1},
+    "instance": {"type": "string"},
+    "code": {"$ref": "common.schema.json#/$defs/ErrorCode"},
+    "request_id": {"type": "string", "minLength": 1},
+    "timestamp": {"$ref": "common.schema.json#/$defs/Timestamp"},
+    "retryable": {"type": "boolean"},
+    "retry_after_s": {"type": "integer", "minimum": 0},
+    "details": {"type": "object"},
+    "errors": {"type": "array", "items": {"$ref": "#/$defs/ProblemItem"}},
+    "warnings": {"type": "array", "items": {"$ref": "#/$defs/ProblemItem"}},
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["type", "count"],
+        "properties": {
+          "type": {"type": "string"},
+          "count": {"type": "integer", "minimum": 0},
+          "finding_ids": {"type": "array", "items": {"type": "string"}},
+          "link": {"type": "string"}
+        }
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["action", "label_ru"],
+        "properties": {
+          "action": {"enum": ["CREATE_SUCCESSOR", "REUPLOAD", "DOWNLOAD_REGISTRY_TEMPLATE", "BUILD_REGISTRY_DRAFT", "OPEN_BLOCKERS", "CONFIRM_BELONGS", "REMOVE_FROM_PACKAGE", "RELOGIN", "RETRY"]},
+          "label_ru": {"type": "string"},
+          "method": {"type": "string"},
+          "href": {"type": "string"}
+        }
+      }
+    },
+    "current": {"type": "object"}
+  },
+  "$defs": {
+    "ProblemItem": {
+      "description": "Per-item error or warning inside a batch or a successful body (10 §3.2).",
+      "type": "object",
+      "required": ["code", "title", "detail"],
+      "properties": {
+        "code": {"$ref": "common.schema.json#/$defs/ErrorCode"},
+        "title": {"type": "string"},
+        "detail": {"type": "string"},
+        "details": {"type": "object"},
+        "pointer": {"type": "string"},
+        "file_name": {"type": "string"},
+        "row": {"type": "integer"},
+        "field": {"type": "string"},
+        "params": {"type": "object"}
+      }
+    }
+  }
+}

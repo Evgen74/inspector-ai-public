@@ -1,0 +1,20 @@
+[project]
+name = "inspector-tables"
+version = "0.1.0"
+description = "Инспектор ИИ: typed header-anchored tables (EXPLICATION, TEP, SPEC_21110, DEVIATION, CHANGE_LOG, АОСР), ИД binders, value extraction (owner AG-02C)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "inspector-common",
+    "inspector-docproc",
+]
+
+[tool.uv.sources]
+inspector-common = { workspace = true }
+inspector-docproc = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inspector_tables"]

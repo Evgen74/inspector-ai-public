@@ -1,0 +1,270 @@
+# «Инспектор ИИ» — upload vertical (ТЗ модуль 1, §9.1), owner AG-08, PENDING ADOPTION by AG-00.
+#
+# Загрузка собственного комплекта ПД/РД/ИД, статус обработки, список проверок. Файлы хранятся в
+# runs/uploads/<process_id>/; реестр комплекта строится inspector_registry.adhoc; задача уходит в очередь
+# `inspector.jobs` (RabbitMQ, при недоступности — в процессе API); итоговый прогон импортируется как обычный.
+# Proposed for enums.yaml (ProcessStatus): FAILED — статус неуспешной обработки (в enums.yaml его пока нет).
+openapi: 3.0.3
+info:
+  title: «Инспектор ИИ» — загрузка комплекта и статус проверок
+  version: 0.1.0-upload
+tags:
+  - name: upload
+    description: Загрузка документов и статус обработки (модуль 1)
+paths:
+  /documents/upload/limits:
+    get:
+      operationId: getUploadLimits
+      tags: [upload]
+      summary: Ограничения загрузки (ТЗ §9.1)
+      x-owner: AG-08
+      x-permission: documents.upload
+      x-error-codes: [SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, INTERNAL_ERROR]
+      responses:
+        '200':
+          description: Лимиты и допустимые форматы
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/UploadLimits'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '500': {$ref: '#/components/responses/InternalError'}
+  /documents/upload:
+    post:
+      operationId: uploadDocuments
+      tags: [upload]
+      summary: Загрузить комплект документов и запустить проверку
+      description: |
+        `multipart/form-data`: поля `files` (повторяемое; PDF, DOCX, XML или архивы ZIP/7z/RAR), необязательные
+        `registry` (реестр CSV/XLSX/JSON: файл, стадия, раздел), `object_name`, `address`.
+        Лимиты: 500 МБ на документ (в том числе внутри архива), 5 ГБ на пакет (подняты относительно ТЗ §9.1 — 50 МБ
+        и 200 МБ — решением руководителя, чтобы полный комплект объекта помещался в один архив). Пакет, превысивший
+        лимит, отклоняется целиком; отдельные неверные файлы отклоняются с указанием причины, остальные принимаются
+        (202, поле `rejected`).
+        Ответ 202: идентификатор процесса; статус — GET /processes/{process_id}.
+      x-owner: AG-08
+      x-permission: documents.upload
+      x-error-codes:
+        - VALIDATION_ERROR
+        - UNSUPPORTED_MEDIA_TYPE
+        - NO_FILES
+        - NO_ACCEPTED_FILES
+        - PACKAGE_TOO_LARGE
+        - TOO_MANY_FILES
+        - PAYLOAD_TOO_LARGE
+        - UNAUTHENTICATED
+        - SESSION_EXPIRED
+        - PASSWORD_CHANGE_REQUIRED
+        - CSRF_TOKEN_INVALID
+        - FORBIDDEN
+        - SESSION_STORE_UNAVAILABLE
+        - INTERNAL_ERROR
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              description: Разобранное тело multipart ({fields, files})
+              properties:
+                fields: {type: object, additionalProperties: {type: string}}
+                files: {type: array, items: {type: object}}
+      responses:
+        '202':
+          description: Комплект принят, проверка поставлена в очередь
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/UploadResult'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '413':
+          description: Превышен размер пакета или число файлов
+          content:
+            application/problem+json:
+              schema: {$ref: '#/components/schemas/Problem'}
+        '415': {$ref: '#/components/responses/UnsupportedMediaType'}
+        '422': {$ref: '#/components/responses/Unprocessable'}
+        '500': {$ref: '#/components/responses/InternalError'}
+  /processes:
+    get:
+      operationId: listProcesses
+      tags: [upload]
+      summary: Проверки (процессы обработки загруженных комплектов)
+      x-owner: AG-08
+      x-permission: object.read
+      x-error-codes: [SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, INTERNAL_ERROR]
+      parameters:
+        - name: include_archived
+          in: query
+          description: Показывать и архивные проверки («Архивировать»); по умолчанию они скрыты
+          schema: {type: boolean}
+      responses:
+        '200':
+          description: Список проверок, новые сверху
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, total]
+                properties:
+                  items: {type: array, items: {$ref: '#/components/schemas/ProcessSummary'}}
+                  total: {type: integer}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '500': {$ref: '#/components/responses/InternalError'}
+  /processes/{process_id}:
+    get:
+      operationId: getProcess
+      tags: [upload]
+      summary: Статус проверки (этапы, прогресс по файлам, журнал)
+      x-owner: AG-08
+      x-permission: object.read
+      x-error-codes: [SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, PROCESS_NOT_FOUND, INTERNAL_ERROR]
+      parameters:
+        - name: process_id
+          in: path
+          required: true
+          schema: {type: string, minLength: 1, maxLength: 64}
+      responses:
+        '200':
+          description: Проверка
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProcessDetail'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+components:
+  schemas:
+    UploadLimits:
+      type: object
+      required: [max_file_bytes, max_package_bytes, max_files, extensions]
+      properties:
+        max_file_bytes: {type: integer}
+        max_package_bytes: {type: integer}
+        max_files: {type: integer}
+        extensions: {type: array, items: {type: string}}
+    UploadResult:
+      type: object
+      required: [process_id, status, object_id, accepted, rejected, queue]
+      properties:
+        process_id: {type: string}
+        status: {type: string, enum: [PENDING]}
+        object_id: {type: string}
+        queue: {type: string, enum: [rabbitmq, in-process]}
+        accepted:
+          type: array
+          items:
+            type: object
+            required: [name, size_bytes, sha256]
+            properties:
+              name: {type: string}
+              size_bytes: {type: integer}
+              sha256: {type: string}
+        rejected:
+          type: array
+          items:
+            type: object
+            required: [name, code, detail]
+            properties:
+              name: {type: string}
+              code: {type: string}
+              detail: {type: string}
+    ProcessProgress:
+      type: object
+      required: [steps_done, steps_total, percent]
+      properties:
+        steps_done: {type: integer}
+        steps_total: {type: integer}
+        percent: {type: integer}
+        stage:
+          type: object
+          nullable: true
+          description: Live progress of the running step (recognition reports pages done / to OCR in this run).
+          required: [step, done, total]
+          properties:
+            step: {type: string}
+            done: {type: integer}
+            total: {type: integer}
+            pages_per_min: {type: number, nullable: true}
+    ProcessSummary:
+      type: object
+      additionalProperties: true
+      required: [process_id, status, object_id, object_name, created_at, updated_at, progress, files_total, files_rejected, pages_total]
+      properties:
+        process_id: {type: string}
+        status: {type: string, enum: [PENDING, PARSING, READY, FAILED], x-contract-enum-proposed: ProcessStatus}
+        stage: {type: string, nullable: true}
+        object_id: {type: string}
+        object_name: {type: string}
+        address: {type: string, nullable: true}
+        created_at: {type: string}
+        updated_at: {type: string}
+        started_at: {type: string, nullable: true}
+        finished_at: {type: string, nullable: true}
+        queue: {type: string, nullable: true}
+        progress: {$ref: '#/components/schemas/ProcessProgress'}
+        error: {type: string, nullable: true}
+        files_total: {type: integer}
+        files_rejected: {type: integer}
+        pages_total: {type: integer}
+        verification_process_id: {type: string, nullable: true}
+        protocol:
+          type: object
+          nullable: true
+          properties:
+            object_id: {type: string}
+            run_id: {type: string}
+    ProcessDetail:
+      allOf:
+        - $ref: '#/components/schemas/ProcessSummary'
+        - type: object
+          required: [steps, files, log]
+          properties:
+            steps:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                required: [step, status]
+                properties:
+                  step: {type: string}
+                  status: {type: string, enum: [PENDING, RUNNING, DONE, FAILED]}
+                  started_at: {type: string, nullable: true}
+                  finished_at: {type: string, nullable: true}
+            files:
+              type: array
+              items:
+                type: object
+                additionalProperties: true
+                required: [name, status]
+                properties:
+                  file_id: {type: string, nullable: true}
+                  name: {type: string}
+                  size_bytes: {type: integer}
+                  sha256: {type: string}
+                  status: {type: string, enum: [RECEIVED, PREPARED, PROCESSING, DONE, REJECTED]}
+                  stage: {type: string, nullable: true}
+                  stage_source: {type: string, nullable: true}
+                  pages: {type: integer, nullable: true}
+                  problems: {type: array, items: {type: string}}
+                  from_archive: {type: string, nullable: true}
+            log:
+              type: array
+              items:
+                type: object
+                required: [ts, level, message]
+                properties:
+                  ts: {type: string}
+                  level: {type: string, enum: [info, warn, error]}
+                  message: {type: string}

@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/extracted_value.schema.json",
+  "title": "ExtractedValue",
+  "description": "One typed value read from one document page (02 §3.15 `extracted_values`, 97 §2.13 F7–F8), with provenance and geometry. Immutable fact keyed by file sha256 + pipeline version (+ matrix version for NLP values). Owner: AG-02C (tables, ИД, NLP), room/title-block values: AG-02B.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "value_id",
+    "file_id",
+    "file_sha256",
+    "stage",
+    "page_no",
+    "value_raw",
+    "value_norm",
+    "method",
+    "confidence",
+    "quality_flag",
+    "pipeline_version"
+  ],
+  "properties": {
+    "value_id": {"type": "string", "minLength": 1},
+    "object_id": {"$ref": "common.schema.json#/$defs/ObjectId"},
+    "file_id": {"$ref": "common.schema.json#/$defs/FileId"},
+    "file_sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+    "stage": {"$ref": "enums.schema.json#/$defs/DocStage"},
+    "page_no": {"$ref": "common.schema.json#/$defs/PageNumber"},
+    "page_basis": {"$ref": "enums.schema.json#/$defs/PageBasis"},
+    "sheet_label": {"$ref": "common.schema.json#/$defs/SheetNumber"},
+    "document_code": {"type": ["string", "null"]},
+    "revision": {"type": ["string", "null"]},
+    "param_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/ParamId"}, {"type": "null"}]},
+    "param_code": {"oneOf": [{"$ref": "common.schema.json#/$defs/CanonicalParameterCode"}, {"type": "null"}]},
+    "fact_key": {"type": ["string", "null"], "description": "Non-parameter facts (room index, title block, ИД act fields), e.g. «room.area», «tb.sheet»."},
+    "location": {"oneOf": [{"$ref": "common.schema.json#/$defs/Location"}, {"type": "null"}]},
+    "location_type": {"oneOf": [{"$ref": "enums.schema.json#/$defs/LocationType"}, {"type": "null"}]},
+    "value_raw": {"type": "string", "description": "Exactly as printed (after NFC)."},
+    "value_norm": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "value"],
+      "properties": {
+        "type": {"$ref": "enums.schema.json#/$defs/DataType"},
+        "value": {"description": "number, string, boolean, [x, y] coordinate or enum code."},
+        "unit": {"type": ["string", "null"], "description": "Canonical unit (follows params.unit)."},
+        "rank": {"type": ["number", "null"], "description": "Ordinal rank for class systems (higher = better), 02 §3.12.3."},
+        "range": {"type": ["array", "null"], "items": {"type": "number"}, "minItems": 2, "maxItems": 2},
+        "qualifiers": {"type": "object"}
+      }
+    },
+    "unit_raw": {"type": ["string", "null"]},
+    "method": {"$ref": "enums.schema.json#/$defs/ExtractionMethod"},
+    "text_source": {"$ref": "enums.schema.json#/$defs/TextSource"},
+    "source_engine": {"type": ["string", "null"]},
+    "confidence": {"$ref": "common.schema.json#/$defs/Confidence"},
+    "quality_flag": {"$ref": "enums.schema.json#/$defs/QualityFlag"},
+    "is_ambiguous": {"type": "boolean"},
+    "candidate_rank": {"type": "integer", "minimum": 1},
+    "geometry": {"$ref": "common.schema.json#/$defs/Geometry"},
+    "geometry_space": {"$ref": "common.schema.json#/$defs/GeometrySpace"},
+    "anchor": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {"type": "string"},
+        "geometry": {"$ref": "common.schema.json#/$defs/Geometry"}
+      }
+    },
+    "context_text": {"type": ["string", "null"]},
+    "table_ref": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "table_id": {"type": "string"},
+        "table_type": {"type": "string"},
+        "row": {"type": "integer", "minimum": 0},
+        "col": {"type": "integer", "minimum": 0}
+      }
+    },
+    "locator": {"type": ["object", "null"], "description": "DOCX/XML native locator."},
+    "pipeline_version": {"type": "string", "minLength": 1},
+    "matrix_version": {"type": ["string", "null"]},
+    "ext": {"$ref": "common.schema.json#/$defs/Extension"}
+  }
+}

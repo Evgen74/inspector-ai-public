@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "description": "Dev sets for inspector-score calibration (95 §5.1, 93 §4.8). Never a TEST_HIDDEN object. Owner: AG-10.",
+  "devsets": [
+    {
+      "id": "T-GOLD",
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "split": "TRAIN_PUBLIC",
+      "format": "gold_checks_jsonl",
+      "path": {"base": "package_data", "relative": "public_train_checks.jsonl"},
+      "groups_path": {"base": "package_data", "relative": "public_train_finding_groups.jsonl"},
+      "badge_ru": "Эталон организаторов (публичная обучающая выборка)",
+      "positives_only": true,
+      "frozen": true,
+      "labels_sha256": "f992db4b339fa2d5a49176e65693fd38be3b6cbffc5a6838ca9819050db32658",
+      "frozen_at": "2026-09-27T00:00:00Z",
+      "folds": null
+    },
+    {
+      "id": "N-GOLD",
+      "object_id": "OBJ-NOVOSLOBODSKAYA",
+      "split": "TRAIN_PUBLIC",
+      "format": "label_seed_json",
+      "path": {"base": "devsets", "relative": "n_gold_novoslob_v1.json"},
+      "badge_ru": "Разметка команды",
+      "positives_only": false,
+      "frozen": false,
+      "labels_sha256": null,
+      "frozen_at": null,
+      "folds": {"A": ["KR"], "B": ["*"]}
+    }
+  ]
+}

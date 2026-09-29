@@ -1,0 +1,47 @@
+{
+  "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-MISS-01",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "run_id": "m1-tyumen-e2e",
+  "matrix_scope": "MATRIX",
+  "parameter_code": "IOS4-078",
+  "parameter_id": 78,
+  "parameter_mapping_status": "PROVISIONAL_DOMAIN_MAPPING",
+  "title": "Отсутствует предусмотренная ПД вытяжная вентиляция",
+  "element_noun": "Вытяжная вентиляция",
+  "axis": "PD_RD",
+  "comparison_result": "MISSING_DESIGN_ELEMENT",
+  "discrepancy_type": "ELEMENT_MISSING",
+  "location_type": "ROOM",
+  "locations": [
+    "140",
+    "142"
+  ],
+  "pd_value": "Местная вытяжная вентиляция предусмотрена",
+  "rd_value": "Местная вытяжная вентиляция отсутствует",
+  "id_value": null,
+  "violation_label": "VIOLATION_PRESENT",
+  "protocol_status": "CRITICAL",
+  "criticality": "Критическое (приостановка работ)",
+  "criticality_level": "CRITICAL_SUSPEND",
+  "anchor_evidence": [
+    {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 88,
+      "is_anchor": true,
+      "document_sheet_number": 10
+    },
+    {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 18,
+      "is_anchor": true,
+      "document_sheet_number": 4
+    }
+  ],
+  "finding_ids": [
+    "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-140",
+    "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-142"
+  ],
+  "card_no": "Б.3"
+}

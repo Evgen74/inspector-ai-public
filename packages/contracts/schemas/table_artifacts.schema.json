@@ -1,0 +1,754 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/table_artifacts.schema.json",
+  "title": "TableArtifacts",
+  "description": "Typed, header-anchored tables of one PDF file (97 §2.13 F7; 96 header-anchored parser): EXPLICATION with Σ checks, TEP, SPEC_21110, DEVIATION/ИГС, CHANGE_LOG, АОСР, ИД registry, project composition. Cell keys are the canonical columns of the table type (enums.yaml TableType `columns`; this schema pins them per type, `inspector-contracts check` keeps both equal). Every cell keeps the raw printed string next to the parsed value. Written to runs/<run_id>/tables/<file_id>.json by `inspector-batch tables`. Owner: AG-02C.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "file_id",
+    "object_id",
+    "file_sha256",
+    "pipeline_version",
+    "generated_at",
+    "tables"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "file_id": {
+      "$ref": "common.schema.json#/$defs/CitableFileId"
+    },
+    "object_id": {
+      "$ref": "common.schema.json#/$defs/ObjectId"
+    },
+    "file_sha256": {
+      "$ref": "common.schema.json#/$defs/Sha256"
+    },
+    "stage": {
+      "oneOf": [
+        {
+          "$ref": "enums.schema.json#/$defs/DocStage"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pipeline_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "$ref": "common.schema.json#/$defs/Timestamp"
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TypedTable"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/ErrorCode"
+      }
+    },
+    "timings_ms": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "number",
+        "minimum": 0
+      }
+    },
+    "ext": {
+      "$ref": "common.schema.json#/$defs/Extension"
+    }
+  },
+  "$defs": {
+    "TypedTable": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "table_id",
+        "table_type",
+        "pages",
+        "columns",
+        "rows"
+      ],
+      "properties": {
+        "table_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96,
+          "description": "Stable within the file, e.g. «F0201-p18-EXPLICATION-1»."
+        },
+        "table_type": {
+          "$ref": "enums.schema.json#/$defs/TableType"
+        },
+        "title": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Printed caption, e.g. «Экспликация помещений»."
+        },
+        "pages": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "common.schema.json#/$defs/PageNumber"
+          },
+          "description": "Pages the table spans (continuations joined)."
+        },
+        "bboxes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PageBox"
+          }
+        },
+        "columns": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/Column"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Row"
+          }
+        },
+        "checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Check"
+          }
+        },
+        "sheet_number": {
+          "$ref": "common.schema.json#/$defs/SheetNumber"
+        },
+        "document_code": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text_source": {
+          "$ref": "enums.schema.json#/$defs/TextSource"
+        },
+        "confidence": {
+          "$ref": "common.schema.json#/$defs/Confidence"
+        },
+        "parser_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "table_type": {
+                "const": "EXPLICATION"
+              }
+            },
+            "required": [
+              "table_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "columns": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "room_no",
+                        "name",
+                        "area_m2",
+                        "category",
+                        "floor",
+                        "note"
+                      ]
+                    }
+                  }
+                }
+              },
+              "rows": {
+                "items": {
+                  "properties": {
+                    "cells": {
+                      "propertyNames": {
+                        "enum": [
+                          "room_no",
+                          "name",
+                          "area_m2",
+                          "category",
+                          "floor",
+                          "note"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "table_type": {
+                "const": "TEP"
+              }
+            },
+            "required": [
+              "table_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "columns": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "indicator",
+                        "unit",
+                        "value",
+                        "note"
+                      ]
+                    }
+                  }
+                }
+              },
+              "rows": {
+                "items": {
+                  "properties": {
+                    "cells": {
+                      "propertyNames": {
+                        "enum": [
+                          "indicator",
+                          "unit",
+                          "value",
+                          "note"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "table_type": {
+                "const": "SPEC_21110"
+              }
+            },
+            "required": [
+              "table_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "columns": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "position",
+                        "name",
+                        "type_mark",
+                        "code",
+                        "manufacturer",
+                        "unit",
+                        "quantity",
+                        "mass",
+                        "note"
+                      ]
+                    }
+                  }
+                }
+              },
+              "rows": {
+                "items": {
+                  "properties": {
+                    "cells": {
+                      "propertyNames": {
+                        "enum": [
+                          "position",
+                          "name",
+                          "type_mark",
+                          "code",
+                          "manufacturer",
+                          "unit",
+                          "quantity",
+                          "mass",
+                          "note"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "table_type": {
+                "const": "DEVIATION"
+              }
+            },
+            "required": [
+              "table_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "columns": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "element",
+                        "axes",
+                        "parameter",
+                        "design_value",
+                        "actual_value",
+                        "deviation",
+                        "tolerance",
+                        "unit",
+                        "note"
+                      ]
+                    }
+                  }
+                }
+              },
+              "rows": {
+                "items": {
+                  "properties": {
+                    "cells": {
+                      "propertyNames": {
+                        "enum": [
+                          "element",
+                          "axes",
+                          "parameter",
+                          "design_value",
+                          "actual_value",
+                          "deviation",
+                          "tolerance",
+                          "unit",
+                          "note"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "table_type": {
+                "const": "CHANGE_LOG"
+              }
+            },
+            "required": [
+              "table_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "columns": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "change_no",
+                        "sheets_changed",
+                        "sheets_replaced",
+                        "sheets_new",
+                        "sheets_cancelled",
+                        "total_sheets",
+                        "doc_no",
+                        "signature",
+                        "date",
+                        "note"
+                      ]
+                    }
+                  }
+                }
+              },
+              "rows": {
+                "items": {
+                  "properties": {
+                    "cells": {
+                      "propertyNames": {
+                        "enum": [
+                          "change_no",
+                          "sheets_changed",
+                          "sheets_replaced",
+                          "sheets_new",
+                          "sheets_cancelled",
+                          "total_sheets",
+                          "doc_no",
+                          "signature",
+                          "date",
+                          "note"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "table_type": {
+                "const": "AOSR"
+              }
+            },
+            "required": [
+              "table_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "columns": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "act_no",
+                        "act_date",
+                        "work_name",
+                        "rd_refs",
+                        "materials",
+                        "quality_docs",
+                        "deviations",
+                        "next_works",
+                        "start_date",
+                        "end_date"
+                      ]
+                    }
+                  }
+                }
+              },
+              "rows": {
+                "items": {
+                  "properties": {
+                    "cells": {
+                      "propertyNames": {
+                        "enum": [
+                          "act_no",
+                          "act_date",
+                          "work_name",
+                          "rd_refs",
+                          "materials",
+                          "quality_docs",
+                          "deviations",
+                          "next_works",
+                          "start_date",
+                          "end_date"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "table_type": {
+                "const": "ID_REGISTRY"
+              }
+            },
+            "required": [
+              "table_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "columns": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "row_no",
+                        "doc_name",
+                        "doc_no",
+                        "doc_date",
+                        "sheets",
+                        "pages",
+                        "note"
+                      ]
+                    }
+                  }
+                }
+              },
+              "rows": {
+                "items": {
+                  "properties": {
+                    "cells": {
+                      "propertyNames": {
+                        "enum": [
+                          "row_no",
+                          "doc_name",
+                          "doc_no",
+                          "doc_date",
+                          "sheets",
+                          "pages",
+                          "note"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "table_type": {
+                "const": "PROJECT_COMPOSITION"
+              }
+            },
+            "required": [
+              "table_type"
+            ]
+          },
+          "then": {
+            "properties": {
+              "columns": {
+                "items": {
+                  "properties": {
+                    "key": {
+                      "enum": [
+                        "volume",
+                        "designation",
+                        "name",
+                        "revision",
+                        "note"
+                      ]
+                    }
+                  }
+                }
+              },
+              "rows": {
+                "items": {
+                  "properties": {
+                    "cells": {
+                      "propertyNames": {
+                        "enum": [
+                          "volume",
+                          "designation",
+                          "name",
+                          "revision",
+                          "note"
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "PageBox": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pdf_page_number",
+        "bbox"
+      ],
+      "properties": {
+        "pdf_page_number": {
+          "$ref": "common.schema.json#/$defs/PageNumber"
+        },
+        "bbox": {
+          "$ref": "common.schema.json#/$defs/BBoxNorm"
+        }
+      }
+    },
+    "Column": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Canonical column key of the table type."
+        },
+        "header_raw": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Header cell as printed, e.g. «Площадь, м²»."
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "Cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "raw"
+      ],
+      "properties": {
+        "raw": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Cell text as printed (tokens joined, line breaks as spaces)."
+        },
+        "value": {
+          "type": [
+            "string",
+            "number",
+            "integer",
+            "boolean",
+            "null"
+          ],
+          "description": "Parsed value (Russian decimal comma → number)."
+        },
+        "unit": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "bbox": {
+          "$ref": "common.schema.json#/$defs/BBoxNorm"
+        },
+        "pdf_page_number": {
+          "$ref": "common.schema.json#/$defs/PageNumber"
+        },
+        "confidence": {
+          "$ref": "common.schema.json#/$defs/Confidence"
+        }
+      }
+    },
+    "Row": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "row_no",
+        "cells"
+      ],
+      "properties": {
+        "row_no": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "1-based order within the table (after joining continuations)."
+        },
+        "cells": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/Cell"
+          }
+        },
+        "pdf_page_number": {
+          "$ref": "common.schema.json#/$defs/PageNumber"
+        },
+        "bbox": {
+          "$ref": "common.schema.json#/$defs/BBoxNorm"
+        },
+        "kind": {
+          "$ref": "enums.schema.json#/$defs/TableRowKind",
+          "description": "SUBZONE = «в том числе» row (counted inside its parent); SECTION_HEADER = e.g. «1 этаж»."
+        },
+        "parent_row_no": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 1,
+          "description": "SUBZONE rows: the row they belong to."
+        },
+        "section": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Current section header, e.g. «Подвал»."
+        }
+      }
+    },
+    "Check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "passed"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "enums.schema.json#/$defs/TableCheckKind"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "expected": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "actual": {
+          "type": [
+            "number",
+            "string",
+            "null"
+          ]
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "detail": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  }
+}

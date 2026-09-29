@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/run_manifest.schema.json",
+  "title": "RunManifest",
+  "description": "Manifest of one inspector-batch run directory (runs/<run_id>/run_manifest.json). The per-object submission sidecar (submission/<object_id>.sidecar.json, 93 §3.9, 97 §2.5) is a RunManifest with exactly one entry in `objects` and only that object's files. The web product imports a run directory by this manifest (97 §2.14). Owner: AG-00 (fields per stage: AG-01 files, AG-02A pages, AG-04 artifacts).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "producer",
+    "started_at",
+    "status",
+    "config_hash",
+    "versions",
+    "inputs",
+    "objects",
+    "files"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "run_id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"},
+    "producer": {"const": "inspector-batch"},
+    "command": {"type": "string", "description": "The CLI invocation (argv joined), without secrets."},
+    "started_at": {"$ref": "common.schema.json#/$defs/Timestamp"},
+    "finished_at": {"oneOf": [{"$ref": "common.schema.json#/$defs/Timestamp"}, {"type": "null"}]},
+    "status": {"$ref": "enums.schema.json#/$defs/RunStatus"},
+    "config_hash": {"$ref": "common.schema.json#/$defs/Sha256", "description": "sha256 of the canonical JSON of the frozen run config."},
+    "stage_config_hashes": {
+      "type": "object",
+      "description": "Per-command config hashes when several inspector-batch commands write into one run id (inventory, recognize, compare, export, …). `config_hash` stays the hash of the whole frozen config; the sidecar carries both.",
+      "propertyNames": {"pattern": "^[a-z][a-z_]*$"},
+      "additionalProperties": {"$ref": "common.schema.json#/$defs/Sha256"}
+    },
+    "freeze_tag": {"type": ["string", "null"], "description": "git tag of the frozen config (e.g. «hidden-run-freeze»)."},
+    "versions": {"$ref": "common.schema.json#/$defs/Versions"},
+    "inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["manifest_sha256", "catalog_sha256", "submission_schema_sha256"],
+      "properties": {
+        "manifest_sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+        "catalog_sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+        "submission_schema_sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+        "split_policy_sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+        "models_manifest_sha256": {"$ref": "common.schema.json#/$defs/Sha256"}
+      }
+    },
+    "host": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "platform": {"type": "string"},
+        "machine": {"type": "string"},
+        "python": {"type": "string"},
+        "cpu_count": {"type": "integer", "minimum": 1},
+        "onnxruntime_providers": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "objects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/ObjectEntry"}
+    },
+    "files": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/FileEntry"}
+    },
+    "timings_s": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
+    "warnings": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/ErrorCode"}},
+    "ext": {"$ref": "common.schema.json#/$defs/Extension"}
+  },
+  "$defs": {
+    "ObjectEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["object_id", "split", "input_manifest_hash", "files_total", "files_present", "missing_on_disk"],
+      "properties": {
+        "object_id": {"$ref": "common.schema.json#/$defs/ObjectId"},
+        "name": {"type": ["string", "null"], "description": "Object name for display: the manifest `corpus` value or the object passport."},
+        "split": {"$ref": "enums.schema.json#/$defs/ManifestSplit"},
+        "input_manifest_hash": {"$ref": "common.schema.json#/$defs/Sha256", "description": "inspector_common.hashing.input_manifest_hash over the object's manifest rows."},
+        "files_total": {"type": "integer", "minimum": 0},
+        "files_present": {"type": "integer", "minimum": 0},
+        "missing_on_disk": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/FileId"}},
+        "scenario": {"oneOf": [{"$ref": "enums.schema.json#/$defs/LoadScenario"}, {"type": "null"}]},
+        "checks_total": {"type": ["integer", "null"], "minimum": 0},
+        "artifacts": {
+          "type": "object",
+          "additionalProperties": false,
+          "description": "Paths relative to the run directory.",
+          "properties": {
+            "inventory": {"type": "string", "description": "inspector_registry inventory report (inventory/<object_id>.json)."},
+            "submission": {"type": "string"},
+            "submission_strict": {"type": "string"},
+            "sidecar": {"type": "string"},
+            "findings": {"type": "string"},
+            "finding_groups": {"type": "string"},
+            "values": {"type": "string"},
+            "protocol_json": {"type": "string"},
+            "protocol_docx": {"type": "string"},
+            "protocol_pdf": {"type": "string"},
+            "score": {"type": "string"}
+          }
+        }
+      }
+    },
+    "FileEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file_id", "object_id", "sha256", "manifest_stage", "local_status"],
+      "properties": {
+        "file_id": {"$ref": "common.schema.json#/$defs/FileId"},
+        "object_id": {"$ref": "common.schema.json#/$defs/ObjectId"},
+        "sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+        "manifest_stage": {"$ref": "enums.schema.json#/$defs/ManifestStage"},
+        "relative_path": {"type": "string", "minLength": 1, "description": "Manifest `relative_path` (relative to the documents root); lets the web import work without the organizer data root."},
+        "section": {"$ref": "enums.schema.json#/$defs/ManifestSection"},
+        "size_bytes": {"type": ["integer", "null"], "minimum": 0},
+        "stage_resolved": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DocStage"}, {"type": "null"}]},
+        "local_status": {"$ref": "enums.schema.json#/$defs/LocalFileStatus"},
+        "sha256_verified": {"type": ["boolean", "null"]},
+        "extension": {"type": "string"},
+        "pdf_pages": {"type": ["integer", "null"], "minimum": 0},
+        "page_basis": {"oneOf": [{"$ref": "enums.schema.json#/$defs/PageBasis"}, {"type": "null"}]},
+        "status": {"oneOf": [{"$ref": "enums.schema.json#/$defs/ExtractionRunStatus"}, {"type": "null"}]},
+        "pages_ocr": {"type": ["integer", "null"], "minimum": 0},
+        "duration_ms": {"type": ["integer", "null"], "minimum": 0},
+        "error_code": {"oneOf": [{"$ref": "common.schema.json#/$defs/ErrorCode"}, {"type": "null"}]},
+        "warnings": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/ErrorCode"}}
+      }
+    }
+  }
+}

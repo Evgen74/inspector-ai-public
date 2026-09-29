@@ -1,0 +1,174 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/layout_artifacts.schema.json",
+  "title": "LayoutArtifacts",
+  "description": "Drawing and sheet layout of one PDF file (97 §2.13 F6; 96 R-07, R-10, R-15): title blocks with Изм. rows and QR, the sheet↔page map, the room index, tag instances (vent/heating marks, equipment, axes), CAD layers (OCG) and revision clouds. Written to runs/<run_id>/layout/<file_id>.json by `inspector-batch layout`. Pages are 1-based physical PDF pages; boxes are in PDF_VISIBLE_ROTATED_TL_V1 space. Tokens keep the printed spelling («012», «П1», «В2»). Owner: AG-02B.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "file_id", "object_id", "file_sha256", "pipeline_version", "generated_at", "pages_total"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "file_id": {"$ref": "common.schema.json#/$defs/CitableFileId"},
+    "object_id": {"$ref": "common.schema.json#/$defs/ObjectId"},
+    "file_sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+    "stage": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DocStage"}, {"type": "null"}]},
+    "pipeline_version": {"type": "string", "minLength": 1},
+    "generated_at": {"$ref": "common.schema.json#/$defs/Timestamp"},
+    "pages_total": {"type": "integer", "minimum": 0},
+    "title_blocks": {"type": "array", "items": {"$ref": "#/$defs/TitleBlock"}},
+    "sheet_page_map": {"type": "array", "items": {"$ref": "#/$defs/SheetPageEntry"}},
+    "rooms": {"type": "array", "items": {"$ref": "#/$defs/RoomEntry"}, "description": "Room index: every place a room token is printed."},
+    "tags": {"type": "array", "items": {"$ref": "#/$defs/TagInstance"}},
+    "cad_layers": {"type": "array", "items": {"$ref": "#/$defs/CadLayer"}},
+    "revision_clouds": {"type": "array", "items": {"$ref": "#/$defs/RevisionCloud"}},
+    "qr_links": {"type": "array", "items": {"$ref": "#/$defs/QrLink"}},
+    "warnings": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/ErrorCode"}},
+    "timings_ms": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
+    "ext": {"$ref": "common.schema.json#/$defs/Extension"}
+  },
+  "$defs": {
+    "Provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "text_source": {"$ref": "enums.schema.json#/$defs/TextSource"},
+        "confidence": {"$ref": "common.schema.json#/$defs/Confidence"},
+        "layer": {"type": ["string", "null"], "description": "CAD layer (OCG name) the text or shape was read from."}
+      }
+    },
+    "ChangeRow": {
+      "description": "One «Изм.» row of the title block (Изм. | Кол.уч. | Лист | № док. | Подп. | Дата).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "change_no": {"type": ["string", "null"]},
+        "count": {"type": ["string", "null"], "description": "Кол.уч."},
+        "sheet": {"type": ["string", "null"]},
+        "doc_no": {"type": ["string", "null"]},
+        "date": {"type": ["string", "null"], "description": "As printed, e.g. «03.24»."},
+        "note": {"type": ["string", "null"]}
+      }
+    },
+    "TitleBlock": {
+      "description": "Штамп (основная надпись) of one page; raw strings as printed plus corrected values.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pdf_page_number"],
+      "properties": {
+        "pdf_page_number": {"$ref": "common.schema.json#/$defs/PageNumber"},
+        "bbox": {"$ref": "common.schema.json#/$defs/BBoxNorm"},
+        "sheet_number": {"$ref": "common.schema.json#/$defs/SheetNumber"},
+        "sheets_total": {"type": ["integer", "null"], "minimum": 1, "description": "«Листов»."},
+        "document_code_raw": {"type": ["string", "null"], "description": "Шифр as read (OCR may return Latin look-alikes)."},
+        "document_code": {"type": ["string", "null"], "description": "Шифр after the code corrector and the registry prior."},
+        "stage_raw": {"type": ["string", "null"], "description": "«Стадия» as printed: «П», «Р», «РД» …"},
+        "stage": {"oneOf": [{"$ref": "enums.schema.json#/$defs/DocStage"}, {"type": "null"}]},
+        "sheet_title": {"type": ["string", "null"], "description": "Наименование листа, e.g. «План 1-го этажа (вентиляция)»."},
+        "object_name": {"type": ["string", "null"]},
+        "organization": {"type": ["string", "null"]},
+        "revision": {"type": ["string", "null"], "description": "Highest «Изм.» number on the sheet."},
+        "change_rows": {"type": "array", "items": {"$ref": "#/$defs/ChangeRow"}},
+        "is_stamp_page": {"type": "boolean"},
+        "provenance": {"$ref": "#/$defs/Provenance"},
+        "fields_confidence": {"type": "object", "additionalProperties": {"$ref": "common.schema.json#/$defs/Confidence"}}
+      }
+    },
+    "SheetPageEntry": {
+      "description": "Sheet ↔ page map entry (sheet = stamp ≥ 0.95 gate). Duplicate sheets (e.g. F0201 p27/p29) are flagged, never dropped.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pdf_page_number", "basis"],
+      "properties": {
+        "pdf_page_number": {"$ref": "common.schema.json#/$defs/PageNumber"},
+        "sheet_number": {"$ref": "common.schema.json#/$defs/SheetNumber"},
+        "document_code": {"type": ["string", "null"]},
+        "basis": {"$ref": "enums.schema.json#/$defs/SheetMapBasis"},
+        "confidence": {"$ref": "common.schema.json#/$defs/Confidence"},
+        "duplicate_of_page": {"oneOf": [{"$ref": "common.schema.json#/$defs/PageNumber"}, {"type": "null"}]},
+        "sheet_title": {"type": ["string", "null"]}
+      }
+    },
+    "RoomEntry": {
+      "description": "One occurrence of a room token. The same room appears on several pages (plans, schematics, explications).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["room_token", "pdf_page_number", "source"],
+      "properties": {
+        "room_token": {"type": "string", "minLength": 1, "maxLength": 32, "description": "Exact printed token: «012», «1.109», «-1.05» (leading zeros kept)."},
+        "pdf_page_number": {"$ref": "common.schema.json#/$defs/PageNumber"},
+        "bbox": {"$ref": "common.schema.json#/$defs/BBoxNorm"},
+        "zone": {"oneOf": [{"$ref": "common.schema.json#/$defs/PolygonNorm"}, {"type": "null"}], "description": "Room contour when known (plans)."},
+        "source": {"$ref": "enums.schema.json#/$defs/RoomSource"},
+        "name": {"type": ["string", "null"], "description": "Room name, e.g. «Венткамера», «Санузел МГН»."},
+        "area_m2": {"type": ["number", "null"], "minimum": 0},
+        "floor": {"type": ["string", "null"], "description": "Floor as printed / derived from the sheet title («1», «-1», «подвал»)."},
+        "sheet_number": {"$ref": "common.schema.json#/$defs/SheetNumber"},
+        "provenance": {"$ref": "#/$defs/Provenance"}
+      }
+    },
+    "TagInstance": {
+      "description": "One printed mark on a drawing, with its nearest or containing room.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "tag_kind", "pdf_page_number"],
+      "properties": {
+        "tag": {"type": "string", "minLength": 1, "maxLength": 64, "description": "As printed, e.g. «П1», «В2», «ТП1», «ПВ-3»."},
+        "tag_norm": {"type": ["string", "null"], "description": "Normalized by the tag grammar (Latin look-alikes → Cyrillic, dash spacing)."},
+        "tag_kind": {"$ref": "enums.schema.json#/$defs/TagKind"},
+        "system_code": {"type": ["string", "null"], "description": "System the mark belongs to, e.g. «П1»."},
+        "pdf_page_number": {"$ref": "common.schema.json#/$defs/PageNumber"},
+        "bbox": {"$ref": "common.schema.json#/$defs/BBoxNorm"},
+        "room_token": {"type": ["string", "null"], "description": "Room containing or nearest to the mark."},
+        "room_link": {"oneOf": [{"$ref": "enums.schema.json#/$defs/TagRoomLink"}, {"type": "null"}], "description": "How the room was attached."},
+        "provenance": {"$ref": "#/$defs/Provenance"}
+      }
+    },
+    "CadLayer": {
+      "description": "A CAD layer kept as a PDF optional-content group (OCG).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name"],
+      "properties": {
+        "name": {"type": "string", "minLength": 1, "description": "Decoded layer name, e.g. «ОВ-Отопление-Изм. №3»."},
+        "xref": {"type": ["integer", "null"], "minimum": 0},
+        "visible_default": {"type": ["boolean", "null"]},
+        "pages": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/PageNumber"}},
+        "is_text_layer": {"type": ["boolean", "null"], "description": "Text-like layer (*-TEXT, *Выноски, *Текст …) used for isolated renders."},
+        "is_revision_layer": {"type": ["boolean", "null"], "description": "Layer name marks a change («Изм.», «ИЗМ», «Rev»)."},
+        "revision_label": {"type": ["string", "null"], "description": "e.g. «Изм. №3»."},
+        "discipline_hint": {"type": ["string", "null"], "description": "Prefix of the layer name, e.g. «ОВ»."}
+      }
+    },
+    "RevisionCloud": {
+      "description": "A revision cloud (облако изменения): where a sheet was changed. On the gold it lies exactly over rooms 270/272 (F0202 p17).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pdf_page_number", "bbox", "source"],
+      "properties": {
+        "pdf_page_number": {"$ref": "common.schema.json#/$defs/PageNumber"},
+        "bbox": {"$ref": "common.schema.json#/$defs/BBoxNorm"},
+        "polygon": {"oneOf": [{"$ref": "common.schema.json#/$defs/PolygonNorm"}, {"type": "null"}]},
+        "source": {"$ref": "enums.schema.json#/$defs/RevisionCloudSource"},
+        "layer": {"type": ["string", "null"]},
+        "revision_label": {"type": ["string", "null"]},
+        "rooms_covered": {"type": "array", "items": {"type": "string", "minLength": 1}, "description": "Room tokens whose label or contour lies inside the cloud."},
+        "confidence": {"$ref": "common.schema.json#/$defs/Confidence"}
+      }
+    },
+    "QrLink": {
+      "description": "A title-block QR code. ИД extracts carry the QR of the RD sheet they were made from (97 §1.5: ИД F0198 ↔ RD F0202 p17).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pdf_page_number", "payload"],
+      "properties": {
+        "pdf_page_number": {"$ref": "common.schema.json#/$defs/PageNumber"},
+        "bbox": {"$ref": "common.schema.json#/$defs/BBoxNorm"},
+        "payload": {"type": "string", "minLength": 1},
+        "doc_key": {"type": ["string", "null"], "description": "Document key parsed from the payload."},
+        "doc_page": {"type": ["integer", "null"], "minimum": 1, "description": "Page number parsed from the payload."},
+        "target_file_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/CitableFileId"}, {"type": "null"}]},
+        "target_pdf_page_number": {"oneOf": [{"$ref": "common.schema.json#/$defs/PageNumber"}, {"type": "null"}]}
+      }
+    }
+  }
+}

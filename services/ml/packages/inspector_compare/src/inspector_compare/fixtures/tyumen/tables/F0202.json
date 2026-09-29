@@ -1,0 +1,220 @@
+{
+ "schema_version": 1,
+ "file_id": "F0202",
+ "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+ "file_sha256": "632379a0e541f0c81e6b03e5528946730b4433939c796db4fdc1e5c3fc8b71ee",
+ "stage": "RD",
+ "pipeline_version": "fixture-ag04-tyumen-tables-1",
+ "generated_at": "2026-09-28T00:00:00Z",
+ "tables": [
+  {
+   "table_id": "F0202-p17-EXPLICATION-1",
+   "table_type": "EXPLICATION",
+   "title": "Экспликация помещений 2 этажа",
+   "pages": [
+    17
+   ],
+   "bboxes": [
+    {
+     "pdf_page_number": 17,
+     "bbox": [
+      0.5117,
+      0.8341,
+      0.636,
+      0.9249
+     ]
+    }
+   ],
+   "columns": [
+    {
+     "key": "room_no",
+     "header_raw": "Номер помещения"
+    },
+    {
+     "key": "name",
+     "header_raw": "Наименование"
+    },
+    {
+     "key": "area_m2",
+     "header_raw": "Площадь",
+     "unit": "м²"
+    },
+    {
+     "key": "category",
+     "header_raw": "Категория"
+    }
+   ],
+   "rows": [
+    {
+     "row_no": 1,
+     "kind": "DATA",
+     "cells": {
+      "room_no": {
+       "raw": "267",
+       "value": "267"
+      },
+      "name": {
+       "raw": "Раздевальная для МГН",
+       "value": "Раздевальная для МГН"
+      },
+      "area_m2": {
+       "raw": "13.7",
+       "value": 13.7,
+       "unit": "м²"
+      }
+     },
+     "pdf_page_number": 17,
+     "bbox": [
+      0.5117,
+      0.8739,
+      0.6328,
+      0.8769
+     ]
+    },
+    {
+     "row_no": 2,
+     "kind": "DATA",
+     "cells": {
+      "room_no": {
+       "raw": "270",
+       "value": "270"
+      },
+      "name": {
+       "raw": "Санузел с душем для МГН",
+       "value": "Санузел с душем для МГН"
+      },
+      "area_m2": {
+       "raw": "5.9",
+       "value": 5.9,
+       "unit": "м²"
+      }
+     },
+     "pdf_page_number": 17,
+     "bbox": [
+      0.5117,
+      0.8789,
+      0.6322,
+      0.8822
+     ]
+    },
+    {
+     "row_no": 3,
+     "kind": "DATA",
+     "cells": {
+      "room_no": {
+       "raw": "271",
+       "value": "271"
+      },
+      "name": {
+       "raw": "Раздевальная для МГН",
+       "value": "Раздевальная для МГН"
+      },
+      "area_m2": {
+       "raw": "12.4",
+       "value": 12.4,
+       "unit": "м²"
+      }
+     },
+     "pdf_page_number": 17,
+     "bbox": [
+      0.512,
+      0.8846,
+      0.6329,
+      0.8875
+     ]
+    },
+    {
+     "row_no": 4,
+     "kind": "DATA",
+     "cells": {
+      "room_no": {
+       "raw": "272",
+       "value": "272"
+      },
+      "name": {
+       "raw": "Санузел с душем для МГН",
+       "value": "Санузел с душем для МГН"
+      },
+      "area_m2": {
+       "raw": "7.2",
+       "value": 7.2,
+       "unit": "м²"
+      }
+     },
+     "pdf_page_number": 17,
+     "bbox": [
+      0.5117,
+      0.8896,
+      0.6322,
+      0.8928
+     ]
+    },
+    {
+     "row_no": 5,
+     "kind": "DATA",
+     "cells": {
+      "room_no": {
+       "raw": "268",
+       "value": "268"
+      },
+      "name": {
+       "raw": "Пожаро-безопасная зона",
+       "value": "Пожаро-безопасная зона"
+      },
+      "area_m2": {
+       "raw": "16.2",
+       "value": 16.2,
+       "unit": "м²"
+      }
+     },
+     "pdf_page_number": 17,
+     "bbox": [
+      0.5117,
+      0.904,
+      0.6328,
+      0.9072
+     ]
+    },
+    {
+     "row_no": 6,
+     "kind": "DATA",
+     "cells": {
+      "room_no": {
+       "raw": "269",
+       "value": "269"
+      },
+      "name": {
+       "raw": "Лестница",
+       "value": "Лестница"
+      },
+      "area_m2": {
+       "raw": "25.8",
+       "value": 25.8,
+       "unit": "м²"
+      }
+     },
+     "pdf_page_number": 17,
+     "bbox": [
+      0.5117,
+      0.9099,
+      0.633,
+      0.913
+     ]
+    }
+   ],
+   "sheet_number": 4,
+   "document_code": "АНО/150321/1-РД-ОВ2.1",
+   "text_source": "TEXT_LAYER",
+   "confidence": 1.0,
+   "parser_version": "fixture-ag04-tyumen-tables-1"
+  }
+ ],
+ "ext": {
+  "fixture": "AG-04 hand-made development fixture (not recognition output)",
+  "sources": [
+   "PDF text layer of F0201 p17, p18 and F0202 p17 (explication blocks)"
+  ],
+  "complete": false,
+  "note": "Only the rows around the gold rooms are listed; totals are not reproduced."
+ }
+}

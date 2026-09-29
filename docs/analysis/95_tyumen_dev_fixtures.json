@@ -1,0 +1,831 @@
+{
+ "meta": {
+  "purpose": "Development fixtures derived from the public Тюменская 5 gold (TRAIN_PUBLIC). Self-measured anchors are SELF_LABELLED, not organizer gold.",
+  "report": "docs/analysis/95_corpus_train_objects.md",
+  "generated": "2026-09-27"
+ },
+ "expected_submission": {
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "checks": [
+   {
+    "parameter_code": "IOS4-079",
+    "location": "012",
+    "pd_value": "Конфигурация приточных установок по листу 26 ПД",
+    "rd_value": "Иная конфигурация на плане ОВ1, помещение 012",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "CRITICAL",
+    "criticality": "Критическое (приостановка работ)",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 104
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 17
+     }
+    ]
+   },
+   {
+    "parameter_code": "FREE-HEATING-001",
+    "location": "267",
+    "pd_value": "Тёплый пол предусмотрен",
+    "rd_value": "Тёплый пол отсутствует",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "WARNING",
+    "criticality": "Существенное (предписание) — требует утверждения",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 99
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0202",
+      "pdf_page_number": 17
+     }
+    ]
+   },
+   {
+    "parameter_code": "FREE-HEATING-001",
+    "location": "270",
+    "pd_value": "Тёплый пол предусмотрен",
+    "rd_value": "Тёплый пол отсутствует",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "WARNING",
+    "criticality": "Существенное (предписание) — требует утверждения",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 99
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0202",
+      "pdf_page_number": 17
+     }
+    ]
+   },
+   {
+    "parameter_code": "FREE-HEATING-001",
+    "location": "271",
+    "pd_value": "Тёплый пол предусмотрен",
+    "rd_value": "Тёплый пол отсутствует",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "WARNING",
+    "criticality": "Существенное (предписание) — требует утверждения",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 99
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0202",
+      "pdf_page_number": 17
+     }
+    ]
+   },
+   {
+    "parameter_code": "FREE-HEATING-001",
+    "location": "272",
+    "pd_value": "Тёплый пол предусмотрен",
+    "rd_value": "Тёплый пол отсутствует",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "WARNING",
+    "criticality": "Существенное (предписание) — требует утверждения",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 99
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0202",
+      "pdf_page_number": 17
+     }
+    ]
+   },
+   {
+    "parameter_code": "IOS4-078",
+    "location": "140",
+    "pd_value": "Вытяжная вентиляция предусмотрена",
+    "rd_value": "Вытяжная вентиляция отсутствует",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "CRITICAL",
+    "criticality": "Критическое (приостановка работ)",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 88
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 18
+     }
+    ]
+   },
+   {
+    "parameter_code": "IOS4-078",
+    "location": "142",
+    "pd_value": "Вытяжная вентиляция предусмотрена",
+    "rd_value": "Вытяжная вентиляция отсутствует",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "CRITICAL",
+    "criticality": "Критическое (приостановка работ)",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 88
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 18
+     }
+    ]
+   },
+   {
+    "parameter_code": "IOS4-078",
+    "location": "147",
+    "pd_value": "Конфигурация вентиляции по листу 10 ПД",
+    "rd_value": "Конфигурация вентиляции изменена",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "CRITICAL",
+    "criticality": "Критическое (приостановка работ)",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 88
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 18
+     }
+    ]
+   },
+   {
+    "parameter_code": "IOS4-078",
+    "location": "198",
+    "pd_value": "Конфигурация вентиляции по листу 10 ПД",
+    "rd_value": "Конфигурация вентиляции изменена",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "CRITICAL",
+    "criticality": "Критическое (приостановка работ)",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 88
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 18
+     }
+    ]
+   },
+   {
+    "parameter_code": "IOS4-078",
+    "location": "314",
+    "pd_value": "Конфигурация вентиляции по листу 10 ПД",
+    "rd_value": "Конфигурация вентиляции изменена",
+    "id_value": null,
+    "violation_label": "VIOLATION_PRESENT",
+    "protocol_status": "CRITICAL",
+    "criticality": "Критическое (приостановка работ)",
+    "evidence": [
+     {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 88
+     },
+     {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 18
+     }
+    ]
+   }
+  ]
+ },
+ "gold_groups": [
+  "G-TR-001 IOS4-079 012",
+  "G-TR-002 FREE-HEATING-001 267/270/271/272",
+  "G-TR-003 IOS4-078 140/142",
+  "G-TR-004 IOS4-078 147/198/314"
+ ],
+ "page_facts": {
+  "F0171:104": {
+   "sheet_stamp": 26,
+   "format": "A4x4 (841x297 mm)",
+   "class": "VECTOR_TEXT",
+   "paths": 4542,
+   "cad_layers": "ОВ-* (784 OCGs in file)",
+   "title": "Принципиальная схема системы теплоснабжения приточных установок",
+   "anchors": {
+    "room_label_012": [
+     0.863,
+     0.323
+    ],
+    "room_label_012.1": [
+     0.885,
+     0.469
+    ],
+    "zone_012_x": [
+     0.665,
+     0.871
+    ],
+    "supply_units_in_012_text_layer": [
+     "П2",
+     "П2.1",
+     "П3",
+     "П8",
+     "П9",
+     "П10",
+     "П15",
+     "П17",
+     "П18"
+    ],
+    "unit_outside_012": {
+     "П20": [
+      0.63,
+      0.414
+     ]
+    }
+   }
+  },
+  "F0201:17": {
+   "sheet_stamp": 4,
+   "gold_sheet": 3,
+   "format": "A0 portrait",
+   "class": "VECTOR_TEXT with outlined tags (233 words, 66k paths)",
+   "title_ocr": "План подвала (вентиляция)",
+   "qr": "exon 3eb2aa9d…/1/wd/17",
+   "anchors": {
+    "room_label_012": [
+     0.867,
+     0.543
+    ],
+    "zone_012_bbox": [
+     0.8,
+     0.44,
+     0.93,
+     0.6
+    ],
+    "ocr_tokens_text_layers_only_300dpi": [
+     "П9",
+     "П15",
+     "П17.1, 17.2",
+     "П18",
+     "В2.1 (OCR: B2.1)",
+     "Пароувлажнитель (П2) ×2",
+     "SBOW 100-50/397"
+    ],
+    "raster_inset": "2914×2381 px image = «Таблица противопожарных клапанов» [0.774,0.822,0.994,0.95]"
+   }
+  },
+  "F0201:32": {
+   "sheet_stamp": 17,
+   "title_ocr": "План Венткамеры в осях 16-18 / К-Н (М1:50)",
+   "note": "detailed plan of vent chamber 012; not cited by gold",
+   "ocr_units": [
+    "П2",
+    "П2.1",
+    "П3",
+    "П8",
+    "П9",
+    "П10",
+    "П15",
+    "П17.1",
+    "П17.2",
+    "П18"
+   ]
+  },
+  "F0171:99": {
+   "sheet_stamp": 21,
+   "format": "A0x? (1486x420 mm)",
+   "class": "VECTOR_TEXT",
+   "paths": 3865,
+   "title": "Принципиальная схема системы отопления",
+   "anchors": {
+    "label_267_270": [
+     0.293,
+     0.42
+    ],
+    "label_271_272": [
+     0.313,
+     0.42
+    ],
+    "leader_text_теплый_пол": [
+     0.332,
+     0.392
+    ],
+    "loops_layer": "ОВ-Отопление-Схема (nested rectangular spirals inside the two МГН rooms)"
+   }
+  },
+  "F0171:11": {
+   "note": "ПЗ text: «В помещениях раздевальных, санузлов и душевых для МГН (пом. 267, 270, 271, 272) предусмотрена система подогрева полов (теплые полы)…»"
+  },
+  "F0171:136": {
+   "note": "PD specification: «Регулятор для системы “теплый пол” Multibox C/RTL — компл. 2»"
+  },
+  "F0202:17": {
+   "sheet_stamp": 4,
+   "gold_sheet": 4,
+   "format": "A0 portrait",
+   "class": "VECTOR_TEXT (817 words) + outlined tags, 164k paths",
+   "qr": "exon 87cc1a16…/1/wd/17",
+   "anchors": {
+    "room_267": [
+     0.359,
+     0.675
+    ],
+    "room_270": [
+     0.355,
+     0.701
+    ],
+    "room_271": [
+     0.394,
+     0.675
+    ],
+    "room_272": [
+     0.392,
+     0.701
+    ],
+    "revision_cloud_layer": "ОВ-Отопление-Изм. №3",
+    "revision_cloud_bbox": [
+     0.337,
+     0.687,
+     0.423,
+     0.73
+    ],
+    "rd_content": "radiators PRADO Universal 22-500-700, +22 °C 700/690 Вт tags, no warm-floor loops"
+   }
+  },
+  "F0171:88": {
+   "sheet_stamp": 10,
+   "format": "A3x3 (891x420 mm)",
+   "class": "VECTOR_TEXT",
+   "paths": 2299,
+   "title": "Принципиальная схема систем общеобменной вентиляции (продолжение №3)",
+   "anchors": {
+    "room_142": [
+     0.168,
+     0.655
+    ],
+    "room_140": [
+     0.221,
+     0.655
+    ],
+    "room_147": [
+     0.322,
+     0.665
+    ],
+    "room_198": [
+     0.709,
+     0.665
+    ],
+    "room_314": [
+     0.757,
+     0.361
+    ],
+    "pd_local_exhaust_tags": {
+     "142": [
+      "В2.4",
+      "В2.5",
+      "В2.6"
+     ],
+     "140": [
+      "В2.7",
+      "В2.8",
+      "В2.9"
+     ],
+     "147": [
+      "В2.10"
+     ],
+     "198": [
+      "В2.2",
+      "В2.3"
+     ],
+     "314": [
+      "В3.1",
+      "В3.2"
+     ]
+    }
+   }
+  },
+  "F0201:18": {
+   "sheet_stamp": 5,
+   "gold_sheet": 4,
+   "format": "A0 portrait",
+   "class": "VECTOR_TEXT (1222 words) + outlined tags, 152k paths",
+   "title_ocr": "План 1-го этажа (вентиляция)",
+   "qr": "exon 3eb2aa9d…/1/wd/18",
+   "anchors": {
+    "room_140": [
+     0.922,
+     0.194
+    ],
+    "room_142": [
+     0.906,
+     0.139
+    ],
+    "room_147": [
+     0.907,
+     0.292
+    ],
+    "room_198": [
+     0.705,
+     0.142
+    ],
+    "rd_tags_ocr": {
+     "140": [
+      "П2/ВЕ ±400 м³/ч"
+     ],
+     "142": [
+      "П2/ВЕ ±400 м³/ч"
+     ],
+     "141": [
+      "В2.7,8,9 −950 м³/ч (moved here)"
+     ],
+     "147": [
+      "В2.2",
+      "В2.3",
+      "В2.4",
+      "В2.3,4 −150 м³/ч"
+     ],
+     "198": [
+      "В2.8",
+      "В2.9",
+      "В2.10",
+      "М.О. поз.159/162",
+      "П2/ВЕ ±150"
+     ]
+    }
+   }
+  },
+  "F0201:20": {
+   "sheet_stamp": 7,
+   "title_ocr": "План 3-го этажа (вентиляция)",
+   "note": "room 314 is drawn HERE, not on p18 cited by gold TRAIN-0010",
+   "anchors": {
+    "room_314": [
+     0.725,
+     0.081
+    ],
+    "rd_tags_ocr": {
+     "314": [
+      "В3.1 −600 м³/ч (над 3D-принтером, поз.133)",
+      "П3/ВЕ ±350"
+     ]
+    }
+   }
+  }
+ },
+ "recognition_tests": [
+  {
+   "id": "RT-01",
+   "file": "F0201",
+   "pages": "14-34",
+   "assert": "title-block OCR sheet number == pdf_page-13 (monotonic); p27/p29 and p28/p30 are duplicate sheets 14/15"
+  },
+  {
+   "id": "RT-02",
+   "file": "F0201",
+   "page": 17,
+   "assert": "with only text-like CAD layers visible (layer_ui_config), OCR of zone [0.80,0.40,0.96,0.60] at 300 dpi returns П9, П15, П17.1, П18, В2.1 (homoglyph-normalized)"
+  },
+  {
+   "id": "RT-03",
+   "file": "F0201",
+   "page": 18,
+   "assert": "OCR of zone [0.83,0.10,0.99,0.32] returns В2.2, В2.3, В2.4, В2.7, В2.8, В2.9, В2.10, П2/ВЕ; room numbers 140/142/147 come from the text layer"
+  },
+  {
+   "id": "RT-04",
+   "file": "F0202",
+   "page": 17,
+   "assert": "CAD layer «ОВ-Отопление-Изм. №3» cluster bbox ≈ [0.337,0.687,0.423,0.73] contains room labels 270, 272"
+  },
+  {
+   "id": "RT-05",
+   "file": "F0171",
+   "page": 11,
+   "assert": "text layer contains «пом. 267, 270, 271, 272» and «теплые полы»"
+  },
+  {
+   "id": "RT-06",
+   "file": "F0202",
+   "pages": "1-36",
+   "assert": "no «тепл* пол» / Multibox in text layer AND in OCR of outlined pages 19-36 (outlined pages must be OCRed before concluding absence)"
+  },
+  {
+   "id": "RT-07",
+   "file": "F0198",
+   "page": 1,
+   "assert": "QR decodes to exon 87cc1a16…/1/wd/17 and content equals F0202 p17 (same 817 words, same 164,576 paths)"
+  },
+  {
+   "id": "RT-08",
+   "file": "F0146",
+   "pages": "1-31,147-175,…",
+   "assert": "page class BROKEN_ENCODING (mojibake «ȺɇɈ/150321/1-ɉ-ɉɁ1.2» = «АНО/150321/1-П-ПЗ1.2»); route to OCR"
+  },
+  {
+   "id": "RT-09",
+   "file": "F0171",
+   "page": 104,
+   "assert": "supply-unit tags inside wall interval x∈[0.665,0.871] = {П2,П2.1,П3,П8,П9,П10,П15,П17,П18}"
+  },
+  {
+   "id": "RT-10",
+   "file": "F0195/F0196",
+   "assert": "АОСР п.2 parsed: «АНО/150321/1-РД-ОВ2.1 - изм. 3», «АНО/150321/1-РД-ОВ1 - изм. 3»; п.4 of F0196 cites «АНО1301211-Р-ОВ1» (cipher typo)"
+  }
+ ],
+ "unlabeled_known_differences": [
+  {
+   "what": "Room 141 receives local exhausts В2.7–В2.9 (−950 м³/ч) in RD p18; PD shows none there",
+   "policy": "relocation/addition, not reported separately (not in gold)"
+  },
+  {
+   "what": "ID as-built plans F0197/F0199 carry CAD layer «ОВ-Вентиляция-Изм. №5» clusters at rooms 114, 115, 154, 166 (ID ≠ RD изм.4)",
+   "policy": "unknown label; do not count as FP or TP on train"
+  },
+  {
+   "what": "АОСР №1/ОВ (F0196, 07.04.2025) cites РД-ОВ1 изм. 3 while the supplied РД is изм. 4 (stamp rows «4 Зам. 839-24 11.08.2024»)",
+   "policy": "document-integrity candidate (revision currency)"
+  },
+  {
+   "what": "АОСР №1/ОВ п.4 cites «Исполнительные чертежи АНО1301211-Р-ОВ1» (130121 vs 150321)",
+   "policy": "document-integrity candidate (cipher mismatch)"
+  },
+  {
+   "what": "PD volumes 1.2 Книга 1 (F0146) and its ИЗМ ПО ЗАМЕЧАНИЯМ (F0150), ПЗУ F0154/F0155, АР F0156/F0157 coexist",
+   "policy": "use the ИЗМ/КОРРЕКТИРОВКА file as current; original = SUPERSEDED"
+  }
+ ],
+ "gold_quirks": [
+  "Gold document_sheet_number for F0201 is stamp−1 (p17: gold 3, stamp 4; p18: gold 4, stamp 5). F0171 and F0202 match the stamp. Never map sheet→page from gold numbers.",
+  "TRAIN-0010 (room 314) cites F0201 p18, but room 314 is drawn on F0201 p20 (stamp sheet 7 = markup «лист 6»). The 6-page «пояснения» markup also says «ОВ1, листы 4 и 6».",
+  "G-TR-003 and G-TR-004 share the same evidence pages (PD p88, RD p18) and parameter IOS4-078 but differ in difference_type (MISSING_DESIGN_ELEMENT vs CONFIGURATION_MISMATCH).",
+  "G-TR-002 is FREE-HEATING-001 (matrix gap), criticality «Существенное (предписание) — требует утверждения», protocol_status WARNING; not IOS4-077.",
+  "id_value is null for all 10 checks and document_status = PD_RD_AVAILABLE_ID_NOT_REQUIRED_FOR_PAIRWISE_CHECK although ИД copies of the same sheets exist (F0198 = F0202 p17).",
+  "evidence_pages/*.png are plain 100-dpi renders of the full pages (no markup); pixel geometry equals a PyMuPDF 100-dpi render, only anti-aliasing differs."
+ ],
+ "markup_zone_bboxes": {
+  "provenance": "Derived by us from the organizers' 6-page «Комплект_предметной_разметки_с_пояснениями_.pdf» (blue = PD zone, red = RD zone) by registering each embedded crop onto the source page. SELF_DERIVED, not scored gold; bbox = [x0,y0,x1,y1] in [0;1] of the visible page, origin top-left.",
+  "zones": [
+   {
+    "markup_page": 2,
+    "group": "G-TR-001 (012)",
+    "stage": "PD",
+    "file_id": "F0171",
+    "pdf_page_number": 104,
+    "zone_bbox_norm": [
+     0.6971,
+     0.2742,
+     0.8884,
+     0.5741
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 91,
+     "matches": 158,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 2,
+    "group": "G-TR-001 (012)",
+    "stage": "RD",
+    "file_id": "F0201",
+    "pdf_page_number": 17,
+    "zone_bbox_norm": [
+     0.8093,
+     0.4748,
+     0.9508,
+     0.604
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 907,
+     "matches": 1070,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 3,
+    "group": "G-TR-002 (267/270/271/272)",
+    "stage": "PD",
+    "file_id": "F0171",
+    "pdf_page_number": 99,
+    "zone_bbox_norm": [
+     0.2832,
+     0.3502,
+     0.3406,
+     0.5082
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 186,
+     "matches": 339,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 3,
+    "group": "G-TR-002 (267/270/271/272)",
+    "stage": "RD",
+    "file_id": "F0202",
+    "pdf_page_number": 17,
+    "zone_bbox_norm": [
+     0.3355,
+     0.6534,
+     0.4425,
+     0.7089
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 622,
+     "matches": 780,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 4,
+    "group": "G-TR-003 (140/142)",
+    "stage": "PD",
+    "file_id": "F0171",
+    "pdf_page_number": 88,
+    "zone_bbox_norm": [
+     0.1671,
+     0.5751,
+     0.2637,
+     0.6884
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 103,
+     "matches": 193,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 4,
+    "group": "G-TR-003 (140/142)",
+    "stage": "RD",
+    "file_id": "F0201",
+    "pdf_page_number": 18,
+    "zone_bbox_norm": [
+     0.8625,
+     0.1067,
+     0.9585,
+     0.2244
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 167,
+     "matches": 324,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 5,
+    "group": "G-TR-004 (147 top row, 198 bottom row)",
+    "stage": "PD",
+    "file_id": "F0171",
+    "pdf_page_number": 88,
+    "zone_bbox_norm": [
+     0.3177,
+     0.575,
+     0.3856,
+     0.6808
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 48,
+     "matches": 91,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 5,
+    "group": "G-TR-004 (147 top row, 198 bottom row)",
+    "stage": "RD",
+    "file_id": "F0201",
+    "pdf_page_number": 18,
+    "zone_bbox_norm": [
+     0.8358,
+     0.2626,
+     0.9364,
+     0.322
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 225,
+     "matches": 363,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 5,
+    "group": "G-TR-004 (147 top row, 198 bottom row)",
+    "stage": "PD",
+    "file_id": "F0171",
+    "pdf_page_number": 88,
+    "zone_bbox_norm": [
+     0.6932,
+     0.5685,
+     0.7542,
+     0.6857
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 67,
+     "matches": 111,
+     "scale": 0.763
+    }
+   },
+   {
+    "markup_page": 5,
+    "group": "G-TR-004 (147 top row, 198 bottom row)",
+    "stage": "RD",
+    "file_id": "F0201",
+    "pdf_page_number": 18,
+    "zone_bbox_norm": [
+     0.6915,
+     0.128,
+     0.8047,
+     0.1784
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 183,
+     "matches": 336,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 6,
+    "group": "G-TR-004 (314)",
+    "stage": "PD",
+    "file_id": "F0171",
+    "pdf_page_number": 88,
+    "zone_bbox_norm": [
+     0.7117,
+     0.2917,
+     0.7815,
+     0.4138
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 119,
+     "matches": 169,
+     "scale": 0.764
+    }
+   },
+   {
+    "markup_page": 6,
+    "group": "G-TR-004 (314)",
+    "stage": "RD",
+    "file_id": "F0201",
+    "pdf_page_number": 20,
+    "zone_bbox_norm": [
+     0.6842,
+     0.0512,
+     0.7849,
+     0.1091
+    ],
+    "registration": {
+     "method": "SIFT + RANSAC partial affine on 110-dpi render",
+     "inliers": 274,
+     "matches": 359,
+     "scale": 0.764
+    }
+   }
+  ],
+  "note": "The markup itself places room 314 on F0201 p20 (zone [0.684,0.051,0.785,0.109]), while gold TRAIN-0010 cites p18."
+ }
+}

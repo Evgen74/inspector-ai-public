@@ -1,0 +1,18 @@
+{
+  "finding_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-KR-058-OBJ",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "matrix_scope": "MATRIX",
+  "parameter_code": "KR-058",
+  "parameter_id": 58,
+  "location": "OBJECT",
+  "location_type": "OBJECT",
+  "pd_value": null,
+  "rd_value": null,
+  "id_value": null,
+  "completeness_status": "MISSING_EVIDENCE",
+  "completeness_basis": "MANDATORY_SOURCE_MISSING",
+  "violation_label": "COMPARISON_IMPOSSIBLE",
+  "protocol_status": "COMPARISON_IMPOSSIBLE",
+  "criticality": "Критическое (приостановка работ)",
+  "evidence": []
+}

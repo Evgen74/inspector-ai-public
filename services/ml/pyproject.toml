@@ -1,0 +1,104 @@
+# uv workspace root for the Python side of «Инспектор ИИ».
+# Owner: AG-00. Members own their own pyproject.toml (see CLAUDE.md).
+#
+# The root is a virtual project (no build system): `uv sync` installs every
+# workspace member in editable mode plus the dev tools below.
+
+[project]
+name = "inspector-ml"
+version = "0.1.0"
+description = "Инспектор ИИ: Python workspace (batch engine, recognition, layout, tables, registry, comparison, evaluation)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "inspector-common",
+    "inspector-registry",
+    "inspector-docproc",
+    "inspector-layout",
+    "inspector-tables",
+    "inspector-eval",
+    "inspector-compare",
+    "inspector-hypothesis",
+    "inspector-batch",
+    # Web mode: internal ml-api (apps/ml_api, FastAPI) — page rendering for the evidence viewer.
+    "inspector-ml-api",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "pytest-xdist>=3.6",
+    "ruff>=0.6",
+]
+
+[tool.uv]
+default-groups = ["dev"]
+
+[tool.uv.workspace]
+members = ["packages/*", "apps/*"]
+
+[tool.uv.sources]
+inspector-common = { workspace = true }
+inspector-registry = { workspace = true }
+inspector-docproc = { workspace = true }
+inspector-layout = { workspace = true }
+inspector-tables = { workspace = true }
+inspector-eval = { workspace = true }
+inspector-compare = { workspace = true }
+inspector-hypothesis = { workspace = true }
+inspector-batch = { workspace = true }
+inspector-ml-api = { workspace = true }
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = ["-ra", "--strict-markers", "--import-mode=importlib"]
+testpaths = [
+    "packages/inspector_common/tests",
+    "packages/inspector_registry/tests",
+    "packages/inspector_docproc/tests",
+    "packages/inspector_layout/tests",
+    "packages/inspector_tables/tests",
+    "packages/inspector_eval/tests",
+    "packages/inspector_compare/tests",
+    "packages/inspector_hypothesis/tests",
+    "apps/inspector_batch/tests",
+    "apps/ml_api/tests",
+    "../../tools/tests",
+]
+markers = [
+    "slow: slow or heavy test (full model hashing, large files, OCR); excluded from `make test`, run by `make test-slow`",
+    "data: needs the organizer data under INSPECTOR_DATA_ROOT; skipped automatically when the data is absent",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+extend-exclude = [
+    "../../tools/prototypes",
+    "packages/inspector_common/src/inspector_common/contracts/enums.py",  # generated
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "RUF", "SIM"]
+ignore = [
+    "RUF001",  # ambiguous unicode characters: Cyrillic is intended
+    "RUF002",
+    "RUF003",
+    "E501",    # line length is handled by the formatter
+]
+
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "inspector_common",
+    "inspector_registry",
+    "inspector_docproc",
+    "inspector_layout",
+    "inspector_tables",
+    "inspector_eval",
+    "inspector_compare",
+    "inspector_hypothesis",
+    "inspector_batch",
+    "inspector_ml_api",
+]

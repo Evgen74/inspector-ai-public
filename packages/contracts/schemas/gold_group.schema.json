@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/gold_group.schema.json",
+  "title": "GoldFindingGroup",
+  "description": "One row of the organizers' public_train_finding_groups.jsonl: a composite finding before the atomic split (one check per location). Owner: AG-10.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "finding_group_id",
+    "object_id",
+    "split",
+    "matrix_scope",
+    "parameter_code",
+    "parameter_mapping_status",
+    "difference_type",
+    "locations",
+    "criticality",
+    "evidence"
+  ],
+  "properties": {
+    "finding_group_id": {"type": "string", "minLength": 1},
+    "object_id": {"$ref": "common.schema.json#/$defs/ObjectId"},
+    "split": {"$ref": "enums.schema.json#/$defs/ManifestSplit"},
+    "matrix_scope": {"$ref": "enums.schema.json#/$defs/MatrixScope"},
+    "parameter_id": {"oneOf": [{"$ref": "common.schema.json#/$defs/ParamId"}, {"type": "null"}]},
+    "parameter_code": {"$ref": "common.schema.json#/$defs/SubmissionParameterCode"},
+    "parameter_mapping_status": {"$ref": "enums.schema.json#/$defs/ParameterMappingStatus"},
+    "title": {"type": "string"},
+    "difference_type": {"$ref": "enums.schema.json#/$defs/ComparisonResult"},
+    "locations": {"type": "array", "minItems": 1, "items": {"$ref": "common.schema.json#/$defs/Location"}},
+    "criticality": {"$ref": "common.schema.json#/$defs/CriticalityString"},
+    "source_label": {"type": ["string", "null"]},
+    "gold_status": {"$ref": "enums.schema.json#/$defs/GoldStatus"},
+    "evidence": {"type": "array", "items": {"$ref": "gold_check.schema.json#/$defs/GoldEvidence"}}
+  }
+}

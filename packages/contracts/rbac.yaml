@@ -1,0 +1,138 @@
+# «Инспектор ИИ» — role → permission matrix (single source of truth; owner AG-00).
+#
+# Source: docs/analysis/90 §3.10 (canonical, replaces 09 §3.3.3) + 97 §2.14 (batch import).
+# The API enforces it (apps/api/src/modules/auth): every OpenAPI operation names its permission in
+# `x-permission` (packages/contracts/openapi/openapi.yaml); operations without one require only a valid session,
+# operations with `security: []` are public. The web mirrors it through GET /api/v1/auth/me.
+#
+# Rules
+# - Roles are enums.yaml `Role`; scopes are enums.yaml `PermissionScope`:
+#     ALL      — every object;
+#     ASSIGNED — objects in object_assignments (inspector visibility, 90 U-08);
+#     OWN      — rows the user created, or the integration client's own cases.
+# - Product-owner decision 29.09: the product has ONE role, INSPECTOR, a super-role granted every permission with scope ALL.
+# - `reauth: true` → the action also needs a fresh step-up token (POST /api/v1/auth/reauth, 5 min, single use).
+# - `inspector-contracts check` verifies roles, scopes, unique codes and that every OpenAPI `x-permission` exists.
+
+schema_version: 1
+rbac_version: "1"
+
+permissions:
+  # ── Objects, documents, processes ──
+  - code: object.read
+    label_ru: "Просмотр объектов и дашборда"
+    grants: {INSPECTOR: ALL}
+  - code: documents.upload
+    label_ru: "Загрузка документов"
+    grants: {INSPECTOR: ALL}
+  - code: process.start
+    label_ru: "Запуск проверки"
+    grants: {INSPECTOR: ALL}
+
+  # ── Protocols and evidence ──
+  - code: protocol.read
+    label_ru: "Просмотр протоколов"
+    grants: {INSPECTOR: ALL}
+  - code: evidence.read
+    label_ru: "Просмотр доказательств и страниц документов"
+    grants: {INSPECTOR: ALL}
+  - code: protocol.export
+    label_ru: "Выгрузка протокола (PDF, DOCX, XML)"
+    grants: {INSPECTOR: ALL}
+
+  # ── Verification (05) ──
+  - code: finding.decide
+    label_ru: "Решения по находкам, разделение, фрагменты, выбор редакции, подозрения"
+    grants: {INSPECTOR: ALL}
+  - code: protocol.finalize
+    label_ru: "Финализация протокола"
+    reauth: true
+    grants: {INSPECTOR: ALL}
+  - code: protocol.unfinalize
+    label_ru: "Отмена финализации (с причиной)"
+    reauth: true
+    grants: {INSPECTOR: ALL}
+  - code: dispute.escalate
+    label_ru: "Эскалация и разрешение споров"
+    grants: {INSPECTOR: ALL}
+
+  # ── ИАИС «РиН» ──
+  - code: rin.send
+    label_ru: "Отправка результатов в ИАИС «РиН»"
+    grants: {INSPECTOR: ALL}
+  - code: rin.inbox.create_process
+    label_ru: "Создание проверки из входящих «РиН»"
+    grants: {INSPECTOR: ALL}
+  - code: rin.admin
+    label_ru: "Настройки интеграции с «РиН»"
+    grants: {INSPECTOR: ALL}
+
+  # ── Matrix, normative base, rules ──
+  - code: matrix.read
+    label_ru: "Просмотр матрицы и нормативной базы"
+    grants: {INSPECTOR: ALL}
+  - code: params.manage
+    label_ru: "Управление параметрами, нормативами, правилами и справочниками решений"
+    grants: {INSPECTOR: ALL}
+  - code: matrix.publish
+    label_ru: "Публикация версии матрицы"
+    grants: {INSPECTOR: ALL}
+
+  # ── Users, sessions, settings ──
+  - code: users.manage
+    label_ru: "Управление пользователями, ролями и назначениями"
+    reauth: true
+    grants: {INSPECTOR: ALL}
+  - code: sessions.manage
+    label_ru: "Управление сессиями"
+    grants: {INSPECTOR: ALL}
+  - code: settings.manage
+    label_ru: "Системные настройки"
+    grants: {INSPECTOR: ALL}
+
+  # ── Audit and operations ──
+  - code: audit.read
+    label_ru: "Просмотр журнала аудита"
+    grants: {INSPECTOR: ALL}
+  - code: audit.export
+    label_ru: "Выгрузка и проверка целостности журнала аудита"
+    grants: {INSPECTOR: ALL}
+  - code: ops.run
+    label_ru: "Контроль целостности, резервные копии, НФТ, задания, самотестирование"
+    grants: {INSPECTOR: ALL}
+  - code: monitoring.read
+    label_ru: "Мониторинг и журналы"
+    grants: {INSPECTOR: ALL}
+
+  # ── Batch runs (97 §2.14) ──
+  - code: batch.read
+    label_ru: "Просмотр импортированных пакетных прогонов"
+    grants: {INSPECTOR: ALL}
+  - code: batch.import
+    label_ru: "Импорт пакетного прогона inspector-batch"
+    grants: {INSPECTOR: ALL}
+
+  # ── ML loop (06) ──
+  - code: retraining.read
+    label_ru: "Журналы отклонений и споров, еженедельные отчёты"
+    grants: {INSPECTOR: ALL}
+  - code: dataset.read
+    label_ru: "Просмотр наборов данных"
+    grants: {INSPECTOR: ALL}
+  - code: dataset.curate
+    label_ru: "Курирование и выпуск набора данных"
+    grants: {INSPECTOR: ALL}
+  - code: model.train
+    label_ru: "Обучение, оценка и предложение моделей"
+    grants: {INSPECTOR: ALL}
+  - code: model.publish.approve
+    label_ru: "Утверждение публикации модели"
+    reauth: true
+    grants: {INSPECTOR: ALL}
+  - code: model.rollback
+    label_ru: "Откат модели"
+    reauth: true
+    grants: {INSPECTOR: ALL}
+  - code: testset.admin
+    label_ru: "Скрытая тестовая выборка (заморозка, поэлементный просмотр)"
+    grants: {INSPECTOR: ALL}

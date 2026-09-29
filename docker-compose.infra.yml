@@ -1,0 +1,66 @@
+# «Инспектор ИИ»: only the backing services (PostgreSQL 17, Redis, RabbitMQ) — an alternative to installing them
+# from apt/Homebrew (docs/runbook/LINUX.md). The application itself (API, web, ML) still runs on the host:
+# `make setup && make dev`.
+#
+#   docker compose -f docker-compose.infra.yml up -d
+#   docker compose -f docker-compose.infra.yml down        # data stays in the named volumes; add -v to wipe it
+#
+# Ports and credentials are exactly what the application expects by default (.env.example):
+#   PostgreSQL  postgresql://localhost:5432/inspector   the superuser is your OS login (the default the pg
+#                                                        client/driver uses when the URL has no user), no password
+#   Redis       redis://127.0.0.1:6379/0
+#   RabbitMQ    amqp://127.0.0.1:5672                    guest/guest (allowed from the host); UI: http://127.0.0.1:15672
+# Everything listens on 127.0.0.1 only. If $USER is not set in your shell, export it (or set POSTGRES_USER) first.
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-${USER:-postgres}}
+      POSTGRES_DB: inspector
+      POSTGRES_HOST_AUTH_METHOD: trust # local development only: the port is bound to loopback
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - inspector-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d inspector"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:8
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:6379:6379"
+    volumes:
+      - inspector-redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    restart: unless-stopped
+    environment:
+      # guest/guest is limited to loopback inside the container by default, and a host connection arrives from the
+      # Docker bridge: lift the limit (the published port is bound to 127.0.0.1 on the host anyway)
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit loopback_users none"
+    ports:
+      - "127.0.0.1:5672:5672"
+      - "127.0.0.1:15672:15672"
+    volumes:
+      - inspector-rabbit:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+volumes:
+  inspector-pg:
+  inspector-redis:
+  inspector-rabbit:

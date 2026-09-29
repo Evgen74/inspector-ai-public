@@ -1,0 +1,29 @@
+[project]
+name = "inspector-eval"
+version = "0.1.0"
+description = "Инспектор ИИ: inspector-score (60/15/15/10 + gate) and inspector-eval (ТЗ §14) (owner AG-10)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "inspector-common",
+    "jsonschema>=4.23",
+    "numpy>=2.0",
+    "rapidfuzz>=3.9",
+    "openpyxl>=3.1",
+    "inspector-registry",
+    "pymupdf>=1.28,<1.29",
+]
+
+[project.scripts]
+inspector-score = "inspector_eval.cli:main"
+inspector-eval = "inspector_eval.harness:main"
+
+[tool.uv.sources]
+inspector-common = { workspace = true }
+inspector-registry = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inspector_eval"]

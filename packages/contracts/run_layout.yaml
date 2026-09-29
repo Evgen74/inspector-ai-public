@@ -1,0 +1,151 @@
+# «Инспектор ИИ» — layout of a run directory `runs/<run_id>/` (single source of truth; owner AG-00).
+#
+# One engine, two front-ends (97 §1.4): `inspector-batch` writes these files, the web product imports them
+# (POST /api/v1/admin/batch-runs/import). Every file a run produces is listed in `artifacts.json`
+# (schemas/run_artifacts.schema.json), with its kind, path, sha256 and size, so importers never guess paths.
+#
+# Placeholders: {object_id}, {file_id}, {page05} (1-based PDF page, zero-padded to 5 digits: p00017).
+# `schema`: the contract schema every file (JSON) or every line (JSONL) validates against; null = free-form.
+# `producer`: the owner agent / batch command that writes it. Keys must equal enums.yaml ArtifactKind
+# (`inspector-contracts check` enforces it). Paths are relative to the run directory and use `/`.
+
+schema_version: 1
+layout_version: "1"
+index_file: artifacts.json
+
+artifacts:
+  RUN_MANIFEST:
+    path: run_manifest.json
+    scope: RUN
+    format: JSON
+    schema: run_manifest
+    producer: {agent: AG-01, command: inventory}
+    note: "Written by `inventory`; later commands update `objects[].artifacts` through inspector_common.runlayout."
+  RUN_CONTEXT:
+    path: "run_context.{command}.json"
+    scope: RUN
+    format: JSON
+    schema: null
+    producer: {agent: AG-00, command: "*"}
+    note: "One per command executed in the run directory (argv, objects, versions). {command} is a batch command name."
+  RUN_ARTIFACTS:
+    path: artifacts.json
+    scope: RUN
+    format: JSON
+    schema: run_artifacts
+    producer: {agent: AG-00, command: "*"}
+    note: "This index. Rebuilt by inspector_common.runlayout.write_artifacts_index() at the end of every command."
+  PIPELINE_SUMMARY:
+    path: pipeline_summary.json
+    scope: RUN
+    format: JSON
+    schema: null
+    producer: {agent: AG-00, command: run}
+    note: "Steps of `inspector-batch run` with owner, status and exit code."
+  INVENTORY_INDEX:
+    path: inventory/index.json
+    scope: RUN
+    format: JSON
+    schema: null
+    producer: {agent: AG-01, command: inventory}
+  INVENTORY:
+    path: "inventory/{object_id}.json"
+    scope: OBJECT
+    format: JSON
+    schema: null
+    producer: {agent: AG-01, command: inventory}
+    note: "inventory_report schema is AG-01's until adopted into contracts (M0 open issue)."
+  PAGE_TOKENS:
+    path: "tokens/{file_id}/p{page05}.json.gz"
+    scope: PAGE
+    format: JSON_GZ
+    schema: page_tokens
+    producer: {agent: AG-02A, command: recognize}
+  TOKENS_INDEX:
+    path: tokens/index.json
+    scope: RUN
+    format: JSON
+    schema: tokens_index
+    producer: {agent: AG-02A, command: recognize}
+  RECOGNIZE_SUMMARY:
+    path: recognize_summary.json
+    scope: RUN
+    format: JSON
+    schema: null
+    producer: {agent: AG-02A, command: recognize}
+  LAYOUT:
+    path: "layout/{file_id}.json"
+    scope: FILE
+    format: JSON
+    schema: layout_artifacts
+    producer: {agent: AG-02B, command: layout}
+  TABLES:
+    path: "tables/{file_id}.json"
+    scope: FILE
+    format: JSON
+    schema: table_artifacts
+    producer: {agent: AG-02C, command: tables}
+  EXTRACTED_VALUES:
+    path: "values/{object_id}.jsonl"
+    scope: OBJECT
+    format: JSONL
+    schema: extracted_value
+    producer: {agent: AG-02C, command: tables}
+  FINDING_GROUPS:
+    path: "findings/{object_id}.groups.jsonl"
+    scope: OBJECT
+    format: JSONL
+    schema: finding_group
+    producer: {agent: AG-04, command: compare}
+    note: "FREE-* groups are written by AG-07 (inspector_hypothesis) through the same file, matrix_scope FREE_SEARCH."
+  FINDINGS:
+    path: "findings/{object_id}.jsonl"
+    scope: OBJECT
+    format: JSONL
+    schema: finding
+    producer: {agent: AG-04, command: compare}
+    note: "Atomic checks (one parameter × one location), all 132 parameter rows included."
+  PROTOCOL_JSON:
+    path: "protocol/{object_id}.json"
+    scope: OBJECT
+    format: JSON
+    schema: protocol
+    producer: {agent: AG-04, command: export}
+  PROTOCOL_DOCX:
+    path: "protocol/{object_id}.docx"
+    scope: OBJECT
+    format: DOCX
+    schema: null
+    producer: {agent: AG-04, command: export}
+  PROTOCOL_PDF:
+    path: "protocol/{object_id}.pdf"
+    scope: OBJECT
+    format: PDF
+    schema: null
+    producer: {agent: AG-04, command: export}
+  SUBMISSION:
+    path: "submission/{object_id}.json"
+    scope: OBJECT
+    format: JSON
+    schema: submission.extended
+    producer: {agent: AG-04, command: export}
+    note: "Also validates against submission.organizer (the pinned schema). inspector-score reads this directory."
+  SUBMISSION_STRICT:
+    path: "submission-strict/{object_id}.json"
+    scope: OBJECT
+    format: JSON
+    schema: submission.strict
+    producer: {agent: AG-04, command: export}
+  SUBMISSION_SIDECAR:
+    path: "submission/{object_id}.sidecar.json"
+    scope: OBJECT
+    format: JSON
+    schema: submission_sidecar
+    producer: {agent: AG-04, command: export}
+    note: "Never part of the answer; inspector-score skips *.sidecar.json. Carries freeze_tag for the hidden run."
+  SCORE:
+    path: score/score.json
+    scope: RUN
+    format: JSON
+    schema: null
+    producer: {agent: AG-10, command: score}

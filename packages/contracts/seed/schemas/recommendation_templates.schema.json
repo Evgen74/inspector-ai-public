@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/seed/recommendation_templates.schema.json",
+  "title": "Matrix seed: recommendation templates of Приложение 2 Раздел 7 (packages/contracts/seed/recommendation_templates.json)",
+  "description": "132 parameter templates + one template per FREE topic: «Вид работ» (7.1), «Вид нарушения» (7.2), «Конкретная рекомендация», the «Отклонение» phrases of Разделы 4–5, delta formats, norm fill, edition rules and the verified norm references; plus the vocabularies and the edition registry the renderer (inspector_common.params) uses. Built by seed/src/build_seed.py from the web-verified staging templates (src/norms) and src/norms.yaml. Owner: AG-03.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seed", "schema_version", "matrix_version", "status", "checked_at", "content_sha256", "counts", "review", "sources", "conventions", "vocabularies", "regime_changes", "templates", "free_topics", "documents"],
+  "properties": {
+    "seed": {"const": "recommendation_templates"},
+    "schema_version": {"const": 1},
+    "matrix_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "status": {"type": "string"},
+    "checked_at": {"$ref": "#/$defs/Date"},
+    "content_sha256": {"$ref": "../schemas/common.schema.json#/$defs/Sha256"},
+    "counts": {"type": "object"},
+    "review": {"type": "object"},
+    "sources": {"$ref": "params.schema.json#/$defs/Sources"},
+    "conventions": {"type": "object"},
+    "vocabularies": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["deviation_kinds", "markers", "delta_formats", "discrepancy_to_deviation_kind", "comparison_result_to_deviation_kind", "violation_type_to_deviation_kind", "reference_status", "threshold_status"],
+      "properties": {
+        "deviation_kinds": {
+          "type": "array",
+          "minItems": 9,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["code", "staging_key", "label_ru", "direction", "default_phrase"],
+            "properties": {
+              "code": {"$ref": "#/$defs/DeviationKind"},
+              "staging_key": {"type": "string"},
+              "label_ru": {"type": "string"},
+              "direction": {"$ref": "../schemas/enums.schema.json#/$defs/DeviationDirection"},
+              "default_phrase": {"$ref": "#/$defs/Phrase"}
+            }
+          }
+        },
+        "markers": {"type": "object", "additionalProperties": {"$ref": "../schemas/enums.schema.json#/$defs/DeviationDirection"}},
+        "delta_formats": {"type": "array", "items": {"$ref": "#/$defs/DeltaFormat"}},
+        "discrepancy_to_deviation_kind": {
+          "type": "object",
+          "propertyNames": {"$ref": "../schemas/enums.schema.json#/$defs/DiscrepancyType"},
+          "additionalProperties": {"$ref": "#/$defs/KindOrSign"}
+        },
+        "comparison_result_to_deviation_kind": {
+          "type": "object",
+          "propertyNames": {"$ref": "../schemas/enums.schema.json#/$defs/ComparisonResult"},
+          "additionalProperties": {"$ref": "#/$defs/KindOrSign"}
+        },
+        "violation_type_to_deviation_kind": {
+          "type": "object",
+          "propertyNames": {"$ref": "../schemas/enums.schema.json#/$defs/ViolationType"},
+          "additionalProperties": {"$ref": "#/$defs/KindOrSign"}
+        },
+        "reference_status": {"type": "object", "propertyNames": {"$ref": "params.schema.json#/$defs/NormRefStatus"}},
+        "threshold_status": {"type": "object", "propertyNames": {"$ref": "params.schema.json#/$defs/NormThresholdStatus"}}
+      }
+    },
+    "regime_changes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "effective_from", "applies_by", "params", "basis", "before", "after"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+          "effective_from": {"$ref": "#/$defs/Date"},
+          "applies_by": {"enum": ["PD_APPROVAL_DATE", "EVENT_DATE"]},
+          "params": {"type": "array", "minItems": 1, "items": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"}},
+          "basis": {"type": "string"},
+          "before": {"type": "string"},
+          "after": {"type": "string"}
+        }
+      }
+    },
+    "documents": {
+      "description": "Edition registry (norms.yaml): replaced documents with the date their replacement took effect, and expiring documents.",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["designation", "basis", "applies_by"],
+        "properties": {
+          "designation": {"type": "string", "minLength": 1},
+          "replaced_by": {"type": "string", "minLength": 1},
+          "effective_from": {"$ref": "#/$defs/Date"},
+          "valid_until": {"$ref": "#/$defs/Date"},
+          "basis": {"type": "string"},
+          "applies_by": {"enum": ["PD_APPROVAL_DATE", "EVENT_DATE"]},
+          "inline_replace": {"type": "boolean"}
+        },
+        "oneOf": [{"required": ["replaced_by", "effective_from"]}, {"required": ["valid_until"]}]
+      }
+    },
+    "templates": {"type": "array", "minItems": 132, "maxItems": 132, "items": {"$ref": "#/$defs/ParamTemplate"}},
+    "free_topics": {"type": "array", "minItems": 17, "maxItems": 17, "items": {"$ref": "#/$defs/FreeTemplate"}}
+  },
+  "$defs": {
+    "Date": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"},
+    "DeviationKind": {
+      "description": "Kind of deviation that selects the «Отклонение» phrase and the «Вид нарушения» variant (seed vocabulary, proposed to AG-00 as enum DeviationKind).",
+      "enum": ["DECREASE", "INCREASE", "CLASS_DOWNGRADE", "ABSENCE", "SUBSTITUTION", "CONFIGURATION_CHANGE", "NORM_VIOLATION", "TOLERANCE_EXCEEDED", "ZONE_INTRUSION"]
+    },
+    "KindOrSign": {"anyOf": [{"$ref": "#/$defs/DeviationKind"}, {"const": "BY_SIGN"}]},
+    "VariantKey": {
+      "description": "A DeviationKind, optionally narrowed by an element: «DECREASE:бетон».",
+      "type": "string",
+      "pattern": "^(DECREASE|INCREASE|CLASS_DOWNGRADE|ABSENCE|SUBSTITUTION|CONFIGURATION_CHANGE|NORM_VIOLATION|TOLERANCE_EXCEEDED|ZONE_INTRUSION)(:[^:]+)?$"
+    },
+    "DeltaFormat": {"enum": ["ABS", "PCT", "COUNT", "NONE"]},
+    "Text": {"type": "string", "minLength": 3},
+    "Phrase": {"description": "«Отклонение» phrase: Приложение 2 marker + verb (+ {delta}).", "type": "string", "pattern": "^(⬇️|⬆️|❌|🔄) \\S"},
+    "Placeholders": {
+      "description": "Texts use only the renderer's placeholders: {pd_value} {rd_value} {id_value} {actual_value} {delta} {location} {norm_value} {norm_ref} {element}.",
+      "not": {"pattern": "\\{(?!(pd_value|rd_value|id_value|actual_value|delta|location|norm_value|norm_ref|element)\\})[^{}]*\\}"}
+    },
+    "DeltaFormatSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "by_kind"],
+      "properties": {
+        "default": {"$ref": "#/$defs/DeltaFormat"},
+        "by_kind": {"type": "object", "propertyNames": {"$ref": "#/$defs/VariantKey"}, "additionalProperties": {"$ref": "#/$defs/DeltaFormat"}}
+      }
+    },
+    "CountNoun": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "required": ["one", "few", "many"],
+      "properties": {
+        "one": {"type": "string"},
+        "one_acc": {"type": "string"},
+        "few": {"type": "string"},
+        "many": {"type": "string"}
+      }
+    },
+    "NormRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["ref", "designation", "clause", "status", "confidence", "record"],
+      "properties": {
+        "ref": {"type": "string", "minLength": 1, "description": "ТЗ §8.1 display form «СП 1.13130.2020, п. 4.2.1»."},
+        "designation": {"type": "string", "minLength": 1},
+        "clause": {"type": ["string", "null"]},
+        "status": {"$ref": "params.schema.json#/$defs/NormRefStatus"},
+        "confidence": {"$ref": "../schemas/enums.schema.json#/$defs/ReferenceConfidence"},
+        "matrix_cited": {"type": ["string", "null"]},
+        "edition": {"type": ["string", "null"]},
+        "url": {"type": ["string", "null"]},
+        "record": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode", "description": "Catalog code of the verified norms record the reference comes from."},
+        "verified_value": {"type": ["string", "null"]},
+        "used_for": {"type": ["string", "null"]}
+      }
+    },
+    "TextOriginSet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_type", "violation_kind", "recommendation"],
+      "properties": {
+        "work_type": {"$ref": "../schemas/enums.schema.json#/$defs/TextOrigin"},
+        "violation_kind": {"$ref": "../schemas/enums.schema.json#/$defs/TextOrigin"},
+        "recommendation": {"$ref": "../schemas/enums.schema.json#/$defs/TextOrigin"}
+      }
+    },
+    "CommonTexts": {
+      "type": "object",
+      "required": ["work_type", "violation_kind", "violation_kind_variants", "recommendation", "recommendation_variants", "deviation_phrases", "delta_format", "count_noun", "norm_refs", "notes", "text_origin"],
+      "properties": {
+        "work_type": {"allOf": [{"$ref": "#/$defs/Text"}, {"not": {"pattern": "\\)$"}}]},
+        "violation_kind": {"allOf": [{"$ref": "#/$defs/Text"}, {"$ref": "#/$defs/Placeholders"}]},
+        "violation_kind_variants": {"type": "object", "propertyNames": {"$ref": "#/$defs/VariantKey"}, "additionalProperties": {"allOf": [{"$ref": "#/$defs/Text"}, {"$ref": "#/$defs/Placeholders"}]}},
+        "recommendation": {"allOf": [{"$ref": "#/$defs/Text"}, {"$ref": "#/$defs/Placeholders"}]},
+        "recommendation_variants": {"type": "object", "propertyNames": {"$ref": "#/$defs/VariantKey"}, "additionalProperties": {"allOf": [{"$ref": "#/$defs/Text"}, {"$ref": "#/$defs/Placeholders"}]}},
+        "deviation_phrases": {"type": "object", "propertyNames": {"$ref": "#/$defs/VariantKey"}, "additionalProperties": {"allOf": [{"$ref": "#/$defs/Phrase"}, {"$ref": "#/$defs/Placeholders"}]}},
+        "delta_format": {"$ref": "#/$defs/DeltaFormatSpec"},
+        "count_noun": {"$ref": "#/$defs/CountNoun"},
+        "norm_refs": {"type": "array", "items": {"$ref": "#/$defs/NormRef"}},
+        "notes": {"type": ["string", "null"]},
+        "text_origin": {"$ref": "#/$defs/TextOriginSet"}
+      }
+    },
+    "ParamTemplate": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "required": ["template_id", "code", "param_id", "section", "short_name", "parameter_name", "criticality", "criticality_level", "protocol_section", "protocol_status", "norm_fill", "edition_rules", "app2_sample"],
+      "properties": {
+        "template_id": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"},
+        "code": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"},
+        "param_id": {"$ref": "../schemas/common.schema.json#/$defs/ParamId"},
+        "section": {"type": "string"},
+        "short_name": {"type": "string", "minLength": 2, "maxLength": 60},
+        "parameter_name": {"type": "string"},
+        "criticality": {"enum": ["Критическое (приостановка работ)", "Существенное (предписание)"]},
+        "criticality_level": {"enum": ["CRITICAL_SUSPEND", "SUBSTANTIAL_ORDER"]},
+        "protocol_section": {"enum": ["7.1", "7.2"]},
+        "protocol_status": {"enum": ["CRITICAL", "WARNING"]},
+        "norm_fill": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["norm_value", "norm_ref"],
+          "properties": {
+            "norm_value": {"type": ["string", "null"]},
+            "norm_ref": {"type": ["string", "null"]}
+          }
+        },
+        "edition_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["pd_approved_before"],
+            "properties": {
+              "pd_approved_before": {"$ref": "#/$defs/Date"},
+              "norm_ref": {"type": "string"},
+              "norm_value": {"type": "string"}
+            }
+          }
+        },
+        "app2_sample": {
+          "description": "The Приложение 2 sample row this template corresponds to, verbatim, with the documented differences.",
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["row", "recommendation", "differences"],
+          "properties": {
+            "row": {"type": "string"},
+            "work_type": {"type": "string"},
+            "violation_kind": {"type": "string"},
+            "recommendation": {"type": "string"},
+            "differences": {"type": "string", "minLength": 3}
+          }
+        }
+      },
+      "allOf": [
+        {"$ref": "#/$defs/CommonTexts"},
+        {"if": {"properties": {"criticality_level": {"const": "CRITICAL_SUSPEND"}}},
+         "then": {"properties": {"protocol_section": {"const": "7.1"}, "protocol_status": {"const": "CRITICAL"}}},
+         "else": {"properties": {"protocol_section": {"const": "7.2"}, "protocol_status": {"const": "WARNING"}}}}
+      ]
+    },
+    "FreeTemplate": {
+      "type": "object",
+      "unevaluatedProperties": false,
+      "required": ["template_id", "topic", "code_pattern", "seen_in_train", "short_name", "criticality", "criticality_level", "protocol_section", "protocol_status", "element_presets"],
+      "properties": {
+        "template_id": {"type": "string", "pattern": "^FREE-[A-Z]+$"},
+        "topic": {"$ref": "../schemas/enums.schema.json#/$defs/FreeTopic"},
+        "code_pattern": {"type": "string"},
+        "seen_in_train": {"type": "boolean"},
+        "short_name": {"type": "string", "minLength": 2},
+        "criticality": {"const": "Существенное (предписание) — требует утверждения"},
+        "criticality_level": {"const": "SUBSTANTIAL_ORDER"},
+        "protocol_section": {"const": "7.2"},
+        "protocol_status": {"const": "WARNING"},
+        "element_presets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["violation_kind", "recommendation", "pd_value", "rd_value"],
+            "properties": {
+              "violation_kind": {"$ref": "#/$defs/Text"},
+              "recommendation": {"allOf": [{"$ref": "#/$defs/Text"}, {"$ref": "#/$defs/Placeholders"}]},
+              "pd_value": {"type": "string"},
+              "rd_value": {"type": "string"}
+            }
+          }
+        }
+      },
+      "allOf": [{"$ref": "#/$defs/CommonTexts"}]
+    }
+  }
+}

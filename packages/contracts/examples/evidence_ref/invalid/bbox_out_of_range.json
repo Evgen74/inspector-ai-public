@@ -1,0 +1,15 @@
+{
+  "stage": "RD",
+  "file_id": "F0201",
+  "pdf_page_number": 17,
+  "geometry": {
+    "boxes": [
+      [
+        0.1,
+        0.2,
+        1.2,
+        0.3
+      ]
+    ]
+  }
+}

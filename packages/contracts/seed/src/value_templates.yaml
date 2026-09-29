@@ -1,0 +1,201 @@
+# «Инспектор ИИ» — value templates for pd_value / rd_value / id_value (submission) and the ПД/РД/ИД cells of
+# Приложение 2 sections 4–5 (93 §3.5, §5.4). Owner: AG-03. Built into value_templates.json by build_seed.py; the
+# renderer is inspector_common.params (format_value, stage_values, protocol_cell).
+#
+# Order of use (params.stage_values):
+#   1. the change-map route of the element family (change_matrix_map.json value_templates: gold phrasing, e.g.
+#      «Конфигурация вентиляции по листу {pd_sheet} ПД» / «Конфигурация вентиляции изменена»);
+#   2. otherwise the generic template of the comparison result below, with the element noun from the lexicon;
+#   3. a stage that is not part of the check gives null (gold style, 97 §2.5).
+# Placeholders: {pd_value} {rd_value} {id_value} (values already formatted by format_value), {Element} (noun,
+# capitalised), {element_gen} (genitive after «Конфигурация»), {pd_sheet}, {rd_plan_mark}, {location};
+# {~<predicate>} agrees with the noun (predicates below).
+# Keep «ё» as printed in the gold («Тёплый пол»).
+
+number_format:
+  decimal_separator: ','
+  group_thousands: false          # «1560 м³» (Приложение 2); no separators keep numeric parsing trivial
+  dimension_separator: '×'        # «4×95 мм²», «500×300»
+  unit_separator: ' '             # «1,0 м», «850 м²»
+  percent: '{value}%'             # «16%» (Приложение 2: no space before %)
+  per_mille: '{value} ‰'
+
+# Display form of units: raw spelling → canonical (normalize_regex_input already maps м2/м3).
+units:
+  м2: м²
+  м3: м³
+  мм2: мм²
+  см2: см²
+  кв.м: м²
+  кв. м: м²
+  куб.м: м³
+  куб. м: м³
+  шт: шт.
+  дн: дн.
+  сут: сут.
+  мес: мес.
+  тыс.руб: тыс. руб.
+  млн.руб: млн руб.
+
+# Class and mark values: pattern (Python re, full match on the stripped value) → format. Приложение 2 prints the
+# concrete class with a Latin B («B35») and the fire-resistance limit with a hyphen («EI-60»); the submission and
+# the protocol cells follow that sample. Normative texts keep their own notation («EI 60»). A «В25» token is
+# formatted as a concrete class only with kind CONCRETE_CLASS (it may be a ventilation or water system tag).
+class_formats:
+  - {kind: CONCRETE_CLASS, pattern: '[BВвb]\s*(\d{1,3}(?:[.,]\d)?)', format: 'B{1}', requires_kind: true}
+  - {kind: FIRE_RESISTANCE, pattern: '(REI|EIW|EIS|EI|RE|R|E)\s*-?\s*(\d{2,3})', format: '{1}-{2}'}
+  - {kind: FROST_RESISTANCE, pattern: '[FfФ]\s*(\d{2,4})', format: 'F{1}'}
+  - {kind: WATER_TIGHTNESS, pattern: '[WwВв]\s*(\d{1,2})', format: 'W{1}', requires_kind: true}
+  - {kind: MATERIAL_FIRE_CLASS, pattern: '(КМ|KM)\s*(\d)', format: 'КМ{2}'}
+
+cells:
+  not_applicable: '—'    # the stage is not part of the check (Приложение 2 «—»)
+  missing: 'нет данных'  # the stage is part of the check but the value was not extracted
+
+# Agreement of a predicate with the noun: m | f | n | pl.
+predicates:
+  предусмотрен: {m: предусмотрен, f: предусмотрена, n: предусмотрено, pl: предусмотрены}
+  отсутствует: {m: отсутствует, f: отсутствует, n: отсутствует, pl: отсутствуют}
+  изменён: {m: изменён, f: изменена, n: изменено, pl: изменены}
+
+# Generic templates per ComparisonResult (93 §3.5). null = no text value (the stage slot stays null).
+by_comparison_result:
+  MISSING_DESIGN_ELEMENT:
+    PD: '{Element} {~предусмотрен}'
+    RD: '{Element} {~отсутствует}'
+    ID: '{Element} {~отсутствует}'
+  EXTRA_ELEMENT:
+    PD: '{Element} не {~предусмотрен}'
+    RD: '{Element} {~предусмотрен}'
+    ID: '{Element} {~предусмотрен}'
+  CONFIGURATION_MISMATCH:
+    PD: 'Конфигурация {element_gen} по листу {pd_sheet} ПД'
+    RD: 'Конфигурация {element_gen} изменена'
+    ID: 'Конфигурация {element_gen} изменена'
+  VALUE_MISMATCH: {PD: '{pd_value}', RD: '{rd_value}', ID: '{id_value}'}
+  MATERIAL_SUBSTITUTION: {PD: '{pd_value}', RD: '{rd_value}', ID: '{id_value}'}
+  TOLERANCE_EXCEEDED: {PD: '{pd_value}', RD: '{rd_value}', ID: '{id_value}'}
+
+# Applied (in order) when a placeholder has no value, before the renderer drops what is left.
+fallbacks:
+  - {placeholder: pd_sheet, find: ' по листу {pd_sheet} ПД', replace: ' по ПД'}
+  - {placeholder: rd_plan_mark, find: ' на плане {rd_plan_mark},', replace: ' в РД,'}
+  - {placeholder: location, find: ', помещение {location}', replace: ''}
+
+# Element nouns keyed by change-map family (the lexicon also takes every «X предусмотрен(а/о/ы)» noun of the
+# change-map routes automatically). agr: m | f | n | pl; gen: genitive after «Конфигурация»/«Состав».
+nouns:
+  VENT_SUPPLY_UNIT: {nom: Приточная установка, agr: f, gen: приточных установок}
+  VENT_EXHAUST_UNIT: {nom: Вытяжная установка, agr: f, gen: вытяжных установок}
+  VENT_EXHAUST_BRANCH: {nom: Вытяжная вентиляция, agr: f, gen: вентиляции}
+  VENT_DUCT: {nom: Воздуховод, agr: m, gen: воздуховодов}
+  SMOKE_CONTROL_FAN: {nom: Система противодымной вентиляции, agr: f, gen: противодымной вентиляции}
+  FIRE_DAMPER: {nom: Огнезадерживающий клапан, agr: m, gen: огнезадерживающих клапанов}
+  WARM_FLOOR: {nom: Тёплый пол, agr: m, gen: тёплого пола}
+  HEATING_DEVICE: {nom: Отопительный прибор, agr: m, gen: отопительных приборов}
+  HEATING_PIPE: {nom: Трубопровод отопления, agr: m, gen: трубопроводов отопления}
+  HEAT_POINT: {nom: Оборудование теплового пункта, agr: n, gen: теплового пункта}
+  HEAT_LOAD: {nom: Тепловая нагрузка, agr: f, gen: тепловой нагрузки}
+  WATER_PIPE: {nom: Трубопровод водоснабжения, agr: m, gen: трубопроводов водоснабжения}
+  WATER_PUMP: {nom: Насосная установка, agr: f, gen: насосных установок}
+  SANITARY_FIXTURE: {nom: Санитарный прибор, agr: m, gen: санитарных приборов}
+  SEWER_PIPE: {nom: Трубопровод канализации, agr: m, gen: трубопроводов канализации}
+  ROOF_DRAIN: {nom: Водосточная воронка, agr: f, gen: водосточных воронок}
+  FIRE_WATER_INTERNAL: {nom: Пожарный кран, agr: m, gen: внутреннего противопожарного водопровода}
+  FIRE_HYDRANT: {nom: Пожарный гидрант, agr: m, gen: наружного противопожарного водоснабжения}
+  SWITCHGEAR_PROTECTION: {nom: Аппарат защиты, agr: m, gen: аппаратов защиты}
+  POWER_CABLE: {nom: Питающий кабель, agr: m, gen: питающих кабелей}
+  FIRE_SAFETY_CABLE: {nom: Кабель систем противопожарной защиты, agr: m, gen: кабельных линий систем противопожарной защиты}
+  GROUNDING: {nom: Элементы молниезащиты, agr: pl, gen: заземления и молниезащиты}
+  LIGHTING_FIXTURE: {nom: Освещение, agr: n, gen: освещения}
+  ENERGY_METER: {nom: Прибор учёта, agr: m, gen: узлов учёта}
+  POWER_LOAD: {nom: Расчётная электрическая мощность, agr: f, gen: электроснабжения}
+  FIRE_DETECTOR: {nom: Пожарные извещатели, agr: pl, gen: пожарных извещателей}
+  FIRE_ALARM_SYSTEM: {nom: Система пожарной сигнализации, agr: f, gen: системы пожарной сигнализации}
+  EVACUATION_ALERT: {nom: Табло «Выход», agr: n, gen: системы оповещения}
+  FIRE_DOOR: {nom: Противопожарная дверь, agr: f, gen: противопожарных дверей}
+  FIRE_COMPARTMENT: {nom: Противопожарная преграда, agr: f, gen: противопожарных преград}
+  FIRE_PROTECTION_COATING: {nom: Огнезащитное покрытие, agr: n, gen: огнезащиты}
+  EVAC_CORRIDOR: {nom: Эвакуационный коридор, agr: m, gen: эвакуационных коридоров}
+  EVAC_DOOR: {nom: Эвакуационный выход, agr: m, gen: эвакуационных выходов}
+  DOOR_SWING: {nom: Открывание по направлению выхода, agr: n, gen: открывания дверей}
+  EVAC_HEIGHT: {nom: Путь эвакуации, agr: m, gen: путей эвакуации}
+  FINISH_MATERIAL: {nom: Отделочный материал, agr: m, gen: отделки путей эвакуации}
+  WINDOW: {nom: Оконный блок, agr: m, gen: оконных блоков}
+  WINDOW_THERMAL: {nom: Оконный блок, agr: m, gen: оконных блоков}
+  ROOF_ASSEMBLY: {nom: Слой кровли, agr: m, gen: кровли}
+  ROOF_INSULATION: {nom: Утеплитель покрытия, agr: m, gen: утепления покрытия}
+  ROOF_SLOPE: {nom: Уклон кровли, agr: m, gen: кровли}
+  STAIR: {nom: Лестничный марш, agr: m, gen: лестниц}
+  RAILING: {nom: Ограждение, agr: n, gen: ограждений}
+  VESTIBULE: {nom: Тамбур, agr: m, gen: тамбура}
+  FACADE_FINISH: {nom: Облицовка фасада, agr: f, gen: фасада}
+  NOISE_PROTECTION: {nom: Звукоизоляционные мероприятия, agr: pl, gen: звукоизоляции}
+  ROOM: {nom: Помещение, agr: n, gen: помещений}
+  APARTMENT_MIX: {nom: Квартирография, agr: f, gen: квартир}
+  MGN_LIFT: {nom: Подъёмная платформа для МГН, agr: f, gen: подъёмных платформ для МГН}
+  MGN_PATH: {nom: Путь движения МГН, agr: m, gen: путей движения МГН}
+  MGN_DOOR: {nom: Дверной проём, agr: m, gen: дверных проёмов}
+  DOOR_THRESHOLD: {nom: Порог, agr: m, gen: порогов}
+  MGN_WC: {nom: Универсальная кабина, agr: f, gen: универсальной кабины}
+  GRAB_BAR: {nom: Поручни, agr: pl, gen: поручней}
+  TACTILE_INDICATOR: {nom: Тактильные указатели, agr: pl, gen: тактильных указателей}
+  CALL_SYSTEM: {nom: Система вызова, agr: f, gen: системы вызова}
+  MGN_PARKING: {nom: Место для автотранспорта МГН, agr: n, gen: мест для автотранспорта МГН}
+  PASSENGER_LIFT: {nom: Лифт, agr: m, gen: лифтов}
+  CONCRETE_CLASS: {nom: Класс бетона, agr: m, gen: бетона}
+  CONCRETE_FW_MARK: {nom: Марка бетона, agr: f, gen: бетона}
+  STEEL_GRADE: {nom: Марка стали, agr: f, gen: металлоконструкций}
+  REBAR_CLASS: {nom: Класс арматуры, agr: m, gen: армирования}
+  REBAR_DIAMETER: {nom: Продольная арматура, agr: f, gen: армирования}
+  FOUNDATION_SLAB: {nom: Фундаментная плита, agr: f, gen: фундамента}
+  FLOOR_SLAB: {nom: Плита перекрытия, agr: f, gen: перекрытия}
+  COLUMN_SECTION: {nom: Колонна, agr: f, gen: колонн}
+  BEARING_WALL: {nom: Несущая стена, agr: f, gen: несущих стен}
+  STRUCTURE_AXES: {nom: Координационная ось, agr: f, gen: осей}
+  STRUCTURE_ELEVATION: {nom: Отметка верха конструкции, agr: f, gen: отметок}
+  STRUCTURE_REPAIR_WORKS: {nom: Работы по ремонту и усилению, agr: pl, gen: ремонта и усиления}
+  EXPANSION_JOINT: {nom: Деформационный шов, agr: m, gen: деформационного шва}
+  LIFT_SHAFT: {nom: Лифтовая шахта, agr: f, gen: лифтовой шахты}
+  TECH_OPENING: {nom: Проём, agr: m, gen: проёмов}
+  MATERIAL_QUANTITIES: {nom: Расход материалов, agr: m, gen: расхода материалов}
+  GREENING: {nom: Озеленение, agr: n, gen: озеленения}
+  ASPHALT_PAVEMENT: {nom: Асфальтобетонное покрытие, agr: n, gen: покрытий}
+  TILE_PAVEMENT: {nom: Плиточное мощение, agr: n, gen: мощения}
+  PLAYGROUND: {nom: Площадка, agr: f, gen: площадок}
+  SMALL_ARCH_FORMS: {nom: МАФ, agr: pl, gen: МАФ}
+  FIRE_ACCESS_ROAD: {nom: Пожарный проезд, agr: m, gen: пожарных проездов}
+  ROAD_RADIUS: {nom: Поворот проезда, agr: m, gen: проездов}
+  ROAD_PAVEMENT_LAYERS: {nom: Слой дорожной одежды, agr: m, gen: дорожной одежды}
+  ROAD_SLOPE: {nom: Уклон проезда, agr: m, gen: проездов}
+  NETWORK_CONNECTION: {nom: Точка подключения, agr: f, gen: подключения сетей}
+  SITE_FENCE: {nom: Ограждение территории, agr: n, gen: ограждения территории}
+  PARKING: {nom: Парковочное место, agr: n, gen: парковочных мест}
+  SITE_DRAINAGE: {nom: Дренаж, agr: m, gen: дренажа}
+  EARTHWORKS: {nom: Земляные работы, agr: pl, gen: земляных работ}
+  WALL_INSULATION: {nom: Теплоизоляционный слой, agr: m, gen: теплоизоляции стен}
+  ENERGY_CLASS: {nom: Класс энергетической эффективности, agr: m, gen: энергосбережения}
+  CRANE_ZONE: {nom: Опасная зона крана, agr: f, gen: опасных зон}
+  WHEEL_WASH: {nom: Пункт мойки колёс, agr: m, gen: пунктов мойки колёс}
+  DEMOLITION_METHOD: {nom: Метод демонтажа, agr: m, gen: демонтажа}
+
+# Agreement fallback for a noun outside the lexicon (e.g. a FREE element noun). The first matching rule wins;
+# `first` is the ending of the first word, `last` (optional) the endings allowed for the last word.
+agreement_by_ending:
+  - {first: ые, agr: pl}
+  - {first: ие, last: [ы, и], agr: pl}
+  - {first: ия, agr: f}
+  - {first: ая, agr: f}
+  - {first: яя, agr: f}
+  - {first: ое, agr: n}
+  - {first: ее, agr: n}
+  - {first: ие, agr: n}
+  - {first: ый, agr: m}
+  - {first: ий, agr: m}
+  - {first: ой, agr: m}
+  - {first: а, agr: f}
+  - {first: я, agr: f}
+  - {first: о, agr: n}
+  - {first: е, agr: n}
+  - {first: ы, agr: pl}
+  - {first: и, agr: pl}

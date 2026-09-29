@@ -1,0 +1,16 @@
+# NVIDIA GPU for the recognition engine (it runs inside the api container). Needs the NVIDIA Container Toolkit
+# on the host. UNTESTED on real hardware (see docs/runbook/DOCKER.md).
+#
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d
+#
+# Nothing else is configured: recognition detects CUDA by itself (`--providers auto`, the image carries the CUDA 12
+# libraries as pip wheels) and falls back to the CPU when no device is visible.
+services:
+  api:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]

@@ -1,0 +1,1802 @@
+# «Инспектор ИИ» — error catalogue (RFC 9457 application/problem+json), seeded from docs/analysis/10 §3.2–§3.12.
+#
+# Maintainer: AG-00. Every error, warning and data-quality code used in code must be listed here.
+# Envelope: schemas/problem.schema.json. Titles and details are Russian (user-facing); `{name}` placeholders
+# are filled from `details` and must be declared in `details`.
+#
+# Required per entry: code, http (int, or null for non-HTTP codes), domain, severity, title_ru, detail_ru;
+# hint_ru is required when severity = error. Everything else falls back to `defaults`.
+# `status: proposed` marks codes added by AG-00 for plan v2 (batch mode, 97) that report 10 does not list.
+
+schema_version: 1
+contract_version: "0.1.0"
+
+vocabularies:
+  domain: [api, auth, security, intake, content, registry, revision, quality, processing, infra, comparison, verification, protocol, rin, normative, ml, client, batch]
+  scope: [request, package, file, page, zone, registry_row, revision_group, param, job, sync, run, system]
+  severity: [error, warning, info]
+  log_level: [DEBUG, INFO, WARNING, ERROR]
+  alert: [null, warning, critical]
+  user_notification: [null, inline, feed]
+  actions: [CREATE_SUCCESSOR, REUPLOAD, DOWNLOAD_REGISTRY_TEMPLATE, BUILD_REGISTRY_DRAFT, OPEN_BLOCKERS, CONFIRM_BELONGS, REMOVE_FROM_PACKAGE, RELOGIN, RETRY]
+
+defaults:
+  scope: request
+  retryable: false
+  security_event: false
+  alert: null
+  user_notification: null
+  details: {}
+  log_level_by_severity: {error: ERROR, warning: WARNING, info: INFO}
+
+errors:
+
+  # ── Generic API ──
+  - code: VALIDATION_ERROR
+    http: 400
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Некорректный запрос"
+    detail_ru: "Запрос не прошёл проверку схемы: {summary}."
+    hint_ru: "Исправьте поля, перечисленные в списке ошибок, и повторите запрос."
+    details: {summary: string}
+    tz_ref: "ТЗ §1.3 (обязательная валидация схемы)"
+  - code: MALFORMED_JSON
+    http: 400
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Некорректный JSON"
+    detail_ru: "Тело запроса не является корректным JSON."
+    hint_ru: "Проверьте формат тела запроса."
+  - code: PAYLOAD_TOO_LARGE
+    http: 413
+    domain: api
+    severity: error
+    title_ru: "Слишком большой запрос"
+    detail_ru: "Размер тела запроса превышает допустимый ({limit_bytes} байт)."
+    hint_ru: "Уменьшите объём передаваемых данных."
+    details: {limit_bytes: integer}
+  - code: UNSUPPORTED_MEDIA_TYPE
+    http: 415
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Неподдерживаемый тип содержимого"
+    detail_ru: "Тип содержимого запроса «{content_type}» не поддерживается."
+    hint_ru: "Передайте данные в формате application/json или multipart/form-data."
+    details: {content_type: string}
+  - code: NOT_FOUND
+    http: 404
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Не найдено"
+    detail_ru: "Запрошенный ресурс не найден."
+    hint_ru: "Проверьте адрес и идентификатор."
+  - code: PROCESS_NOT_FOUND
+    http: 404
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Проверка не найдена"
+    detail_ru: "Проверка не найдена или у вас нет к ней доступа."
+    hint_ru: "Откройте проверку из списка объектов."
+    scenarios: [NS-A23]
+  - code: FILE_NOT_FOUND
+    http: 404
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Файл не найден"
+    detail_ru: "Файл {file_id} не найден или у вас нет к нему доступа."
+    hint_ru: "Проверьте идентификатор файла."
+    details: {file_id: string}
+  - code: METHOD_NOT_ALLOWED
+    http: 405
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Метод не поддерживается"
+    detail_ru: "Метод {method} не поддерживается для этого ресурса."
+    hint_ru: "Используйте метод, указанный в описании API."
+    details: {method: string}
+  - code: NOT_ACCEPTABLE
+    http: 406
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Формат ответа недоступен"
+    detail_ru: "Запрошенный формат ответа ({accept}) недоступен."
+    hint_ru: "Запросите ответ в формате application/json."
+    details: {accept: string}
+  - code: REQUEST_TIMEOUT
+    http: 408
+    domain: api
+    severity: error
+    retryable: true
+    title_ru: "Превышено время передачи"
+    detail_ru: "Превышено время передачи файлов. Проверьте соединение и повторите загрузку."
+    hint_ru: "Повторите загрузку при стабильном соединении."
+    scenarios: [NS-A30]
+  - code: PRECONDITION_REQUIRED
+    http: 428
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Требуется версия записи"
+    detail_ru: "Обновите карточку и повторите действие."
+    hint_ru: "Запрос на изменение должен содержать заголовок If-Match."
+    scenarios: [NS-G06]
+  - code: IDEMPOTENCY_KEY_REUSED
+    http: 422
+    domain: api
+    severity: error
+    title_ru: "Ключ идемпотентности уже использован"
+    detail_ru: "Повторный запрос с тем же ключом содержит другие данные."
+    hint_ru: "Для нового действия используйте новый Idempotency-Key."
+    scenarios: [NS-G09]
+  - code: RESULT_NOT_READY
+    http: 409
+    domain: api
+    severity: error
+    log_level: INFO
+    retryable: true
+    title_ru: "Результат ещё не готов"
+    detail_ru: "Протокол ещё формируется (этап: {stage}, {pct} %). Повторите запрос позже."
+    hint_ru: "Дождитесь завершения обработки; статус доступен в карточке проверки."
+    details: {stage: string, pct: integer}
+    scenarios: [NS-G19]
+  - code: RATE_LIMITED
+    http: 429
+    domain: api
+    severity: error
+    retryable: true
+    security_event: true
+    title_ru: "Превышен лимит запросов"
+    detail_ru: "Превышен лимит запросов ({limit} за {window}). Повторите через {retry_after_s} с."
+    hint_ru: "Подождите указанное время и повторите действие."
+    details: {limit: integer, window: string, retry_after_s: integer}
+    scenarios: [NS-A29]
+  - code: INTERNAL_ERROR
+    http: 500
+    domain: api
+    severity: error
+    retryable: true
+    alert: warning
+    title_ru: "Внутренняя ошибка"
+    detail_ru: "Внутренняя ошибка сервиса. Код обращения: {request_id}."
+    hint_ru: "Повторите попытку. Если ошибка повторяется, сообщите администратору код обращения."
+    details: {request_id: string}
+  - code: RESPONSE_SCHEMA_VIOLATION
+    http: 500
+    domain: api
+    severity: error
+    alert: warning
+    title_ru: "Ответ не соответствует контракту"
+    detail_ru: "Ответ сервиса не прошёл проверку схемы (код обращения {request_id})."
+    hint_ru: "Сообщите администратору код обращения."
+    details: {request_id: string}
+  - code: SERVICE_UNAVAILABLE
+    http: 503
+    domain: infra
+    severity: error
+    retryable: true
+    title_ru: "Сервис временно недоступен"
+    detail_ru: "Сервис временно недоступен. Повторите попытку через {retry_after_s} с."
+    hint_ru: "Повторите попытку позже."
+    details: {retry_after_s: integer}
+  - code: MAINTENANCE_MODE
+    http: 503
+    domain: infra
+    severity: info
+    retryable: true
+    title_ru: "Технические работы"
+    detail_ru: "Проводятся технические работы. Повторите попытку через {retry_after_s} с."
+    details: {retry_after_s: integer}
+  - code: UPSTREAM_BAD_RESPONSE
+    http: 502
+    domain: infra
+    severity: error
+    retryable: true
+    title_ru: "Ошибка смежного сервиса"
+    detail_ru: "Смежный сервис {service} вернул некорректный ответ."
+    hint_ru: "Повторите попытку позже."
+    details: {service: string}
+  - code: UPSTREAM_TIMEOUT
+    http: 504
+    domain: infra
+    severity: error
+    retryable: true
+    title_ru: "Смежный сервис не ответил"
+    detail_ru: "Смежный сервис {service} не ответил за отведённое время."
+    hint_ru: "Повторите попытку позже."
+    details: {service: string}
+
+  # ── Auth and security ──
+  - code: UNAUTHENTICATED
+    http: 401
+    domain: auth
+    severity: error
+    log_level: INFO
+    title_ru: "Требуется вход"
+    detail_ru: "Для выполнения действия войдите в систему."
+    hint_ru: "Войдите в систему и повторите действие."
+    ui: {actions: [RELOGIN]}
+  - code: INVALID_CREDENTIALS
+    http: 401
+    domain: auth
+    severity: error
+    security_event: true
+    title_ru: "Неверные учётные данные"
+    detail_ru: "Неверный логин или пароль."
+    hint_ru: "Проверьте раскладку клавиатуры и повторите ввод."
+  - code: SESSION_EXPIRED
+    http: 401
+    domain: auth
+    severity: error
+    log_level: INFO
+    title_ru: "Сессия истекла"
+    detail_ru: "Сессия истекла. Войдите в систему снова."
+    hint_ru: "Войдите в систему; несохранённые данные формы сохранены в браузере."
+    ui: {actions: [RELOGIN]}
+  - code: REAUTH_REQUIRED
+    http: 401
+    domain: auth
+    severity: error
+    log_level: INFO
+    title_ru: "Требуется подтверждение"
+    detail_ru: "Подтвердите действие вводом пароля."
+    hint_ru: "Введите пароль повторно, чтобы подтвердить действие."
+    scenarios: [NS-G11]
+  - code: ACCOUNT_LOCKED
+    http: 423
+    domain: auth
+    severity: error
+    retryable: true
+    security_event: true
+    alert: critical
+    title_ru: "Учётная запись заблокирована"
+    detail_ru: "Учётная запись временно заблокирована после {attempts} неудачных попыток входа. Повторите через {retry_after_min} мин."
+    hint_ru: "Обратитесь к администратору, если блокировка не снимается."
+    details: {attempts: integer, retry_after_min: integer}
+  - code: IP_TEMPORARILY_BLOCKED
+    http: 429
+    domain: security
+    severity: error
+    retryable: true
+    security_event: true
+    alert: critical
+    title_ru: "Доступ временно ограничен"
+    detail_ru: "Доступ с вашего адреса временно ограничен. Повторите через {retry_after_min} мин."
+    hint_ru: "Обратитесь к администратору."
+    details: {retry_after_min: integer}
+  - code: PASSWORD_CHANGE_REQUIRED
+    http: 403
+    domain: auth
+    severity: error
+    log_level: INFO
+    title_ru: "Требуется смена пароля"
+    detail_ru: "Перед продолжением работы смените пароль."
+    hint_ru: "Откройте профиль и задайте новый пароль."
+  - code: CSRF_TOKEN_INVALID
+    http: 403
+    domain: security
+    severity: error
+    security_event: true
+    title_ru: "Недействительный токен формы"
+    detail_ru: "Токен защиты формы недействителен. Обновите страницу."
+    hint_ru: "Обновите страницу и повторите действие."
+  - code: FORBIDDEN
+    http: 403
+    domain: auth
+    severity: error
+    security_event: true
+    title_ru: "Недостаточно прав"
+    detail_ru: "Недостаточно прав для выполнения действия."
+    hint_ru: "Обратитесь к администратору для назначения роли."
+    scenarios: [NS-A33, NS-G04]
+  - code: SEPARATION_OF_DUTIES
+    http: 403
+    domain: auth
+    severity: error
+    security_event: true
+    title_ru: "Нарушение разделения обязанностей"
+    detail_ru: "Одно лицо не может выполнить оба действия: {first_action} и {second_action}."
+    hint_ru: "Поручите действие другому пользователю с нужной ролью."
+    details: {first_action: string, second_action: string}
+  - code: SESSION_STORE_UNAVAILABLE
+    http: 503
+    domain: infra
+    severity: error
+    retryable: true
+    alert: critical
+    title_ru: "Сервис авторизации недоступен"
+    detail_ru: "Сервис авторизации временно недоступен. Повторите попытку позже."
+    hint_ru: "Повторите попытку через несколько минут."
+    scenarios: [NS-E06]
+  - code: PASSWORD_POLICY_VIOLATION
+    http: 422
+    domain: auth
+    severity: error
+    log_level: INFO
+    status: proposed
+    title_ru: "Пароль не соответствует требованиям"
+    detail_ru: "Новый пароль не соответствует требованиям: {violations}."
+    hint_ru: "Пароль — не короче 12 символов, не совпадает с логином и с последними паролями, не из списка распространённых."
+    details: {violations: string}
+    tz_ref: "09 §3.3.1 (password policy)"
+
+  # ── Page rendering for the evidence viewer (AG-00 M1; ml-api /v1/render/*) ──
+  - code: PAGE_NOT_FOUND
+    http: 404
+    domain: api
+    severity: error
+    log_level: INFO
+    status: proposed
+    title_ru: "Страница не найдена"
+    detail_ru: "В файле {file_id} нет страницы {page_no} (всего страниц: {pdf_pages})."
+    hint_ru: "Проверьте номер страницы: он считается с 1 по физическим страницам PDF."
+    details: {file_id: string, page_no: integer, pdf_pages: integer}
+  - code: FILE_NOT_RENDERABLE
+    http: 422
+    domain: api
+    severity: error
+    log_level: INFO
+    status: proposed
+    title_ru: "Файл нельзя показать"
+    detail_ru: "Файл {file_id} нельзя показать постранично: {reason}."
+    hint_ru: "Постранично показываются только PDF-файлы обучающих объектов, которые есть на диске."
+    details: {file_id: string, reason: string}
+  - code: PAGE_RENDERER_UNAVAILABLE
+    http: 503
+    domain: infra
+    severity: error
+    retryable: true
+    alert: warning
+    status: proposed
+    title_ru: "Просмотр страниц недоступен"
+    detail_ru: "Сервис отрисовки страниц временно недоступен ({reason})."
+    hint_ru: "Запустите ml-api (make ml-api-dev) и повторите попытку."
+    details: {reason: string}
+
+  # ── Intake (transport and package limits) ──
+  - code: NO_FILES
+    http: 400
+    domain: intake
+    severity: error
+    log_level: INFO
+    title_ru: "Файлы не выбраны"
+    detail_ru: "Не выбрано ни одного файла для загрузки."
+    hint_ru: "Выберите файлы PDF, DOCX или XML."
+    scenarios: [NS-A12]
+  - code: NO_ACCEPTED_FILES
+    http: 422
+    domain: intake
+    severity: error
+    title_ru: "Ни один файл не принят"
+    detail_ru: "Ни один файл пакета не принят. Причины указаны для каждого файла."
+    hint_ru: "Исправьте файлы по указанным причинам и загрузите пакет повторно."
+    scenarios: [NS-A13]
+  - code: PACKAGE_TOO_LARGE
+    http: 413
+    domain: intake
+    scope: package
+    severity: error
+    title_ru: "Превышен размер пакета"
+    detail_ru: "Общий размер пакета ({total_mb} МБ) превышает лимит загрузки 5 ГБ. Пакет отклонён целиком — загрузите файлы несколькими пакетами."
+    hint_ru: "Разделите файлы на несколько пакетов не более 5 ГБ."
+    details: {total_mb: string, limit_bytes: integer, actual_bytes: integer}
+    tz_ref: "ТЗ §9.1 «Обработка ошибок при загрузке»"
+    scenarios: [NS-A09, NS-A10]
+  - code: TOO_MANY_FILES
+    http: 413
+    domain: intake
+    scope: package
+    severity: error
+    title_ru: "Слишком много файлов"
+    detail_ru: "В пакете {count} файлов — максимум {limit}. Разделите пакет на части."
+    hint_ru: "Разделите пакет на несколько частей."
+    details: {count: integer, limit: integer}
+    scenarios: [NS-A11]
+  - code: FILE_TOO_LARGE
+    http: 413
+    domain: intake
+    scope: file
+    severity: error
+    title_ru: "Превышен размер файла"
+    detail_ru: "Файл «{file_name}» ({size_mb} МБ) превышает максимальный допустимый размер 500 МБ."
+    hint_ru: "Разделите документ на части или уменьшите размер файла и загрузите повторно."
+    details: {file_name: string, size_mb: string, size_bytes: integer, limit_bytes: integer}
+    maps_to: {intake_status: REJECTED_SIZE}
+    tz_ref: "ТЗ §9.1 «Обработка ошибок при загрузке»"
+    scenarios: [NS-A07, NS-A08]
+  - code: EMPTY_FILE
+    http: 422
+    domain: intake
+    scope: file
+    severity: error
+    title_ru: "Пустой файл"
+    detail_ru: "Файл «{file_name}» пустой (0 байт). Загрузите файл повторно."
+    hint_ru: "Проверьте исходный файл и загрузите его повторно."
+    details: {file_name: string}
+    maps_to: {intake_status: REJECTED_EMPTY}
+    scenarios: [NS-A06]
+  - code: UNSUPPORTED_FORMAT
+    http: 415
+    domain: intake
+    scope: file
+    severity: error
+    title_ru: "Формат не поддерживается"
+    detail_ru: "Формат файла «{file_name}» не поддерживается. Допустимые форматы: PDF, DOCX, XML."
+    hint_ru: "Сохраните документ в формате PDF, DOCX или XML."
+    details: {file_name: string, detected: string, allowed: array}
+    maps_to: {intake_status: REJECTED_FORMAT}
+    tz_ref: "ТЗ §9.1 «Обработка ошибок при загрузке»"
+    scenarios: [NS-A01, NS-A02, NS-A04, NS-A31]
+  - code: CONTENT_TYPE_MISMATCH
+    http: 415
+    domain: intake
+    scope: file
+    severity: error
+    security_event: true
+    title_ru: "Содержимое не соответствует расширению"
+    detail_ru: "Содержимое файла «{file_name}» не соответствует расширению .{ext} (определено: {detected}). Допустимые форматы: PDF, DOCX, XML."
+    hint_ru: "Проверьте файл: расширение должно соответствовать его содержимому."
+    details: {file_name: string, ext: string, detected: string}
+    maps_to: {intake_status: REJECTED_MISMATCH}
+    scenarios: [NS-A03]
+  - code: MACRO_ENABLED_DOCUMENT
+    http: 415
+    domain: intake
+    scope: file
+    severity: error
+    security_event: true
+    title_ru: "Документ с макросами"
+    detail_ru: "Файл «{file_name}» содержит макросы и не может быть принят. Сохраните документ как DOCX без макросов или PDF."
+    hint_ru: "Сохраните документ без макросов."
+    details: {file_name: string}
+    scenarios: [NS-A05]
+  - code: FILENAME_INVALID
+    http: 422
+    domain: intake
+    scope: file
+    severity: error
+    title_ru: "Недопустимое имя файла"
+    detail_ru: "Недопустимое имя файла. Переименуйте файл и загрузите повторно."
+    hint_ru: "Используйте имя без служебных символов и путей."
+    scenarios: [NS-A16]
+  - code: CHECKSUM_MISMATCH
+    http: 422
+    domain: intake
+    scope: file
+    severity: error
+    retryable: true
+    title_ru: "Контрольная сумма не совпала"
+    detail_ru: "Контрольная сумма файла «{file_name}» не совпала с переданной (повреждение при передаче). Загрузите файл повторно."
+    hint_ru: "Загрузите файл повторно."
+    details: {file_name: string}
+    scenarios: [NS-A15]
+  - code: VIRUS_DETECTED
+    http: 422
+    domain: security
+    scope: file
+    severity: error
+    security_event: true
+    alert: critical
+    title_ru: "Обнаружено вредоносное содержимое"
+    detail_ru: "Файл «{file_name}» не прошёл антивирусную проверку и отклонён. Администратор уведомлён."
+    hint_ru: "Проверьте источник файла."
+    details: {file_name: string}
+    maps_to: {intake_status: REJECTED_INFECTED}
+    scenarios: [NS-A25, NS-B28]
+  - code: AV_UNAVAILABLE
+    http: 503
+    domain: infra
+    scope: package
+    severity: error
+    retryable: true
+    alert: critical
+    title_ru: "Антивирусная проверка недоступна"
+    detail_ru: "Антивирусная проверка временно недоступна, файлы не приняты. Повторите загрузку через {retry_after_s} с."
+    hint_ru: "Повторите загрузку позже."
+    details: {retry_after_s: integer}
+    scenarios: [NS-A26, NS-A27]
+  - code: STORAGE_UNAVAILABLE
+    http: 503
+    domain: infra
+    scope: package
+    severity: error
+    retryable: true
+    alert: critical
+    title_ru: "Хранилище недоступно"
+    detail_ru: "Хранилище файлов временно недоступно. Файлы не приняты, повторите загрузку позже."
+    hint_ru: "Повторите загрузку позже."
+    scenarios: [NS-A28, NS-E09, NS-E18]
+  - code: FILE_ID_IMMUTABLE
+    http: 409
+    domain: registry
+    scope: file
+    severity: error
+    title_ru: "Идентификатор файла занят"
+    detail_ru: "Файл с идентификатором {file_id} уже загружен с другим содержимым. Перезапись запрещена — укажите в реестре новый file_id и редакцию."
+    hint_ru: "Укажите в реестре новый file_id и редакцию."
+    details: {file_id: string}
+    scenarios: [NS-A19]
+  - code: PROCESS_BUSY
+    http: 409
+    domain: intake
+    severity: error
+    log_level: INFO
+    retryable: true
+    title_ru: "Идёт обработка"
+    detail_ru: "Дозагрузка недоступна: выполняется парсинг документов. Повторите после его завершения."
+    hint_ru: "Дождитесь завершения парсинга."
+    tz_ref: "ТЗ §9.1 (таблица статусов)"
+    scenarios: [NS-A21]
+  - code: PROTOCOL_FINALIZED
+    http: 423
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Протокол финализирован"
+    detail_ru: "Протокол финализирован. Изменения и дозагрузка невозможны. Для новых документов создайте новую проверку."
+    hint_ru: "Создайте новую проверку для новых документов."
+    ui: {actions: [CREATE_SUCCESSOR]}
+    tz_ref: "ТЗ §9.3 п.5"
+    scenarios: [NS-A22, NS-G12, NS-G13]
+  - code: MULTIPART_MALFORMED
+    http: 400
+    domain: intake
+    severity: error
+    retryable: true
+    title_ru: "Некорректный запрос загрузки"
+    detail_ru: "Некорректный формат запроса загрузки."
+    hint_ru: "Повторите загрузку через интерфейс или проверьте формирование multipart-запроса."
+    scenarios: [NS-A32]
+  - code: UPLOAD_INCOMPLETE
+    http: 400
+    domain: intake
+    severity: error
+    retryable: true
+    title_ru: "Загрузка прервана"
+    detail_ru: "Загрузка прервана. Повторите загрузку — уже принятые файлы не будут загружены повторно."
+    hint_ru: "Повторите загрузку с тем же ключом идемпотентности."
+    scenarios: [NS-A14]
+
+  # ── File content ──
+  - code: FILE_CORRUPTED
+    http: 422
+    domain: content
+    scope: file
+    severity: error
+    user_notification: feed
+    title_ru: "Файл повреждён"
+    detail_ru: "Файл «{file_name}» повреждён и не может быть обработан. Загрузите файл повторно."
+    hint_ru: "Загрузите исходный неповреждённый файл."
+    details: {file_name: string, reason: string}
+    maps_to: {intake_status: REJECTED_CORRUPTED}
+    tz_ref: "ТЗ §9.1 «Обработка ошибок при загрузке»"
+    scenarios: [NS-B01, NS-B02, NS-B03, NS-B13, NS-B14, NS-B16, NS-B27]
+  - code: FILE_ENCRYPTED
+    http: 422
+    domain: content
+    scope: file
+    severity: error
+    title_ru: "Файл защищён паролем"
+    detail_ru: "Файл «{file_name}» защищён паролем. Снимите защиту и загрузите файл повторно."
+    hint_ru: "Снимите защиту паролем и загрузите файл повторно."
+    details: {file_name: string}
+    maps_to: {intake_status: REJECTED_ENCRYPTED}
+    scenarios: [NS-B06, NS-B17]
+  - code: ARCHIVE_BOMB_SUSPECTED
+    http: 422
+    domain: security
+    scope: file
+    severity: error
+    security_event: true
+    alert: warning
+    title_ru: "Недопустимая степень сжатия"
+    detail_ru: "Файл «{file_name}» отклонён: недопустимая степень сжатия содержимого (признак «zip-бомбы»)."
+    hint_ru: "Загрузите документ без вложенных архивов."
+    details: {file_name: string}
+    scenarios: [NS-B15]
+  - code: EMBEDDED_EXECUTABLE
+    http: 422
+    domain: security
+    scope: file
+    severity: error
+    security_event: true
+    alert: warning
+    title_ru: "Вложенный исполняемый файл"
+    detail_ru: "Файл «{file_name}» содержит вложенный исполняемый файл и отклонён по требованиям безопасности."
+    hint_ru: "Удалите вложения и загрузите документ повторно."
+    details: {file_name: string}
+    scenarios: [NS-B09]
+  - code: TOO_MANY_PAGES
+    http: 422
+    domain: content
+    scope: file
+    severity: error
+    title_ru: "Слишком много страниц"
+    detail_ru: "Файл «{file_name}» содержит {pages} страниц — максимум {limit}. Разделите документ."
+    hint_ru: "Разделите документ на части."
+    details: {file_name: string, pages: integer, limit: integer}
+    scenarios: [NS-B10]
+  - code: XML_MALFORMED
+    http: 422
+    domain: content
+    scope: file
+    severity: error
+    title_ru: "Синтаксическая ошибка XML"
+    detail_ru: "XML-файл «{file_name}» содержит синтаксическую ошибку (строка {line}, позиция {column}). Исправьте файл и загрузите повторно."
+    hint_ru: "Исправьте XML-файл и загрузите повторно."
+    details: {file_name: string, line: integer, column: integer}
+    scenarios: [NS-B20]
+  - code: XML_FORBIDDEN_DTD
+    http: 422
+    domain: security
+    scope: file
+    severity: error
+    security_event: true
+    alert: warning
+    title_ru: "Запрещённое объявление DTD"
+    detail_ru: "XML-файл «{file_name}» содержит объявление DOCTYPE или сущностей, запрещённое требованиями безопасности."
+    hint_ru: "Удалите объявление DOCTYPE и загрузите файл повторно."
+    details: {file_name: string}
+    scenarios: [NS-B21]
+  - code: XML_ENCODING_INVALID
+    http: 422
+    domain: content
+    scope: file
+    severity: error
+    title_ru: "Некорректная кодировка XML"
+    detail_ru: "Кодировка XML-файла «{file_name}» не соответствует объявленной ({declared})."
+    hint_ru: "Сохраните файл в объявленной кодировке (рекомендуется UTF-8)."
+    details: {file_name: string, declared: string}
+    scenarios: [NS-B22]
+  - code: XML_LIMITS_EXCEEDED
+    http: 422
+    domain: security
+    scope: file
+    severity: error
+    security_event: true
+    title_ru: "Превышены ограничения XML"
+    detail_ru: "XML-файл «{file_name}» превышает допустимую вложенность или размер элементов."
+    hint_ru: "Упростите структуру XML-файла."
+    details: {file_name: string}
+    scenarios: [NS-B23]
+
+  # ── Warnings (non-blocking; `warnings[]` or processing_issues) ──
+  - code: DUPLICATE_FILE
+    http: null
+    domain: intake
+    scope: file
+    severity: info
+    title_ru: "Файл уже загружен"
+    detail_ru: "Файл «{file_name}» уже загружен в эту проверку (совпадает SHA-256 с «{existing_name}», {uploaded_at}). Повторная обработка не требуется."
+    details: {file_name: string, existing_name: string, uploaded_at: string}
+    scenarios: [NS-A17]
+  - code: DUPLICATE_IN_PACKAGE
+    http: null
+    domain: intake
+    scope: file
+    severity: info
+    title_ru: "Повтор файла в пакете"
+    detail_ru: "Файл «{file_name}» повторяется в пакете (совпадает с «{other_name}»); принят один экземпляр."
+    details: {file_name: string, other_name: string}
+    scenarios: [NS-A18]
+  - code: PDF_REPAIRED
+    http: null
+    domain: content
+    scope: file
+    severity: warning
+    title_ru: "Файл автоматически восстановлен"
+    detail_ru: "Файл «{file_name}» содержал структурные ошибки и был автоматически восстановлен. Рекомендуем загрузить исходный файл."
+    details: {file_name: string}
+    scenarios: [NS-B04]
+  - code: PDF_PERMISSIONS_RESTRICTED
+    http: null
+    domain: content
+    scope: file
+    severity: info
+    title_ru: "Ограничены права на файл"
+    detail_ru: "Для файла «{file_name}» установлены ограничения прав (копирование, печать). Файл принят; содержимое используется только для проверки."
+    details: {file_name: string}
+    scenarios: [NS-B07]
+  - code: PDF_ACTIVE_CONTENT
+    http: null
+    domain: security
+    scope: file
+    severity: warning
+    security_event: true
+    title_ru: "Активное содержимое в PDF"
+    detail_ru: "Файл «{file_name}» содержит активное содержимое (JavaScript, действия). Оно не исполняется; для просмотра используется безопасная копия."
+    details: {file_name: string}
+    scenarios: [NS-B08]
+  - code: PDF_HAS_REVIEW_MARKUP
+    http: null
+    domain: content
+    scope: file
+    severity: info
+    title_ru: "Пометки проверяющего"
+    detail_ru: "Файл содержит пометки проверяющего (аннотации); они не учитываются при извлечении данных."
+    scenarios: [NS-D08]
+  - code: EXTERNAL_REFERENCES_IGNORED
+    http: null
+    domain: security
+    scope: file
+    severity: warning
+    security_event: true
+    title_ru: "Внешние ссылки не загружаются"
+    detail_ru: "Внешние ссылки в файле «{file_name}» (шаблоны, изображения по сети) не загружаются."
+    details: {file_name: string}
+    scenarios: [NS-B18]
+  - code: RENDER_CAPPED
+    http: null
+    domain: quality
+    scope: page
+    severity: warning
+    title_ru: "Разрешение понижено"
+    detail_ru: "Страницы {pages} файла «{file_name}» слишком велики для полного разрешения; анализ выполнен с пониженным разрешением."
+    details: {pages: string, file_name: string}
+    scenarios: [NS-B11]
+  - code: LARGE_DOCUMENT
+    http: null
+    domain: content
+    scope: file
+    severity: info
+    title_ru: "Большой документ"
+    detail_ru: "Обработка файла «{file_name}» ({pages} стр.) может занять более 10 минут."
+    details: {file_name: string, pages: integer}
+    scenarios: [NS-B10]
+  - code: NO_TEXT_LAYER
+    http: null
+    domain: quality
+    scope: file
+    severity: info
+    title_ru: "Нет текстового слоя"
+    detail_ru: "Файл «{file_name}» не содержит текстового слоя; текст будет распознан (OCR)."
+    details: {file_name: string}
+  - code: LOW_DPI
+    http: null
+    domain: quality
+    scope: page
+    severity: info
+    title_ru: "Низкое разрешение скана"
+    detail_ru: "Страницы {pages}: разрешение скана {dpi} dpi (рекомендуется не менее 300 dpi). Нечитаемые и рукописные зоны исключены из анализа."
+    details: {pages: string, dpi: integer}
+    scenarios: [NS-D02]
+  - code: SKEW_CORRECTED
+    http: null
+    domain: quality
+    scope: page
+    severity: info
+    title_ru: "Перекос исправлен"
+    detail_ru: "Страницы {pages} отсканированы с перекосом {deg}°; перекос исправлен автоматически."
+    details: {pages: string, deg: string}
+    scenarios: [NS-D04]
+  - code: SKEW_RESIDUAL
+    http: null
+    domain: quality
+    scope: page
+    severity: warning
+    title_ru: "Остаточный перекос"
+    detail_ru: "Страницы {pages} отсканированы с перекосом {deg}°; точность распознавания снижена."
+    details: {pages: string, deg: string}
+    scenarios: [NS-D04]
+  - code: HANDWRITING_ZONES
+    http: null
+    domain: quality
+    scope: page
+    severity: info
+    title_ru: "Рукописные зоны"
+    detail_ru: "На страницах {pages} обнаружены рукописные зоны ({share} % площади); они исключены из анализа (ABSTAIN)."
+    details: {pages: string, share: string}
+    tz_ref: "ТЗ §9.1 алг. 1"
+    scenarios: [NS-D05]
+  - code: SEAL_OVERLAP
+    http: null
+    domain: quality
+    scope: page
+    severity: info
+    title_ru: "Печать перекрывает текст"
+    detail_ru: "Часть значений на странице {page} перекрыта печатью и не используется."
+    details: {page: integer}
+    scenarios: [NS-D07]
+  - code: OCR_PARTIAL
+    http: null
+    domain: quality
+    scope: page
+    severity: warning
+    title_ru: "Распознавание выполнено частично"
+    detail_ru: "Текст на страницах {pages} файла «{file_name}» распознан частично; значения с низкой уверенностью не используются."
+    details: {pages: string, file_name: string}
+    scenarios: [NS-D03]
+  - code: LOW_COVERAGE
+    http: null
+    domain: quality
+    scope: file
+    severity: info
+    title_ru: "Низкое покрытие извлечения"
+    detail_ru: "Покрытие извлечения по файлу «{file_name}» — {coverage} %; часть параметров не сравнивается."
+    details: {file_name: string, coverage: string}
+    scenarios: [NS-D15]
+  - code: RENDITION_FAILED
+    http: null
+    domain: processing
+    scope: file
+    severity: warning
+    retryable: true
+    title_ru: "Не построено постраничное представление"
+    detail_ru: "Не удалось построить постраничное представление DOCX «{file_name}»; доказательства будут указаны без координат."
+    details: {file_name: string}
+    scenarios: [NS-D16]
+  - code: DRAFT_NEWER_EXISTS
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: info
+    title_ru: "Есть более новый черновик"
+    detail_ru: "Для {document_code} есть более новая неутверждённая редакция {draft_revision}; сравнение выполняется по утверждённой ред. {approved_revision}."
+    details: {document_code: string, draft_revision: string, approved_revision: string}
+    scenarios: [NS-C18]
+  - code: META_OBJECT_MISMATCH
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    user_notification: feed
+    title_ru: "Файл другого объекта"
+    detail_ru: "Файл «{file_name}» по данным штампа относится к другому объекту ({stamp_address}). Файл исключён из сравнения до подтверждения."
+    details: {file_name: string, stamp_address: string}
+    ui: {actions: [CONFIRM_BELONGS, REMOVE_FROM_PACKAGE]}
+    scenarios: [NS-C24]
+  - code: META_CONFLICT
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    title_ru: "Метаданные противоречат штампу"
+    detail_ru: "Метаданные файла «{file_name}» противоречат штампу: {field} в реестре — «{registry_value}», на листе — «{stamp_value}»."
+    details: {file_name: string, field: string, registry_value: string, stamp_value: string}
+    scenarios: [NS-C15]
+  - code: SIGNATURE_MISSING
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    title_ru: "Документ не подписан"
+    detail_ru: "Электронный документ «{file_name}» не подписан (УКЭП/УНЭП не обнаружена)."
+    details: {file_name: string}
+    scenarios: [NS-C26]
+  - code: REQUISITES_MISSING
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    title_ru: "Нет обязательных реквизитов"
+    detail_ru: "На скане «{file_name}» не обнаружены обязательные реквизиты: {missing}."
+    details: {file_name: string, missing: string}
+    scenarios: [NS-C26]
+
+  # ── Registry (the manifest is the registry in batch mode, 97 §2.12) ──
+  - code: REGISTRY_MISSING
+    http: null
+    domain: registry
+    scope: package
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REGISTRY_MISSING}
+    title_ru: "Реестр файлов не приложен"
+    detail_ru: "Пакет принят без реестра файлов. Статус: CLARIFICATION_REQUIRED — выводы о нарушениях не формируются до загрузки реестра."
+    ui: {actions: [DOWNLOAD_REGISTRY_TEMPLATE, BUILD_REGISTRY_DRAFT]}
+    scenarios: [NS-C01]
+  - code: REGISTRY_FORMAT_UNSUPPORTED
+    http: null
+    domain: registry
+    scope: package
+    severity: warning
+    title_ru: "Формат реестра не поддерживается"
+    detail_ru: "Реестр принимается в форматах CSV, XLSX или JSON. Пакет принят без реестра (CLARIFICATION_REQUIRED)."
+    scenarios: [NS-C02]
+  - code: REGISTRY_UNREADABLE
+    http: null
+    domain: registry
+    scope: package
+    severity: warning
+    title_ru: "Реестр не читается"
+    detail_ru: "Не удалось прочитать реестр «{file_name}» ({reason}). Проверьте формат и кодировку."
+    details: {file_name: string, reason: string}
+    scenarios: [NS-C03]
+  - code: REGISTRY_COLUMN_MISSING
+    http: null
+    domain: registry
+    scope: package
+    severity: warning
+    title_ru: "В реестре нет обязательных столбцов"
+    detail_ru: "В реестре отсутствуют обязательные столбцы: {columns}."
+    details: {columns: string}
+    scenarios: [NS-C05]
+  - code: REGISTRY_ROW_INVALID
+    http: null
+    domain: registry
+    scope: registry_row
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REGISTRY_ROW_INVALID}
+    title_ru: "Некорректная строка реестра"
+    detail_ru: "Строка {row}: поле «{field}» — {reason}."
+    details: {row: integer, field: string, reason: string}
+    scenarios: [NS-C06, NS-C14]
+  - code: REGISTRY_DUPLICATE_FILE_ID
+    http: null
+    domain: registry
+    scope: registry_row
+    severity: warning
+    title_ru: "Повтор идентификатора в реестре"
+    detail_ru: "Идентификатор {file_id} повторяется в строках {rows}."
+    details: {file_id: string, rows: string}
+    scenarios: [NS-C07]
+  - code: REGISTRY_FILE_NOT_UPLOADED
+    http: null
+    domain: registry
+    scope: registry_row
+    severity: info
+    maps_to: {completeness_status: MISSING_EVIDENCE, basis: DECLARED_NOT_RECEIVED}
+    title_ru: "Файл из реестра не загружен"
+    detail_ru: "Файл «{file_name}» указан в реестре (строка {row}), но не загружен."
+    details: {file_name: string, row: integer}
+    scenarios: [NS-C08]
+  - code: REGISTRY_FILE_NOT_LISTED
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    maps_to: {basis: FILE_NOT_LISTED}
+    title_ru: "Файла нет в реестре"
+    detail_ru: "Файл «{file_name}» загружен, но отсутствует в реестре. Он не используется для сравнения, пока не будет добавлен в реестр."
+    details: {file_name: string}
+    scenarios: [NS-C09]
+  - code: REGISTRY_HASH_MISMATCH
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REGISTRY_HASH_MISMATCH}
+    title_ru: "Контрольная сумма не совпадает с реестром"
+    detail_ru: "Контрольная сумма файла «{file_name}» не совпадает с реестром (реестр: {expected_short}, файл: {actual_short}). Проверьте, загружена ли нужная редакция."
+    details: {file_name: string, expected_short: string, actual_short: string}
+    scenarios: [NS-C10]
+  - code: REGISTRY_AMBIGUOUS_MATCH
+    http: null
+    domain: registry
+    scope: registry_row
+    severity: warning
+    title_ru: "Неоднозначное соответствие реестру"
+    detail_ru: "Строке реестра {row} соответствует несколько файлов: {files}. Укажите SHA-256."
+    details: {row: integer, files: string}
+    scenarios: [NS-C11]
+  - code: REGISTRY_OBJECT_MISMATCH
+    http: null
+    domain: registry
+    scope: package
+    severity: warning
+    security_event: true
+    maps_to: {basis: OBJECT_MISMATCH}
+    title_ru: "Реестр другого объекта"
+    detail_ru: "Реестр относится к объекту {registry_object}, а проверка — к объекту {process_object}. Реестр не принят."
+    details: {registry_object: string, process_object: string}
+    scenarios: [NS-C12, NS-C25]
+  - code: REGISTRY_PAGE_RANGE_INVALID
+    http: null
+    domain: registry
+    scope: registry_row
+    severity: warning
+    maps_to: {basis: SHEETS_NOT_MATCHED}
+    title_ru: "Некорректный диапазон листов"
+    detail_ru: "Диапазон листов «{range}» (строка {row}) выходит за пределы файла ({page_count} стр.); листы не сопоставлены."
+    details: {range: string, row: integer, page_count: integer}
+    scenarios: [NS-C13]
+
+  # ── Revisions ──
+  - code: REVISION_CONFLICT
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REVISION_UNRESOLVED}
+    title_ru: "Несколько утверждённых редакций"
+    detail_ru: "Для документа {document_code} найдено несколько утверждённых редакций ({revisions}) без связи замены. Выберите актуальную редакцию — до этого выводы о нарушениях не формируются."
+    details: {document_code: string, revisions: string}
+    tz_ref: "ТЗ §9.1 (конфликт редакций)"
+    scenarios: [NS-C16, NS-F09]
+  - code: APPROVAL_STATUS_MISSING
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: APPROVAL_MISSING}
+    title_ru: "Не указан статус утверждения"
+    detail_ru: "Для документа {document_code} ред. {revision} не указан статус утверждения. Выводы о нарушениях не формируются."
+    details: {document_code: string, revision: string}
+    scenarios: [NS-C17]
+  - code: REVISION_CHAIN_CYCLE
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REVISION_UNRESOLVED}
+    title_ru: "Цикл в цепочке редакций"
+    detail_ru: "Цепочка редакций {document_code} неоднозначна: {reason}. Выберите актуальную редакцию."
+    details: {document_code: string, reason: string}
+    scenarios: [NS-C19]
+  - code: REVISION_CHAIN_FORK
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REVISION_UNRESOLVED}
+    title_ru: "Ветвление цепочки редакций"
+    detail_ru: "У редакции {revision} документа {document_code} несколько преемников: {successors}. Выберите актуальную редакцию."
+    details: {document_code: string, revision: string, successors: string}
+    scenarios: [NS-C19]
+  - code: REVISION_CHAIN_DANGLING
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REVISION_UNRESOLVED}
+    title_ru: "Разрыв цепочки редакций"
+    detail_ru: "Редакция {revision} документа {document_code} ссылается на отсутствующую предыдущую редакцию {predecessor}."
+    details: {document_code: string, revision: string, predecessor: string}
+    scenarios: [NS-C19]
+  - code: REVISION_DATE_INVERSION
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REVISION_UNRESOLVED}
+    title_ru: "Нарушен порядок дат редакций"
+    detail_ru: "Дата редакции {revision} документа {document_code} раньше даты предыдущей редакции."
+    details: {document_code: string, revision: string}
+    scenarios: [NS-C19]
+  - code: REVISION_LABEL_DUPLICATE
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: warning
+    maps_to: {completeness_status: CLARIFICATION_REQUIRED, basis: REVISION_UNRESOLVED}
+    title_ru: "Одинаковые обозначения редакций"
+    detail_ru: "Два разных файла заявлены как {document_code} ред. {revision}."
+    details: {document_code: string, revision: string}
+    scenarios: [NS-C20]
+  - code: CURRENT_REVISION_NOT_UPLOADED
+    http: null
+    domain: revision
+    scope: revision_group
+    severity: info
+    maps_to: {completeness_status: MISSING_EVIDENCE, basis: CURRENT_REVISION_NOT_UPLOADED}
+    title_ru: "Актуальная редакция не загружена"
+    detail_ru: "Актуальная редакция {successor_ref} документа {document_code} не загружена; устаревшая ред. {revision} не используется как эталон."
+    details: {successor_ref: string, document_code: string, revision: string}
+    scenarios: [NS-C21]
+  - code: SUPERSEDED_REVISION_NOT_ALLOWED
+    http: 422
+    domain: revision
+    severity: error
+    title_ru: "Устаревшая редакция"
+    detail_ru: "Устаревшая или аннулированная редакция не может использоваться как эталон."
+    hint_ru: "Выберите актуальную утверждённую редакцию."
+    scenarios: [NS-C22]
+
+  # ── Processing, quality, infrastructure ──
+  - code: PROCESSING_TIMEOUT
+    http: null
+    domain: processing
+    scope: job
+    severity: error
+    retryable: true
+    alert: warning
+    user_notification: feed
+    maps_to: {intake_status: FAILED_TIMEOUT, completeness_status: NOT_COMPARABLE, basis: FILE_NOT_PROCESSED}
+    title_ru: "Превышено время обработки"
+    detail_ru: "Файл «{file_name}» не обработан за отведённое время (3 попытки). Администратор уведомлён. Загрузите файл повторно или продолжите без него."
+    hint_ru: "Загрузите файл повторно или продолжите проверку без него."
+    details: {file_name: string}
+    tz_ref: "ТЗ §9.1 (таймаут обработки)"
+    scenarios: [NS-D10, NS-E13, NS-E15]
+  - code: PARSE_RESOURCE_LIMIT
+    http: null
+    domain: processing
+    scope: job
+    severity: error
+    retryable: true
+    alert: warning
+    title_ru: "Превышен лимит ресурсов"
+    detail_ru: "Обработка файла «{file_name}» превысила лимит памяти; повтор выполнен с пониженным разрешением."
+    hint_ru: "Разделите документ на части, если ошибка повторяется."
+    details: {file_name: string}
+    scenarios: [NS-D11]
+  - code: WORKER_CRASHED
+    http: null
+    domain: processing
+    scope: job
+    severity: error
+    retryable: true
+    alert: warning
+    title_ru: "Сбой обработчика"
+    detail_ru: "Обработчик файла «{file_name}» аварийно завершился; задание будет повторено."
+    hint_ru: "Действий не требуется; при повторных сбоях администратор уведомлён."
+    details: {file_name: string}
+    scenarios: [NS-D12, NS-E15]
+  - code: JOB_DEAD_LETTERED
+    http: null
+    domain: processing
+    scope: job
+    severity: error
+    alert: warning
+    title_ru: "Задание перемещено в DLQ"
+    detail_ru: "Сообщение очереди {queue} отклонено как некорректное и перемещено в DLQ (job {job_id})."
+    hint_ru: "Проверьте содержимое сообщения и перезапустите задание вручную."
+    details: {queue: string, job_id: string}
+    scenarios: [NS-E03]
+  - code: OCR_FAILED
+    http: null
+    domain: quality
+    scope: page
+    severity: warning
+    user_notification: feed
+    maps_to: {completeness_status: NOT_COMPARABLE, basis: SOURCE_UNREADABLE}
+    title_ru: "Текст не распознан"
+    detail_ru: "Не удалось распознать текст на страницах {pages} файла «{file_name}». Загрузите скан лучшего качества (не менее 300 dpi)."
+    details: {pages: string, file_name: string}
+    scenarios: [NS-D01]
+  - code: PAGE_UNREADABLE
+    http: null
+    domain: quality
+    scope: page
+    severity: warning
+    user_notification: feed
+    maps_to: {completeness_status: NOT_COMPARABLE, basis: SOURCE_UNREADABLE}
+    title_ru: "Страница не читается"
+    detail_ru: "Страница {page} файла «{file_name}» не может быть прочитана; зависимые параметры не сравниваются."
+    details: {page: integer, file_name: string}
+    scenarios: [NS-D13]
+  - code: OCR_MODEL_MISSING
+    http: null
+    domain: infra
+    scope: system
+    severity: error
+    status: proposed
+    alert: critical
+    title_ru: "Модель OCR недоступна"
+    detail_ru: "OCR недоступен: не найдена или повреждена модель {model}. Сканы не будут обработаны до устранения."
+    hint_ru: "Выполните `make verify-models` и восстановите файлы моделей в .models/."
+    details: {model: string}
+    tz_ref: "replaces OCR_LANG_MISSING (Tesseract rus is no longer a runtime dependency, 97 §2.16)"
+  - code: ENGINE_ERROR
+    http: null
+    domain: comparison
+    scope: param
+    severity: error
+    alert: warning
+    maps_to: {completeness_status: NOT_COMPARABLE, basis: ENGINE_ERROR}
+    title_ru: "Внутренняя ошибка сравнения"
+    detail_ru: "Параметр {param_code} не проверен из-за внутренней ошибки (код обращения {request_id})."
+    hint_ru: "Параметр помечен как несопоставимый; сообщите администратору код обращения."
+    details: {param_code: string, request_id: string}
+    scenarios: [NS-E12, NS-C23]
+  - code: RECHECK_FAILED
+    http: null
+    domain: processing
+    scope: run
+    severity: error
+    retryable: true
+    alert: warning
+    title_ru: "Инкрементальная проверка не выполнена"
+    detail_ru: "Инкрементальная проверка не выполнена. Решения сохранены; финализация недоступна до успешного повтора."
+    hint_ru: "Повторите инкрементальную проверку."
+    ui: {actions: [RETRY]}
+    scenarios: [NS-E14]
+  - code: EXPORT_FAILED
+    http: null
+    domain: protocol
+    scope: job
+    severity: error
+    retryable: true
+    title_ru: "Не удалось сформировать протокол"
+    detail_ru: "Не удалось сформировать протокол в формате {format}. Повторите попытку; протокол доступен в формате JSON."
+    hint_ru: "Повторите экспорт; протокол в формате JSON доступен всегда."
+    details: {format: string}
+    scenarios: [NS-E11, NS-G21]
+  - code: DB_UNAVAILABLE
+    http: 503
+    domain: infra
+    severity: error
+    retryable: true
+    alert: critical
+    title_ru: "Сервис временно недоступен"
+    detail_ru: "Сервис временно недоступен. Повторите попытку через {retry_after_s} с. Код обращения: {request_id}."
+    hint_ru: "Повторите попытку позже."
+    details: {retry_after_s: integer, request_id: string}
+    scenarios: [NS-E07]
+  - code: DB_BUSY
+    http: 503
+    domain: infra
+    severity: error
+    retryable: true
+    title_ru: "Сервис перегружен"
+    detail_ru: "Сервис перегружен. Повторите действие через несколько секунд."
+    hint_ru: "Повторите действие через несколько секунд."
+    scenarios: [NS-E08]
+  - code: BROKER_UNAVAILABLE
+    http: null
+    domain: infra
+    scope: system
+    severity: error
+    retryable: true
+    alert: critical
+    title_ru: "Очередь обработки недоступна"
+    detail_ru: "Очередь обработки временно недоступна — обработка начнётся автоматически."
+    hint_ru: "Действий не требуется."
+    scenarios: [NS-E01]
+  - code: CACHE_UNAVAILABLE
+    http: null
+    domain: infra
+    scope: system
+    severity: warning
+    retryable: true
+    alert: warning
+    title_ru: "Кэш недоступен"
+    detail_ru: "Кэш временно недоступен; обработка продолжается без кэша и может занять больше времени."
+    scenarios: [NS-E05]
+  - code: ML_API_UNAVAILABLE
+    http: 503
+    domain: infra
+    severity: error
+    retryable: true
+    alert: warning
+    title_ru: "Сервис проверки недоступен"
+    detail_ru: "Сервис проверки временно недоступен; решение сохранено без комментария ИИ."
+    hint_ru: "Повторите действие позже."
+    scenarios: [NS-E10]
+  - code: RENDERER_UNAVAILABLE
+    http: null
+    domain: infra
+    scope: job
+    severity: error
+    retryable: true
+    alert: warning
+    title_ru: "Сервис формирования документов недоступен"
+    detail_ru: "Сервис формирования PDF/DOCX временно недоступен; протокол доступен в формате JSON."
+    hint_ru: "Повторите экспорт позже."
+    scenarios: [NS-E11]
+  - code: NOTIFIER_UNAVAILABLE
+    http: null
+    domain: infra
+    scope: system
+    severity: warning
+    retryable: true
+    title_ru: "Канал уведомлений недоступен"
+    detail_ru: "Канал уведомлений {channel} временно недоступен; уведомление доступно в системе."
+    details: {channel: string}
+    scenarios: [NS-E21]
+  - code: DISK_SPACE_LOW
+    http: null
+    domain: infra
+    scope: system
+    severity: warning
+    alert: warning
+    title_ru: "Мало места на диске"
+    detail_ru: "Свободно {free_pct} % дискового пространства ({free_gb} ГБ)."
+    details: {free_pct: string, free_gb: string}
+    scenarios: [NS-E18]
+  - code: STORAGE_INTEGRITY_VIOLATION
+    http: null
+    domain: security
+    scope: file
+    severity: error
+    security_event: true
+    alert: critical
+    title_ru: "Нарушена целостность файла"
+    detail_ru: "Файл «{file_name}» в хранилище повреждён или изменён. Доказательства из него не используются; администратор уведомлён."
+    hint_ru: "Восстановите файл из резервной копии."
+    details: {file_name: string}
+    scenarios: [NS-E20]
+  - code: MODEL_ARTIFACT_INTEGRITY_FAILED
+    http: null
+    domain: ml
+    scope: system
+    severity: error
+    security_event: true
+    alert: critical
+    title_ru: "Нарушена целостность модели"
+    detail_ru: "Целостность артефакта модели {model_version} нарушена; используется предыдущая версия."
+    hint_ru: "Проверьте файлы моделей командой `make verify-models`."
+    details: {model_version: string}
+    scenarios: [NS-E19]
+  - code: CONFIG_INVALID
+    http: null
+    domain: infra
+    scope: system
+    severity: error
+    alert: critical
+    title_ru: "Некорректная конфигурация"
+    detail_ru: "Конфигурация некорректна: {field} — {reason}."
+    hint_ru: "Исправьте переменные окружения (см. .env.example) и перезапустите."
+    details: {field: string, reason: string}
+    scenarios: [NS-E23]
+  - code: PROCESS_STALLED
+    http: null
+    domain: processing
+    scope: system
+    severity: warning
+    alert: warning
+    title_ru: "Проверка не продвигается"
+    detail_ru: "Проверка {process_id} не продвигается более 15 минут."
+    details: {process_id: string}
+    scenarios: [NS-E16]
+
+  # ── Comparison semantics (basis codes surfaced to the user) ──
+  - code: MANDATORY_SOURCE_MISSING
+    http: null
+    domain: comparison
+    scope: param
+    severity: info
+    maps_to: {completeness_status: MISSING_EVIDENCE, basis: MANDATORY_SOURCE_MISSING}
+    title_ru: "Отсутствует обязательный источник"
+    detail_ru: "Отсутствует обязательный источник: {doc_kind} ({stage}). Запросите или дозагрузите документ."
+    details: {doc_kind: string, stage: string}
+    tz_ref: "ТЗ §9.2 (отсутствующие доказательства)"
+    scenarios: [NS-F01]
+  - code: UNIT_INCOMPATIBLE
+    http: null
+    domain: comparison
+    scope: param
+    severity: warning
+    maps_to: {completeness_status: NOT_COMPARABLE, basis: UNIT_INCOMPATIBLE}
+    title_ru: "Несопоставимые единицы измерения"
+    detail_ru: "Значения несопоставимы по единицам измерения: {expected_unit} и {actual_unit}."
+    details: {expected_unit: string, actual_unit: string}
+    scenarios: [NS-F03]
+  - code: VALUE_UNPARSEABLE
+    http: null
+    domain: comparison
+    scope: param
+    severity: warning
+    maps_to: {completeness_status: NOT_COMPARABLE, basis: VALUE_UNPARSEABLE}
+    title_ru: "Значение не распознано"
+    detail_ru: "Значение «{raw}» не распознано или вне допустимого диапазона; параметр {param_code} не сравнивается."
+    details: {raw: string, param_code: string}
+    scenarios: [NS-F05, NS-B26]
+  - code: SHEETS_NOT_MATCHED
+    http: null
+    domain: comparison
+    scope: param
+    severity: info
+    maps_to: {completeness_status: NOT_COMPARABLE, basis: SHEETS_NOT_MATCHED}
+    title_ru: "Листы не сопоставлены"
+    detail_ru: "Листы ПД и РД не сопоставлены; запросите уточнение состава листов."
+    scenarios: [NS-F07]
+  - code: EVIDENCE_NOT_LOCALIZABLE
+    http: null
+    domain: comparison
+    scope: param
+    severity: warning
+    maps_to: {completeness_status: NOT_COMPARABLE, basis: EVIDENCE_NOT_LOCALIZABLE}
+    title_ru: "Доказательство не локализовано"
+    detail_ru: "Не удалось локализовать доказательство на листе; кандидат не сформирован."
+    scenarios: [NS-F08]
+
+  # ── Verification and protocol ──
+  - code: VERSION_CONFLICT
+    http: 409
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Карточка уже изменена"
+    detail_ru: "Решение по карточке уже изменено: {user}, {decision}, {time}."
+    hint_ru: "Примите текущее решение или замените его своим."
+    details: {user: string, decision: string, time: string}
+    scenarios: [NS-G05]
+  - code: EVIDENCE_CHANGED
+    http: 409
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Доказательства обновлены"
+    detail_ru: "Доказательства по карточке обновлены после дозагрузки. Проверьте карточку ещё раз."
+    hint_ru: "Откройте карточку заново и проверьте доказательства."
+    scenarios: [NS-G07]
+  - code: FINDING_LOCKED_BY_RECHECK
+    http: 409
+    domain: verification
+    severity: error
+    log_level: INFO
+    retryable: true
+    title_ru: "Карточка обновляется"
+    detail_ru: "Карточка обновляется после дозагрузки. Повторите через несколько секунд."
+    hint_ru: "Повторите действие через несколько секунд."
+    scenarios: [NS-G08]
+  - code: VERIFICATION_NOT_ALLOWED_IN_STATUS
+    http: 409
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Верификация недоступна"
+    detail_ru: "Верификация недоступна в статусе {status}."
+    hint_ru: "Дождитесь формирования протокола или откройте верификацию повторно."
+    details: {status: string}
+    tz_ref: "ТЗ §9.1 (таблица статусов)"
+    scenarios: [NS-G01]
+  - code: REASON_CODE_REQUIRED
+    http: 422
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Не указана причина"
+    detail_ru: "Для отклонения укажите код причины."
+    hint_ru: "Выберите код причины из списка."
+    tz_ref: "ТЗ §9.3 п.2"
+    scenarios: [NS-G02]
+  - code: COMMENT_REQUIRED
+    http: 422
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Нужен комментарий"
+    detail_ru: "Добавьте комментарий к решению."
+    hint_ru: "Опишите основание решения в комментарии."
+    tz_ref: "ТЗ §9.3 п.2"
+    scenarios: [NS-G02]
+  - code: STATUS_NOT_ALLOWED
+    http: 422
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Статус не используется"
+    detail_ru: "Статус {status} не используется: разделите кандидата на атомарные нарушения."
+    hint_ru: "Используйте действие «Разделить»."
+    details: {status: string}
+    scenarios: [NS-G03]
+  - code: EVIDENCE_REQUIRED
+    http: 422
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Нужны доказательства"
+    detail_ru: "Для перевода гипотезы в кандидаты укажите источники и координаты доказательств: {missing}."
+    hint_ru: "Добавьте источники с листом и координатами."
+    details: {missing: string}
+    tz_ref: "ТЗ §9.5"
+    scenarios: [NS-G17]
+  - code: FINALIZE_GATE_BLOCKED
+    http: 409
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Финализация невозможна"
+    detail_ru: "Финализация невозможна: не обработано кандидатов — {n}. Примите решение или переведите их в CLARIFICATION_REQUIRED."
+    hint_ru: "Откройте список блокирующих карточек."
+    details: {n: integer}
+    ui: {actions: [OPEN_BLOCKERS]}
+    tz_ref: "ТЗ §9.3 п.4"
+    scenarios: [NS-G10]
+  - code: UNFINALIZE_FORBIDDEN
+    http: 403
+    domain: verification
+    severity: error
+    security_event: true
+    title_ru: "Отмена финализации запрещена"
+    detail_ru: "Отмена финализации недоступна для этой учётной записи."
+    hint_ru: "Войдите под учётной записью инспектора."
+    scenarios: [NS-G14]
+  - code: UNFINALIZE_REASON_REQUIRED
+    http: 422
+    domain: verification
+    severity: error
+    log_level: INFO
+    title_ru: "Не указана причина отмены"
+    detail_ru: "Укажите причину отмены финализации (не менее 20 символов)."
+    hint_ru: "Опишите причину отмены финализации."
+    scenarios: [NS-G15]
+  - code: PROTOCOL_NOT_FINALIZED
+    http: 409
+    domain: protocol
+    severity: error
+    log_level: INFO
+    title_ru: "Протокол не финализирован"
+    detail_ru: "Действие доступно только для финализированного протокола."
+    hint_ru: "Финализируйте протокол."
+  - code: EXPORT_FORMAT_UNSUPPORTED
+    http: 422
+    domain: protocol
+    severity: error
+    log_level: INFO
+    title_ru: "Формат не поддерживается"
+    detail_ru: "Формат {format} не поддерживается. Доступно: PDF, DOCX, XML, JSON."
+    hint_ru: "Выберите PDF, DOCX, XML или JSON."
+    details: {format: string}
+    scenarios: [NS-G20]
+
+  # ── Normative base administration ──
+  - code: THRESHOLD_RANGE_INVALID
+    http: 422
+    domain: normative
+    severity: error
+    log_level: INFO
+    title_ru: "Некорректный диапазон"
+    detail_ru: "Минимальное значение ({min_value}) не может быть больше максимального ({max_value})."
+    hint_ru: "Исправьте границы диапазона."
+    details: {min_value: string, max_value: string}
+  - code: REGEX_INVALID
+    http: 422
+    domain: normative
+    severity: error
+    log_level: INFO
+    title_ru: "Некорректное регулярное выражение"
+    detail_ru: "Регулярное выражение не компилируется: {reason}."
+    hint_ru: "Исправьте выражение."
+    details: {reason: string}
+  - code: REGEX_UNSAFE
+    http: 422
+    domain: normative
+    severity: error
+    security_event: true
+    title_ru: "Небезопасное регулярное выражение"
+    detail_ru: "Регулярное выражение может выполняться неограниченно долго (катастрофический возврат)."
+    hint_ru: "Упростите выражение: уберите вложенные квантификаторы."
+    tz_ref: "97 §2.14 (M-044 regex guard)"
+  - code: PARAM_CODE_INVALID
+    http: 422
+    domain: normative
+    severity: error
+    log_level: INFO
+    title_ru: "Некорректный код параметра"
+    detail_ru: "Код параметра «{code}» не соответствует каталогу (PZ-001 … SM-132 или FREE-<ТЕМА>-<NNN>)."
+    hint_ru: "Используйте код из каталога 132 параметров."
+    details: {code: string}
+  - code: PARAM_CODE_DUPLICATE
+    http: 409
+    domain: normative
+    severity: error
+    log_level: INFO
+    title_ru: "Код параметра уже существует"
+    detail_ru: "Параметр с кодом {code} уже существует."
+    hint_ru: "Укажите другой код."
+    details: {code: string}
+
+  # ── ML, datasets, hidden-test integrity ──
+  - code: HIDDEN_TEST_ACCESS_DENIED
+    http: 403
+    domain: ml
+    severity: error
+    security_event: true
+    title_ru: "Доступ к скрытой выборке запрещён"
+    detail_ru: "Объект {object_id} входит в скрытую тестовую выборку; оценка и настройка по нему запрещены."
+    hint_ru: "Используйте обучающие объекты (TRAIN_PUBLIC)."
+    details: {object_id: string}
+    tz_ref: "93 §4.9; 97 §2.17"
+  - code: HIDDEN_TEST_LEAKAGE
+    http: 422
+    domain: ml
+    severity: error
+    security_event: true
+    alert: critical
+    title_ru: "Утечка скрытой выборки"
+    detail_ru: "В наборе данных обнаружены элементы скрытой тестовой выборки: {items}."
+    hint_ru: "Исключите элементы скрытой выборки из набора."
+    details: {items: string}
+  - code: SPLIT_LEAKAGE
+    http: 422
+    domain: ml
+    severity: error
+    title_ru: "Пересечение выборок"
+    detail_ru: "Объект {object_group_id} встречается в нескольких выборках ({splits})."
+    hint_ru: "Назначьте объект одной выборке."
+    details: {object_group_id: string, splits: string}
+  - code: MODEL_GATE_NOT_PASSED
+    http: 409
+    domain: ml
+    severity: error
+    log_level: INFO
+    title_ru: "Модель не прошла контроль качества"
+    detail_ru: "Модель {model_version} не прошла контроль качества и не может быть утверждена."
+    hint_ru: "Исправьте модель и повторите оценку."
+    details: {model_version: string}
+  - code: TEST_SET_HASH_MISMATCH
+    http: 409
+    domain: ml
+    severity: error
+    alert: critical
+    title_ru: "Изменён тестовый набор"
+    detail_ru: "Хэш тестового набора {test_set} не совпадает с зафиксированным."
+    hint_ru: "Восстановите зафиксированную версию тестового набора."
+    details: {test_set: string}
+
+  # ── Batch mode (inspector-batch, 97 two run modes; proposed by AG-00) ──
+  - code: DATA_ROOT_NOT_FOUND
+    http: null
+    domain: batch
+    scope: system
+    severity: error
+    status: proposed
+    title_ru: "Не найден каталог данных"
+    detail_ru: "Каталог данных организаторов «{path}» не найден."
+    hint_ru: "Укажите путь в переменной INSPECTOR_DATA_ROOT (см. .env.example)."
+    details: {path: string}
+  - code: MANIFEST_UNREADABLE
+    http: null
+    domain: batch
+    scope: system
+    severity: error
+    status: proposed
+    title_ru: "Манифест не читается"
+    detail_ru: "Не удалось прочитать манифест документов «{path}»: {reason}."
+    hint_ru: "Проверьте файл document_manifest.jsonl и его контрольную сумму по sha256sums.txt."
+    details: {path: string, reason: string}
+  - code: MANIFEST_ROW_INVALID
+    http: null
+    domain: batch
+    scope: registry_row
+    severity: warning
+    status: proposed
+    title_ru: "Некорректная строка манифеста"
+    detail_ru: "Строка {row} манифеста ({file_id}) не соответствует контракту: {reason}."
+    details: {row: integer, file_id: string, reason: string}
+  - code: FILE_MISSING_ON_DISK
+    http: null
+    domain: batch
+    scope: file
+    severity: warning
+    status: proposed
+    maps_to: {local_status: MISSING_ON_DISK}
+    title_ru: "Файл отсутствует на диске"
+    detail_ru: "Файл {file_id} из манифеста не найден на диске ({relative_path}); это не означает отсутствие документа у объекта."
+    details: {file_id: string, relative_path: string}
+    tz_ref: "97 §2.12 (LocalFileStatus, never MISSING_DOCUMENT)"
+  - code: EXCLUDED_FILE_REFERENCED
+    http: null
+    domain: batch
+    scope: file
+    severity: error
+    status: proposed
+    title_ru: "Ссылка на исключённый файл"
+    detail_ru: "Файл {file_id} исключён организаторами (excluded_file_ids) и не может быть доказательством."
+    hint_ru: "Уберите ссылку на исключённый файл."
+    details: {file_id: string}
+    tz_ref: "split_policy.json excluded_file_ids; 93 §4.6 R5"
+  - code: SUBMISSION_SCHEMA_INVALID
+    http: null
+    domain: batch
+    scope: run
+    severity: error
+    status: proposed
+    title_ru: "Ответ не соответствует схеме"
+    detail_ru: "Ответ по объекту {object_id} не прошёл проверку схемы {schema}: {reason}."
+    hint_ru: "Исправьте экспорт; невалидный ответ оценивается в 0 баллов."
+    details: {object_id: string, schema: string, reason: string}
+    tz_ref: "93 §4.2"
+  - code: CONTRACT_VALIDATION_FAILED
+    http: 422
+    domain: batch
+    scope: run
+    severity: error
+    status: proposed
+    title_ru: "Нарушение контракта данных"
+    detail_ru: "Артефакт «{artifact}» не соответствует схеме {schema}: {reason}."
+    hint_ru: "Исправьте производителя артефакта; контракты — в packages/contracts."
+    details: {artifact: string, schema: string, reason: string}
+  - code: COMMAND_NOT_IMPLEMENTED
+    http: null
+    domain: batch
+    scope: system
+    severity: error
+    status: proposed
+    title_ru: "Команда ещё не реализована"
+    detail_ru: "Команда «{command}» ещё не реализована (владелец: {owner})."
+    hint_ru: "Команда появится в следующих вехах плана; см. docs/PLAN.md."
+    details: {command: string, owner: string}
+
+  # ── M0 integration: codes requested by AG-01 (registry), AG-08 (import) and AG-10 (scorer); proposed by AG-00 ──
+  - code: PAGE_COUNT_MISMATCH
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    status: proposed
+    title_ru: "Число страниц не совпадает с манифестом"
+    detail_ru: "Файл {file_id}: в манифесте {expected} стр., в PDF {actual} стр."
+    details: {file_id: string, expected: integer, actual: integer}
+  - code: NEAR_DUPLICATE
+    http: null
+    domain: registry
+    scope: file
+    severity: info
+    status: proposed
+    title_ru: "Возможный дубликат"
+    detail_ru: "Файл {file_id} почти совпадает с файлом {other_file_id} (признак: {basis}); проверьте, не является ли один из них другой редакцией."
+    details: {file_id: string, other_file_id: string, basis: string}
+    tz_ref: "97 §2.12 (near-duplicates by text hash)"
+  - code: STAGE_UNRESOLVED
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    status: proposed
+    title_ru: "Стадия документа не определена"
+    detail_ru: "Стадию файла {file_id} не удалось определить (в манифесте: {manifest_stage})."
+    details: {file_id: string, manifest_stage: string}
+    tz_ref: "97 §2.12 (RD_ID_MIXED/UNKNOWN resolved per file)"
+  - code: DWG_TWIN_NOT_FOUND
+    http: null
+    domain: registry
+    scope: file
+    severity: warning
+    status: proposed
+    title_ru: "Для чертежа DWG не найден PDF-двойник"
+    detail_ru: "Для чертежа «{member}» ({file_id}) не найден PDF-двойник; чертёж не используется как доказательство."
+    details: {file_id: string, member: string}
+    tz_ref: "97 §2.12 (DWG linked to its same-folder PDF twin, never cited)"
+  - code: ARCHIVE_MEMBER_UNSAFE_PATH
+    http: null
+    domain: intake
+    scope: file
+    severity: warning
+    status: proposed
+    security_event: true
+    title_ru: "Небезопасное имя элемента архива"
+    detail_ru: "Элемент архива {file_id} «{member}» пропущен: {reason}."
+    details: {file_id: string, member: string, reason: string}
+    tz_ref: "97 §2.12 (traversal and zip-bomb guards)"
+  - code: EVIDENCE_FILE_UNKNOWN
+    http: null
+    domain: batch
+    scope: file
+    severity: warning
+    status: proposed
+    title_ru: "Доказательство ссылается на неизвестный файл"
+    detail_ru: "Находки объекта {object_id} ссылаются на файл {file_id}, которого нет в манифесте прогона этого объекта."
+    details: {object_id: string, file_id: string}
+    tz_ref: "97 §2.5 (evidence only from the object's manifest PDF pages)"
+  - code: HIDDEN_TEST_ARTIFACTS_DROPPED
+    http: null
+    domain: batch
+    scope: run
+    severity: warning
+    status: proposed
+    title_ru: "Артефакты скрытой выборки не импортированы"
+    detail_ru: "Для объекта {object_id} из скрытой тестовой выборки импортирована только инвентаризация; пути к артефактам отброшены и не читались."
+    details: {object_id: string}
+    tz_ref: "97 §2.17"
+  - code: PREDICTION_NOT_FOUND
+    http: null
+    domain: batch
+    scope: run
+    severity: error
+    status: proposed
+    title_ru: "Ответ для оценки не найден"
+    detail_ru: "Ответ для оценки не найден: {path}."
+    hint_ru: "Укажите --pred или сначала выполните export (ожидается runs/<run_id>/submission/<object_id>.json)."
+    details: {path: string}
+  - code: GOLD_NOT_FOUND
+    http: null
+    domain: batch
+    scope: run
+    severity: warning
+    status: proposed
+    title_ru: "Нет эталонной разметки"
+    detail_ru: "Для объекта {object_id} нет эталонной разметки; объект пропущен при оценке."
+    details: {object_id: string}
+  - code: HIDDEN_FINAL_NOT_FROZEN
+    http: null
+    domain: batch
+    scope: run
+    severity: error
+    status: proposed
+    security_event: true
+    title_ru: "Итоговая оценка скрытой выборки без замороженного прогона"
+    detail_ru: "Итоговая оценка по скрытой выборке требует замороженного прогона: {reason}."
+    hint_ru: "Передайте run_manifest.json с freeze_tag, который существует как git-тег, и объектом в objects[]."
+    details: {reason: string}
+    tz_ref: "93 §4.9; 97 §2.17"

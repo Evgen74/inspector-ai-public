@@ -1,0 +1,61 @@
+{
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "checks": [
+    {
+      "parameter_code": "IOS4-078",
+      "location": "314",
+      "pd_value": "Конфигурация вентиляции по листу 10 ПД",
+      "rd_value": "Конфигурация вентиляции изменена",
+      "id_value": null,
+      "violation_label": "VIOLATION_PRESENT",
+      "protocol_status": "CRITICAL",
+      "criticality": "Критическое (приостановка работ)",
+      "evidence": [
+        {
+          "stage": "PD",
+          "file_id": "F0171",
+          "pdf_page_number": 88
+        },
+        {
+          "stage": "RD",
+          "file_id": "F0201",
+          "pdf_page_number": 18
+        }
+      ],
+      "comparison_result": "CONFIGURATION_MISMATCH"
+    },
+    {
+      "parameter_code": "FREE-HEATING-001",
+      "location": "267",
+      "pd_value": "Тёплый пол предусмотрен",
+      "rd_value": "Тёплый пол отсутствует",
+      "id_value": null,
+      "violation_label": "VIOLATION_PRESENT",
+      "protocol_status": "WARNING",
+      "criticality": "Существенное (предписание) — требует утверждения",
+      "evidence": [
+        {
+          "stage": "PD",
+          "file_id": "F0171",
+          "pdf_page_number": 99
+        },
+        {
+          "stage": "RD",
+          "file_id": "F0202",
+          "pdf_page_number": 17
+        }
+      ]
+    },
+    {
+      "parameter_code": "IOS2-071",
+      "location": "OBJECT",
+      "pd_value": null,
+      "rd_value": null,
+      "id_value": null,
+      "violation_label": "MISSING_DOCUMENT",
+      "protocol_status": "ID_MISSING",
+      "criticality": "Критическое (приостановка работ)",
+      "evidence": []
+    }
+  ]
+}

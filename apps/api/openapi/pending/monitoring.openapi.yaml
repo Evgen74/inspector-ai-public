@@ -1,0 +1,172 @@
+# «Инспектор ИИ» — модули 11 и 12 (мониторинг, самопроверка), PENDING ADOPTION by AG-00 (see m1-d1.openapi.yaml).
+# Метрики Prometheus отдаются вне префикса API: GET /metrics (текстовый формат, без авторизации, только localhost).
+openapi: 3.0.3
+info:
+  title: «Инспектор ИИ» — мониторинг и самопроверка
+  version: 0.1.0-monitoring
+paths:
+  /admin/monitoring/overview:
+    get:
+      operationId: getMonitoringOverview
+      tags: [admin]
+      summary: Мониторинг — состояние сервисов, метрики запросов, очередь, диск, журнал, оповещения
+      x-owner: AG-08
+      x-permission: monitoring.read
+      x-error-codes: [VALIDATION_ERROR, SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, INTERNAL_ERROR]
+      parameters:
+        - name: log_lines
+          in: query
+          description: Сколько последних строк журнала вернуть (по умолчанию 50, максимум 500)
+          schema: {type: integer, minimum: 1, maximum: 500}
+      responses:
+        '200':
+          description: Сводка мониторинга
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/MonitoringOverview'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '500': {$ref: '#/components/responses/InternalError'}
+  /admin/selftest/run:
+    post:
+      operationId: runSelftest
+      tags: [admin]
+      summary: Самопроверка — негативные сценарии (модуль 12); данные не изменяются
+      description: |
+        Выполняет около двадцати проверок на работающем API: неподдерживаемый формат и повреждённый PDF, файл
+        больше 500 МБ и пакет больше 5 ГБ, решение без авторизации, решение после финализации, финализация с
+        ожидающими кандидатами, снятие финализации без причины, выгрузка несуществующего протокола, некорректные
+        пороги, недоступный RabbitMQ. Сценарий, контракт которого ещё не опубликован, получает статус
+        NOT_IMPLEMENTED; сценарий, который нельзя выполнить в текущем режиме или на текущих данных, — SKIPPED.
+      x-owner: AG-08
+      x-permission: ops.run
+      x-audit-action: SELFTEST_RUN
+      x-error-codes: [SESSION_STORE_UNAVAILABLE, FORBIDDEN, CSRF_TOKEN_INVALID, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, INTERNAL_ERROR]
+      responses:
+        '200':
+          description: Отчёт самопроверки
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SelftestReport'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '500': {$ref: '#/components/responses/InternalError'}
+components:
+  schemas:
+    MonitoringOverview:
+      type: object
+      required: [time, services, http, system, queue, disk, logs, alerts, thresholds, metrics_url]
+      properties:
+        time: {type: string, format: date-time}
+        services:
+          type: array
+          items:
+            type: object
+            required: [code, name, status, latency_ms, detail]
+            properties:
+              code: {type: string, enum: [api, database, redis, rabbitmq, ml_api]}
+              name: {type: string}
+              status: {type: string, enum: [up, down]}
+              latency_ms: {type: number, nullable: true}
+              detail: {type: string, nullable: true}
+              optional: {type: boolean}
+        http:
+          type: object
+          required: [window_s, requests, rate_per_min, p50_ms, p95_ms, errors_5xx, errors_4xx, total_requests, total_errors_5xx]
+          properties:
+            window_s: {type: integer}
+            requests: {type: integer}
+            rate_per_min: {type: number}
+            p50_ms: {type: number, nullable: true}
+            p95_ms: {type: number, nullable: true}
+            errors_5xx: {type: integer}
+            errors_4xx: {type: integer}
+            total_requests: {type: integer}
+            total_errors_5xx: {type: integer}
+        system:
+          type: object
+          required: [cpu_percent, load_avg_1m, cpu_count, memory_used_percent, process_rss_mb, uptime_s, api_version]
+          properties:
+            cpu_percent: {type: number}
+            load_avg_1m: {type: number}
+            cpu_count: {type: integer}
+            memory_used_percent: {type: number}
+            process_rss_mb: {type: number}
+            uptime_s: {type: integer}
+            api_version: {type: string}
+        queue:
+          type: object
+          required: [mode, size, processes_by_status]
+          properties:
+            mode: {type: string, enum: [rabbitmq, in-process], description: 'Режим заданий: через RabbitMQ или внутри процесса (резервный)'}
+            size: {type: integer, description: 'Проверки в статусах PENDING и PARSING'}
+            processes_by_status:
+              type: object
+              additionalProperties: {type: integer}
+        disk:
+          type: object
+          required: [runs_bytes, runs_dir, free_bytes, total_bytes, used_percent]
+          properties:
+            runs_bytes: {type: number, nullable: true}
+            runs_dir: {type: string}
+            free_bytes: {type: number, nullable: true}
+            total_bytes: {type: number, nullable: true}
+            used_percent: {type: number, nullable: true}
+        logs:
+          type: array
+          items:
+            type: object
+            required: [timestamp, level, message, event, request_id]
+            properties:
+              timestamp: {type: string}
+              level: {type: string}
+              message: {type: string}
+              event: {type: string, nullable: true}
+              request_id: {type: string, nullable: true}
+        alerts:
+          type: array
+          items:
+            type: object
+            required: [code, severity, message]
+            properties:
+              code: {type: string}
+              severity: {type: string, enum: [warning, critical]}
+              message: {type: string}
+        thresholds:
+          type: object
+          additionalProperties: {type: number}
+        metrics_url: {type: string}
+    SelftestReport:
+      type: object
+      required: [started_at, duration_ms, summary, results]
+      properties:
+        started_at: {type: string, format: date-time}
+        duration_ms: {type: integer}
+        summary:
+          type: object
+          required: [total, pass, fail, not_implemented, skipped]
+          properties:
+            total: {type: integer}
+            pass: {type: integer}
+            fail: {type: integer}
+            not_implemented: {type: integer}
+            skipped: {type: integer}
+        results:
+          type: array
+          items:
+            type: object
+            required: [id, group, title, expected, actual, status, detail, duration_ms]
+            properties:
+              id: {type: string}
+              group: {type: string}
+              title: {type: string}
+              expected: {type: string}
+              actual: {type: string}
+              status: {type: string, enum: [PASS, FAIL, NOT_IMPLEMENTED, SKIPPED]}
+              detail: {type: string, nullable: true}
+              duration_ms: {type: integer}

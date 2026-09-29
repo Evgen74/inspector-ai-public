@@ -1,0 +1,25 @@
+# Docker build context of «Инспектор ИИ» (docker/Dockerfile). Organizer data, models and run output never enter an image.
+.git
+.claude/
+.github/
+data/
+data_utf8/
+data_recovered/
+ТЗ/
+runs/
+.cache/
+.models/
+deliverables/
+**/*.onnx
+**/node_modules
+**/.venv
+**/dist
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+.env
+.env.*
+!.env.example
+docs/spec/
+docs/workflows/

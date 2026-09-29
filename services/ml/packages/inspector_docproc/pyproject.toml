@@ -1,0 +1,34 @@
+[project]
+name = "inspector-docproc"
+version = "0.1.0"
+description = "Инспектор ИИ: recognition (inventory, text layer, OCR v2, layout, tables, NLP) (owners AG-02A/B/C)"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "inspector-common",
+    "pymupdf>=1.28,<1.29",
+    "rapidocr>=3.9.2",
+    # onnxruntime and onnxruntime-gpu share one import name and must never be installed together: CPU/CoreML
+    # build on macOS and Linux aarch64, the CUDA 12 build (also runs on the CPU without a GPU) on Linux x86_64
+    # and Windows. Capped below 1.27: from 1.27 PyPI ships CUDA 13 (driver >= 580).
+    # The [cuda,cudnn] extras pull the NVIDIA runtime wheels, so no system CUDA toolkit is needed.
+    "onnxruntime>=1.22; sys_platform == 'darwin' or (sys_platform == 'linux' and platform_machine != 'x86_64')",
+    "onnxruntime-gpu[cuda,cudnn]>=1.22,<1.27; (sys_platform == 'linux' and platform_machine == 'x86_64') or sys_platform == 'win32'",
+    "opencv-python-headless>=4.10",
+    "numpy>=2.0",
+    "pillow>=10.4",
+    "shapely>=2.0",
+    "rapidfuzz>=3.9",
+    "tokenizers>=0.20",
+    "python-docx>=1.1",
+    "openpyxl>=3.1",
+]
+
+[tool.uv.sources]
+inspector-common = { workspace = true }
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inspector_docproc"]

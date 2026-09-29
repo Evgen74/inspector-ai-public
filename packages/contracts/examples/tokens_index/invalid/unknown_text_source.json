@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "run_id": "m1-tyumen-e2e",
+  "pipeline_version": "docproc-2.2.0+coreml",
+  "generated_at": "2026-10-01T08:00:00Z",
+  "files": [
+    {
+      "file_id": "F0201",
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "file_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "stage": "RD",
+      "pages_total": 34,
+      "pages": [
+        {
+          "pdf_page_number": 17,
+          "path": "tokens/F0201/p00017.json.gz",
+          "page_class": "VECTOR_OUTLINED_TEXT",
+          "text_sources": [
+            "PDF_TEXT"
+          ],
+          "quality_flag": "OK",
+          "rotation": 0,
+          "tokens": 233,
+          "has_layers": true,
+          "cache_hit": false
+        }
+      ]
+    }
+  ]
+}

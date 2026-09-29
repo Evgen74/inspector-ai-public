@@ -1,0 +1,23 @@
+{
+  "type": "/problems/protocol-finalized",
+  "title": "Протокол финализирован",
+  "status": 423,
+  "detail": "Протокол финализирован. Изменения и дозагрузка невозможны. Для новых документов создайте новую проверку.",
+  "instance": "/api/v1/documents/upload#0192f6c4-7a1e-7b2c-9d10-4f5a6b7c8d9e",
+  "code": "PROTOCOL_FINALIZED",
+  "request_id": "0192f6c4-7a1e-7b2c-9d10-4f5a6b7c8d9e",
+  "timestamp": "2026-10-02T09:03:11.412Z",
+  "retryable": false,
+  "details": {
+    "process_status": "FINALIZED",
+    "protocol_version": 5
+  },
+  "actions": [
+    {
+      "action": "CREATE_SUCCESSOR",
+      "label_ru": "Создать новую проверку",
+      "method": "POST",
+      "href": "/api/v1/processes/p-1/successor"
+    }
+  ]
+}

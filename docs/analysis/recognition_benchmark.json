@@ -1,0 +1,5576 @@
+{
+ "name": "recognition_benchmark",
+ "version": "0.1",
+ "created": "2026-09-27",
+ "purpose": "Real-page benchmark for Module 1 part B (OCR, text layer, tables, title blocks, key fields). Defines pages, regions and ground truth; results and method in 96_recognition_real_data.md.",
+ "data_roots": {
+  "documents": "data_utf8/ХАКАТОН_УЧАСТНИКАМ_ГОТОВО_К_ПЕРЕДАЧЕ/01_ДОКУМЕНТАЦИЯ/ (manifest relative_path)",
+  "manifest": "data_utf8/ПАКЕТ_УЧАСТНИКАМ_БЕЗ_ОТВЕТОВ_v2.0/data/document_manifest.jsonl"
+ },
+ "groups": {
+  "A": "vector pages with a text layer (GT = text layer, rendered and OCR'd)",
+  "B": "real raster scans (GT = hand transcription, lines + excluded zones)",
+  "C": "hybrid / scanner-OCR-layer pages (qualitative routing tests)",
+  "D": "text drawn as vector outlines (GT = hand transcription or title-block key fields)",
+  "R": "Речников hidden test: speed/format profiling only"
+ },
+ "metric": {
+  "character_accuracy": "1 - (edits + deletions) / N_gt, Unicode NFC. 'strict': whitespace removed on both sides (CAD text layers have unreliable spacing), no case folding, no homoglyph folding. 'relaxed': + dash unification and Latin->Cyrillic homoglyph folding. 'relaxed_ci': + case folding. Insertions (OCR text with no GT) reported separately.",
+  "alignment_text_layer": "each GT glyph is assigned to the OCR line polygon containing its centre (pad 0.25 line height; nearest by outside-distance, then minor-axis offset); per line Levenshtein(GT glyphs in reading order, OCR text). Reading-order and segmentation independent.",
+  "alignment_scans": "per GT line: min semi-global edit distance against any overlapping OCR line or the x-ordered concatenation of same-row OCR lines. GT lines whose centre lies in an excluded zone (seal, stamp, QR, handwriting, overlay) are not scored.",
+  "acceptance_threshold": "OCR lines with score < 0.5 count as not returned (deletions).",
+  "key_field_em": "exact match of the GT token inside the OCR text of lines overlapping the GT field box (±0.5 line height); NFC + whitespace collapse; strict case; word boundaries enforced (numeric tokens may be followed by a unit letter); 'relaxed' adds homoglyph folding.",
+  "ci": "bootstrap over pages/regions (2000-4000 resamples), weighted by N_gt"
+ },
+ "pages": [
+  {
+   "id": "A01",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0171",
+   "pdf_page_number": 88,
+   "stage": "PD",
+   "relative_path": "Пример нарушений на чертежах/ПД/5 Сведения об инженерном оборудовании/5.4 Отопление, вентиляц/V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+   "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+   "description": "PD ОВ принципиальная схема вентиляции (gold G-TR-003/004 PD evidence); room names + system marks",
+   "page_facts": {
+    "size_mm": [
+     891,
+     420
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 0,
+    "visible_text_chars": 2346
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.7756,
+     0.8334,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.1,
+     0.45,
+     0.35,
+     0.7
+    ],
+    "rooms": [
+     0.15,
+     0.3,
+     0.4,
+     0.55
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A02",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0171",
+   "pdf_page_number": 99,
+   "stage": "PD",
+   "relative_path": "Пример нарушений на чертежах/ПД/5 Сведения об инженерном оборудовании/5.4 Отопление, вентиляц/V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+   "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+   "description": "PD ОВ plan, heating (gold G-TR-002 PD evidence), 1486x420",
+   "page_facts": {
+    "size_mm": [
+     1486,
+     420
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 403,
+    "visible_text_chars": 5201
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.8654,
+     0.8334,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.45,
+     0.0,
+     0.7,
+     0.25
+    ],
+    "rooms": [
+     0.15,
+     0.2,
+     0.4,
+     0.45
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A03",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0171",
+   "pdf_page_number": 104,
+   "stage": "PD",
+   "relative_path": "Пример нарушений на чертежах/ПД/5 Сведения об инженерном оборудовании/5.4 Отопление, вентиляц/V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+   "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+   "description": "PD ОВ sheet 26 (gold G-TR-001 PD evidence), 841x297",
+   "page_facts": {
+    "size_mm": [
+     841,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 399,
+    "visible_text_chars": 1559
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.7622,
+     0.7643,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.45,
+     0.7,
+     0.7,
+     0.95
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A04",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0201",
+   "pdf_page_number": 18,
+   "stage": "RD_ID_MIXED",
+   "relative_path": "Пример нарушений на чертежах/Рабочая и исполнительная документация/Полные разделы/АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+   "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+   "description": "RD ОВ1 plan 1st floor + explication + valve table (gold RD evidence), A0",
+   "page_facts": {
+    "size_mm": [
+     841,
+     1189
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 400,
+    "visible_text_chars": 5597
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.7622,
+     0.9411,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.05,
+     0.75,
+     0.3,
+     1.0
+    ],
+    "rooms": [
+     0.15,
+     0.7,
+     0.4,
+     0.95
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)",
+   "key_fields_title_block": {
+    "шифр": "АНО/150321/1-РД-ОВ1",
+    "стадия": "РД",
+    "лист": "5",
+    "изм_rows": [
+     "2 Зам. 690-23 20.03.2024",
+     "1 Зам. 582-23 27.11.2023"
+    ],
+    "note": "title block drawn as curves; gold document_sheet_number=4 (stamp-1)"
+   }
+  },
+  {
+   "id": "A05",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0201",
+   "pdf_page_number": 17,
+   "stage": "RD_ID_MIXED",
+   "relative_path": "Пример нарушений на чертежах/Рабочая и исполнительная документация/Полные разделы/АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+   "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+   "description": "RD ОВ1 plan (gold RD evidence), A0, sparse text layer",
+   "page_facts": {
+    "size_mm": [
+     841,
+     1189
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 400,
+    "visible_text_chars": 911
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.7622,
+     0.9411,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.05,
+     0.75,
+     0.3,
+     1.0
+    ],
+    "rooms": [
+     0.15,
+     0.55,
+     0.4,
+     0.8
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)",
+   "key_fields_title_block": {
+    "шифр": "АНО/150321/1-РД-ОВ1",
+    "стадия": "РД",
+    "лист": "4",
+    "note": "title block drawn as curves; gold document_sheet_number=3 (stamp-1)"
+   }
+  },
+  {
+   "id": "A06",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0202",
+   "pdf_page_number": 17,
+   "stage": "RD_ID_MIXED",
+   "relative_path": "Пример нарушений на чертежах/Рабочая и исполнительная документация/Полные разделы/АНО-150321-1-РД-ОВ2.1_изм. 3_в1.pdf",
+   "file_sha256": "632379a0e541f0c81e6b03e5528946730b4433939c796db4fdc1e5c3fc8b71ee",
+   "description": "RD ОВ2.1 heating plan (gold G-TR-002 RD evidence), A0",
+   "page_facts": {
+    "size_mm": [
+     841,
+     1189
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 556,
+    "visible_text_chars": 3920
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.7622,
+     0.9411,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.2,
+     0.75,
+     0.45,
+     1.0
+    ],
+    "rooms": [
+     0.0,
+     0.75,
+     0.25,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)",
+   "key_fields_title_block": {
+    "шифр": "АНО/150321/1-РД-ОВ2.1",
+    "стадия": "РД",
+    "лист": "4",
+    "изм_rows": [
+     "3 Зам. 861-24 22.08.2024",
+     "1 Зам. 606-23 13.12.2023"
+    ],
+    "note": "title block drawn as curves"
+   }
+  },
+  {
+   "id": "A07",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0156",
+   "pdf_page_number": 27,
+   "stage": "PD",
+   "relative_path": "Пример нарушений на чертежах/ПД/3 Архитектурные решения/V2_01-03-00-01-20_Том 3.РЕД.pdf",
+   "file_sha256": "16cd7f0b61a31b52b6e5d94f9249c0382407ec91b5531d6e0ed843e8827e30cf",
+   "description": "PD АР floor plan + explication, /Rotate 270, A0",
+   "page_facts": {
+    "size_mm": [
+     1189,
+     841
+    ],
+    "rotate": 270,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 0,
+    "visible_text_chars": 8590
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.8318,
+     0.9168,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.75,
+     0.1,
+     1.0,
+     0.35
+    ],
+    "rooms": [
+     0.15,
+     0.45,
+     0.4,
+     0.7
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A08",
+   "group": "A",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0104",
+   "pdf_page_number": 22,
+   "stage": "PD",
+   "relative_path": "Новослободская/Новослободская/Стадия П/НВС-2025.03-3-АР.pdf",
+   "file_sha256": "bbfef68dad703d33c63d73549b0c4a1007f74213a236580346262491839d80f8",
+   "description": "PD АР plan + explication (Новослободская), A2",
+   "page_facts": {
+    "size_mm": [
+     594,
+     420
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 184,
+    "visible_text_chars": 4042
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.6633,
+     0.8333,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.75,
+     0.4,
+     1.0,
+     0.65
+    ],
+    "rooms": [
+     0.3,
+     0.1,
+     0.55,
+     0.35
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A09",
+   "group": "A",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0101",
+   "pdf_page_number": 9,
+   "stage": "PD",
+   "relative_path": "Новослободская/Новослободская/Стадия П/НВС-2025.03-1.2-ПЗ.pdf",
+   "file_sha256": "01db90e015c39a9502b99969ce04f27825265203bc8728da6141d7b6d2b1ef54",
+   "description": "PD ПЗ ТЭП table, A4",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 0,
+    "visible_text_chars": 1646
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "page": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A10",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0154",
+   "pdf_page_number": 13,
+   "stage": "PD",
+   "relative_path": "Пример нарушений на чертежах/ПД/2 Схема планировочной организации ЗУ/АНО1503211-П-ПЗУ.pdf",
+   "file_sha256": "336e9742450dd403c6e2dfd0ee4660d316725e95201f4cb41308d2b9296c085b",
+   "description": "PD ПЗУ ТЭП, A4",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 0,
+    "visible_text_chars": 1187
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "page": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A11",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0171",
+   "pdf_page_number": 105,
+   "stage": "PD",
+   "relative_path": "Пример нарушений на чертежах/ПД/5 Сведения об инженерном оборудовании/5.4 Отопление, вентиляц/V2_01-05-04-02-07_Том 5.4.2 ОВ (1).pdf",
+   "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+   "description": "PD ОВ specification ГОСТ 21.110, A3",
+   "page_facts": {
+    "size_mm": [
+     420,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 0,
+    "visible_text_chars": 1286
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "page": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A12",
+   "group": "A",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0201",
+   "pdf_page_number": 6,
+   "stage": "RD_ID_MIXED",
+   "relative_path": "Пример нарушений на чертежах/Рабочая и исполнительная документация/Полные разделы/АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+   "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+   "description": "RD ОВ1 общие данные / ведомость, A4",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 199,
+    "visible_text_chars": 800
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "page": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A13",
+   "group": "A",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0140",
+   "pdf_page_number": 2,
+   "stage": "RD",
+   "relative_path": "Новослободская/Новослободская/Стадия РД/НСЛ-17-02.2026-1_2-КЖ1.1.1.pdf",
+   "file_sha256": "2c46f909396f33e4286637319fe4829d8d4cf6742c0e7337577dfdc4127ab085",
+   "description": "RD КЖ title page with «В производство работ» stamp, A4",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 220,
+    "visible_text_chars": 802
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "page": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A14",
+   "group": "A",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0001",
+   "pdf_page_number": 1,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/АОСР №1БТ от 17.04.2026.pdf",
+   "file_sha256": "ab8be6dc7a185f6d58231a1763537ac9fb6974aa9e3c6726a54862ce4741a577",
+   "description": "ID АОСР act (electronic, text layer), A4",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 0,
+    "visible_text_chars": 6893
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "page": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A15",
+   "group": "A",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0012",
+   "pdf_page_number": 3,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/Ограждение котлована. Обвязочный пояс/АОСР №1БОП от 22.06.2026.pdf",
+   "file_sha256": "e93e16ce69a0acea2e48aa1b17e862818cd4ca7aaa91b6d640e5abdcffeaf767",
+   "description": "ID исполнительная схема (vector+text), A3",
+   "page_facts": {
+    "size_mm": [
+     420,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 400,
+    "visible_text_chars": 1367
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "page": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A16",
+   "group": "A",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0140",
+   "pdf_page_number": 5,
+   "stage": "RD",
+   "relative_path": "Новослободская/Новослободская/Стадия РД/НСЛ-17-02.2026-1_2-КЖ1.1.1.pdf",
+   "file_sha256": "2c46f909396f33e4286637319fe4829d8d4cf6742c0e7337577dfdc4127ab085",
+   "description": "RD КЖ drawing sheet with title block, A1",
+   "page_facts": {
+    "size_mm": [
+     841,
+     594
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 0,
+    "visible_text_chars": 918
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "title": [
+     0.7622,
+     0.8822,
+     1.0,
+     1.0
+    ],
+    "dense": [
+     0.1,
+     0.4,
+     0.35,
+     0.65
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "A17",
+   "group": "A",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0106",
+   "pdf_page_number": 20,
+   "stage": "PD",
+   "relative_path": "Новослободская/Новослободская/Стадия П/НВС-2025.03-4.2-КР2.pdf",
+   "file_sha256": "ae8b16439650526a5ef6e1975c852fa38c2ab4466cd73ab725a47bcb32a6b655",
+   "description": "PD КР2 text page (geology), A4",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 299,
+    "visible_text_chars": 3184
+   },
+   "gt_method": "TEXT_LAYER",
+   "regions_norm": {
+    "page": [
+     0.0,
+     0.0,
+     1.0,
+     1.0
+    ]
+   },
+   "gt_note": "visible text-layer glyphs (texttrace, render mode != 3, non-white) inside each region, mapped to displayed page coords; regions with < 50 GT chars are excluded from CA (title blocks drawn as curves)"
+  },
+  {
+   "id": "B01",
+   "group": "B",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0001",
+   "pdf_page_number": 5,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/АОСР №1БТ от 17.04.2026.pdf",
+   "file_sha256": "ab8be6dc7a185f6d58231a1763537ac9fb6974aa9e3c6726a54862ce4741a577",
+   "description": "ID scan: документ о качестве бетонной смеси, 299 dpi, seal+QR+signature",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 299,
+    "visible_text_chars": 1
+   },
+   "gt_method": "HAND_TRANSCRIPTION_LINES",
+   "gt_ref": "hand_gt.B01",
+   "key_fields": [
+    "18-000001597",
+    "07.02.2026",
+    "БСТ В15П4F(I)150W6",
+    "10306",
+    "В15",
+    "19,2",
+    "РОСС RU Д-RU.РА01.В.44924/25",
+    "241"
+   ]
+  },
+  {
+   "id": "B02",
+   "group": "B",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0001",
+   "pdf_page_number": 15,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/АОСР №1БТ от 17.04.2026.pdf",
+   "file_sha256": "ab8be6dc7a185f6d58231a1763537ac9fb6974aa9e3c6726a54862ce4741a577",
+   "description": "ID scan: протокол испытаний (landscape), 149 dpi",
+   "page_facts": {
+    "size_mm": [
+     297,
+     210
+    ],
+    "rotate": 0,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 149,
+    "visible_text_chars": 2
+   },
+   "gt_method": "HAND_TRANSCRIPTION_LINES",
+   "gt_ref": "hand_gt.B02",
+   "key_fields": [
+    "250",
+    "16.02.2026",
+    "25/1230",
+    "30.12.2025",
+    "В15",
+    "13,9",
+    "73",
+    "11",
+    "14.02.2026",
+    "07.02.2026",
+    "77:01:0004009:3829",
+    "13,3*",
+    "140"
+   ]
+  },
+  {
+   "id": "B03",
+   "group": "B",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0012",
+   "pdf_page_number": 21,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/Ограждение котлована. Обвязочный пояс/АОСР №1БОП от 22.06.2026.pdf",
+   "file_sha256": "e93e16ce69a0acea2e48aa1b17e862818cd4ca7aaa91b6d640e5abdcffeaf767",
+   "description": "ID scan: протокол испытаний, /Rotate 270, 199 dpi",
+   "page_facts": {
+    "size_mm": [
+     297,
+     210
+    ],
+    "rotate": 270,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 199,
+    "visible_text_chars": 2
+   },
+   "gt_method": "NONE_QUALITATIVE"
+  },
+  {
+   "id": "B04",
+   "group": "B",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0004",
+   "pdf_page_number": 25,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/Ограждение котлована. БСС/АОСР №1А-БСС от 24.02.2026.pdf",
+   "file_sha256": "4e26b26409e2c59cd116b9f8dc789e6b4614000938ba83a519578e1214ae22d6",
+   "description": "ID scan: content rotated 90° inside image (/Rotate 0), 199 dpi",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 199,
+    "visible_text_chars": 2
+   },
+   "gt_method": "HAND_TRANSCRIPTION_LINES",
+   "gt_ref": "hand_gt.B04",
+   "key_fields": [
+    "284",
+    "20.02.2026",
+    "В25",
+    "22,6",
+    "18",
+    "72",
+    "10.02.2026",
+    "17.02.2026",
+    "ВСС-1а",
+    "№81",
+    "21,3*",
+    "224"
+   ]
+  },
+  {
+   "id": "B05",
+   "group": "B",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0001",
+   "pdf_page_number": 3,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/АОСР №1БТ от 17.04.2026.pdf",
+   "file_sha256": "ab8be6dc7a185f6d58231a1763537ac9fb6974aa9e3c6726a54862ce4741a577",
+   "description": "ID scan: colour исполнительная схема with seal, 213 dpi",
+   "page_facts": {
+    "size_mm": [
+     210,
+     152
+    ],
+    "rotate": 0,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 213,
+    "visible_text_chars": 1
+   },
+   "gt_method": "NONE_QUALITATIVE"
+  },
+  {
+   "id": "B06",
+   "group": "B",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0201",
+   "pdf_page_number": 7,
+   "stage": "RD_ID_MIXED",
+   "relative_path": "Пример нарушений на чертежах/Рабочая и исполнительная документация/Полные разделы/АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+   "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+   "description": "RD scan: анкета абонента (heat loads table) with stamps, 424 dpi",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 270,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 424,
+    "visible_text_chars": 0
+   },
+   "gt_method": "HAND_TRANSCRIPTION_LINES",
+   "gt_ref": "hand_gt.B06",
+   "key_fields": [
+    "60997,93",
+    "389,893",
+    "0,335",
+    "4,0",
+    "3100",
+    "вл.5"
+   ]
+  },
+  {
+   "id": "B07",
+   "group": "B",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0146",
+   "pdf_page_number": 40,
+   "stage": "PD",
+   "relative_path": "Пример нарушений на чертежах/ПД/1 Пояснительная записка/01-01-00-02-19_Том 1.2_Книга 1.pdf",
+   "file_sha256": "ccb8aac770ff3dbfd28e70467ad598927b5d95e885878c2572f437caaa3e134c",
+   "description": "PD scan: skewed text page, low dpi",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 120,
+    "visible_text_chars": 2
+   },
+   "gt_method": "HAND_TRANSCRIPTION_LINES",
+   "gt_ref": "hand_gt.B07",
+   "key_fields": [
+    "18",
+    "250"
+   ]
+  },
+  {
+   "id": "B08",
+   "group": "B",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0202",
+   "pdf_page_number": 5,
+   "stage": "RD_ID_MIXED",
+   "relative_path": "Пример нарушений на чертежах/Рабочая и исполнительная документация/Полные разделы/АНО-150321-1-РД-ОВ2.1_изм. 3_в1.pdf",
+   "file_sha256": "632379a0e541f0c81e6b03e5528946730b4433939c796db4fdc1e5c3fc8b71ee",
+   "description": "RD scan: cover sheet with approval stamps and signatures",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 199,
+    "visible_text_chars": 0
+   },
+   "gt_method": "NONE_QUALITATIVE"
+  },
+  {
+   "id": "C01",
+   "group": "C",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0083",
+   "pdf_page_number": 5,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/Строительное водопонижение/АОСР №1.1_П от 05.06.2026.pdf",
+   "file_sha256": "090f9e765bac846eb55e6425cc0f8e1fb4a120c92aae45369144579db3f24c44",
+   "description": "ID hybrid: scan under a visible-mode garbage text layer (occluded by image)",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "HYBRID",
+    "dominant_image_dpi": 151,
+    "visible_text_chars": 1146
+   },
+   "gt_method": "NONE_QUALITATIVE"
+  },
+  {
+   "id": "C02",
+   "group": "C",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0081",
+   "pdf_page_number": 16,
+   "stage": "ID",
+   "relative_path": "Новослободская/Новослободская/Исполнительная документация/Строительное водопонижение/АОСР №0.1_СБ от 28.06.2026.pdf",
+   "file_sha256": "6f7dc656b5fb2a63f92c28d52c5f27348a0126dbf7e01d83fcd7b89a44456cf1",
+   "description": "ID scan with invisible scanner OCR layer (декларация о соответствии), 200 dpi",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "SCAN_OCR_LAYER",
+    "dominant_image_dpi": 200,
+    "visible_text_chars": 2027
+   },
+   "gt_method": "NONE_QUALITATIVE"
+  },
+  {
+   "id": "C03",
+   "group": "C",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0116",
+   "pdf_page_number": 5,
+   "stage": "PD",
+   "relative_path": "Новослободская/Новослободская/Стадия П/НВС-2025.03-8.4 ПЭ.pdf",
+   "file_sha256": "51ee39b0189ba7360888d745db6e669a240067284d685c523e00683f817730b0",
+   "description": "PD hybrid text page (ПЭ)",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 0,
+    "visible_text_chars": 1744
+   },
+   "gt_method": "NONE_QUALITATIVE"
+  },
+  {
+   "id": "C04",
+   "group": "C",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0146",
+   "pdf_page_number": 200,
+   "stage": "PD",
+   "relative_path": "Пример нарушений на чертежах/ПД/1 Пояснительная записка/01-01-00-02-19_Том 1.2_Книга 1.pdf",
+   "file_sha256": "ccb8aac770ff3dbfd28e70467ad598927b5d95e885878c2572f437caaa3e134c",
+   "description": "PD colour scanned plan (hybrid)",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "SCAN",
+    "dominant_image_dpi": 119,
+    "visible_text_chars": 6
+   },
+   "gt_method": "NONE_QUALITATIVE"
+  },
+  {
+   "id": "D01",
+   "group": "D",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0201",
+   "pdf_page_number": 15,
+   "stage": "RD_ID_MIXED",
+   "relative_path": "Пример нарушений на чертежах/Рабочая и исполнительная документация/Полные разделы/АНО-150321-1-РД-ОВ1 изм. 4_в1 (1).pdf",
+   "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+   "description": "RD ОВ1 specification table fully as curves (outlined text), A1",
+   "page_facts": {
+    "size_mm": [
+     841,
+     594
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_OUTLINED",
+    "dominant_image_dpi": 556,
+    "visible_text_chars": 9
+   },
+   "gt_method": "NONE_QUALITATIVE",
+   "key_fields_title_block": {
+    "шифр": "АНО/150321/1-РД-ОВ1",
+    "стадия": "РД",
+    "лист": "2"
+   }
+  },
+  {
+   "id": "D02",
+   "group": "D",
+   "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+   "file_id": "F0202",
+   "pdf_page_number": 19,
+   "stage": "RD_ID_MIXED",
+   "relative_path": "Пример нарушений на чертежах/Рабочая и исполнительная документация/Полные разделы/АНО-150321-1-РД-ОВ2.1_изм. 3_в1.pdf",
+   "file_sha256": "632379a0e541f0c81e6b03e5528946730b4433939c796db4fdc1e5c3fc8b71ee",
+   "description": "RD ОВ2.1 axonometric scheme as curves, A0",
+   "page_facts": {
+    "size_mm": [
+     1189,
+     841
+    ],
+    "rotate": 270,
+    "inventory_class": "VECTOR_OUTLINED",
+    "dominant_image_dpi": 399,
+    "visible_text_chars": 7
+   },
+   "gt_method": "NONE_QUALITATIVE",
+   "key_fields_title_block": {
+    "шифр": "АНО/150321/1-РД-ОВ2.1",
+    "стадия": "РД",
+    "лист": "6"
+   }
+  },
+  {
+   "id": "D03",
+   "group": "D",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0107",
+   "pdf_page_number": 4,
+   "stage": "PD",
+   "relative_path": "Новослободская/Новослободская/Стадия П/НВС-2025.03-4.3-КР3.pdf",
+   "file_sha256": "f4762efb6baafdd9475b0dfe61e5dc89da840e2120245723abf0228a94c74744",
+   "description": "PD КР3 text page as curves («Справка главного конструктора»), A4",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_OUTLINED",
+    "dominant_image_dpi": 300,
+    "visible_text_chars": 11
+   },
+   "gt_method": "HAND_TRANSCRIPTION_LINES",
+   "gt_ref": "hand_gt.D03",
+   "key_fields": [
+    "ИДК-ДУП-25-2178-КР2"
+   ]
+  },
+  {
+   "id": "D04",
+   "group": "D",
+   "object_id": "OBJ-NOVOSLOBODSKAYA",
+   "file_id": "F0138",
+   "pdf_page_number": 3,
+   "stage": "RD",
+   "relative_path": "Новослободская/Новослободская/Стадия РД/2451.Р.ДР (1).pdf",
+   "file_sha256": "94a8c8436906ec7e66047e9c43d5fafe7e514bb1356e2065d1826867fddc700d",
+   "description": "RD 2451.Р.ДР sheet as curves, A1",
+   "page_facts": {
+    "size_mm": [
+     841,
+     594
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_OUTLINED",
+    "dominant_image_dpi": 599,
+    "visible_text_chars": 0
+   },
+   "gt_method": "NONE_QUALITATIVE",
+   "key_fields_title_block": {
+    "шифр": "2451.Р.ДР.ГИ",
+    "стадия": "Р",
+    "лист": "1",
+    "листов": "13"
+   }
+  },
+  {
+   "id": "R01",
+   "group": "R",
+   "object_id": "OBJ-RECHNIKOV-7-7",
+   "file_id": "F0232",
+   "pdf_page_number": 1,
+   "stage": "ID",
+   "relative_path": "Речников ул. 7-7/ИД/Папка №29. Кладка 7.7.pdf",
+   "file_sha256": "8b7c68824143739f077883a9de1225c0123db26f6c59f09553cab241c70896f1",
+   "description": "Речников ИД Папка №29 Кладка (658 MB, 507 pages) — speed/format profiling only",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 116,
+    "visible_text_chars": 449
+   },
+   "gt_method": "NONE_PROFILING_ONLY",
+   "gt_note": "Hidden-test object: used only for format/speed profiling (93 §4.9). No labels, no tuning."
+  },
+  {
+   "id": "R02",
+   "group": "R",
+   "object_id": "OBJ-RECHNIKOV-7-7",
+   "file_id": "F0232",
+   "pdf_page_number": 250,
+   "stage": "ID",
+   "relative_path": "Речников ул. 7-7/ИД/Папка №29. Кладка 7.7.pdf",
+   "file_sha256": "8b7c68824143739f077883a9de1225c0123db26f6c59f09553cab241c70896f1",
+   "description": "Речников ИД Кладка binder mid page — profiling only",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "(not inventoried)",
+    "dominant_image_dpi": null,
+    "visible_text_chars": null
+   },
+   "gt_method": "NONE_PROFILING_ONLY",
+   "gt_note": "Hidden-test object: used only for format/speed profiling (93 §4.9). No labels, no tuning."
+  },
+  {
+   "id": "R03",
+   "group": "R",
+   "object_id": "OBJ-RECHNIKOV-7-7",
+   "file_id": "F0205",
+   "pdf_page_number": 10,
+   "stage": "ID",
+   "relative_path": "Речников ул. 7-7/ИД/! 4 этаж.pdf",
+   "file_sha256": "854f7bc6edbf6cd0aee8a4d17407192cdbc8b44fc2d68932c2c7e4f98e1f4bb4",
+   "description": "Речников ИД «4 этаж» binder — profiling only",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 270,
+    "inventory_class": "(not inventoried)",
+    "dominant_image_dpi": null,
+    "visible_text_chars": null
+   },
+   "gt_method": "NONE_PROFILING_ONLY",
+   "gt_note": "Hidden-test object: used only for format/speed profiling (93 §4.9). No labels, no tuning."
+  },
+  {
+   "id": "R04",
+   "group": "R",
+   "object_id": "OBJ-RECHNIKOV-7-7",
+   "file_id": "F0253",
+   "pdf_page_number": 20,
+   "stage": "PD",
+   "relative_path": "Речников ул. 7-7/ПД/3 Архитектурные реше/01-07-22-14-П-АР1-кор3.pdf",
+   "file_sha256": "96d9893856e7dd93429c64d00c33526d068a9d9d747db178597957664be7bce6",
+   "description": "Речников PD АР1-кор3 sheet — profiling only",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "(not inventoried)",
+    "dominant_image_dpi": null,
+    "visible_text_chars": null
+   },
+   "gt_method": "NONE_PROFILING_ONLY",
+   "gt_note": "Hidden-test object: used only for format/speed profiling (93 §4.9). No labels, no tuning."
+  },
+  {
+   "id": "R05",
+   "group": "R",
+   "object_id": "OBJ-RECHNIKOV-7-7",
+   "file_id": "F0341",
+   "pdf_page_number": 1,
+   "stage": "RD",
+   "relative_path": "Речников ул. 7-7/РД/3. КР/1. Подземная автостоянка/2. ОК Ограждение котлована/01-07_23-14-РД-ОК.pdf",
+   "file_sha256": "784145fe2c704b0e0a324deb6b58a2e0c714e190b101c89014b7bae9db79c137",
+   "description": "Речников RD ОК PDF twin of DWG F0340 — profiling only",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 0,
+    "inventory_class": "VECTOR_TEXT",
+    "dominant_image_dpi": 676,
+    "visible_text_chars": 351
+   },
+   "gt_method": "NONE_PROFILING_ONLY",
+   "gt_note": "Hidden-test object: used only for format/speed profiling (93 §4.9). No labels, no tuning."
+  },
+  {
+   "id": "R06",
+   "group": "R",
+   "object_id": "OBJ-RECHNIKOV-7-7",
+   "file_id": "F0240",
+   "pdf_page_number": 100,
+   "stage": "PD",
+   "relative_path": "Речников ул. 7-7/ПД/1 Пояснительная запи/01-07.22-14-П-ИД-Кор2.pdf",
+   "file_sha256": "0cbf729de07d979f825c8c4d4c54da7a20d73a994aa7a3447c48d73270feaf89",
+   "description": "Речников PD ИД (ИРД, 424 pages) — profiling only",
+   "page_facts": {
+    "size_mm": [
+     210,
+     297
+    ],
+    "rotate": 270,
+    "inventory_class": "(not inventoried)",
+    "dominant_image_dpi": null,
+    "visible_text_chars": null
+   },
+   "gt_method": "NONE_PROFILING_ONLY",
+   "gt_note": "Hidden-test object: used only for format/speed profiling (93 §4.9). No labels, no tuning."
+  }
+ ],
+ "hand_gt": {
+  "B01": {
+   "file_id": "F0001",
+   "pdf_page_number": 5,
+   "lines": [
+    {
+     "bbox": [
+      180.7,
+      11.0,
+      442.1,
+      42.2
+     ],
+     "text": "ДОКУМЕНТ О КАЧЕСТВЕ БЕТОННОЙ СМЕСИ",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      167.0,
+      24.7,
+      453.1,
+      57.6
+     ],
+     "text": "ЗАДАННОГО КАЧЕСТВА ПАРТИИ № 18-000001597",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      489.4,
+      74.9,
+      562.1,
+      91.2
+     ],
+     "text": "Приложение Б",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      50.6,
+      82.3,
+      127.4,
+      97.7
+     ],
+     "text": "ГОСТ 7473-2010",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      481.0,
+      86.9,
+      560.9,
+      103.9
+     ],
+     "text": "(обязательное)",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      322.3,
+      121.9,
+      516.0,
+      147.8
+     ],
+     "text": "ООО \"БЕТОЛЮКС\", 129110, г. Москва,",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      320.2,
+      134.6,
+      539.5,
+      162.5
+     ],
+     "text": "Олимпийский пр-т, д. 20, пом. 1/1 , +7 (499)",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      47.0,
+      137.0,
+      279.1,
+      163.2
+     ],
+     "text": "Производитель и поставщик бетонной смеси:",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      52.6,
+      182.9,
+      107.5,
+      194.2
+     ],
+     "text": "наименование",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      130.6,
+      187.7,
+      186.2,
+      199.2
+     ],
+     "text": "наименование",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      41.5,
+      211.9,
+      113.8,
+      230.2
+     ],
+     "text": "Потребитель:",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      40.6,
+      226.3,
+      181.0,
+      245.8
+     ],
+     "text": "наименование, адрес, телефон, факс",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      39.8,
+      237.1,
+      322.3,
+      268.8
+     ],
+     "text": "ООО \"МЕГАСТРОЙ\", г. Москва ул. Новослободская д.19",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      37.9,
+      251.3,
+      276.2,
+      281.5
+     ],
+     "text": "Дата и время отгрузки бетонной смеси, ч-мин :",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      37.7,
+      265.9,
+      283.2,
+      296.2
+     ],
+     "text": "Вид бетонной смеси и ее условное обозначение",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      313.4,
+      269.3,
+      399.6,
+      286.3
+     ],
+     "text": "07.02.2026 10-20",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      35.3,
+      281.3,
+      271.0,
+      307.9
+     ],
+     "text": "Номер номинального состава бетонной смеси",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      311.3,
+      282.7,
+      424.3,
+      303.8
+     ],
+     "text": "БСТ В15П4F(I)150W6",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      418.3,
+      290.2,
+      492.2,
+      308.6
+     ],
+     "text": "(ПМД до -10)",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      37.2,
+      295.0,
+      221.3,
+      319.7
+     ],
+     "text": "Объем бетонной смеси в партии, м3",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      311.3,
+      297.6,
+      344.6,
+      311.8
+     ],
+     "text": "10306",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      36.2,
+      309.1,
+      303.8,
+      339.6
+     ],
+     "text": "Марка бетонной смеси по удобоукладываемости или",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      309.8,
+      311.8,
+      325.2,
+      325.0
+     ],
+     "text": "11",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      34.8,
+      322.3,
+      299.3,
+      351.8
+     ],
+     "text": "значение удобоукладываемости бетонной смеси (по",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      34.6,
+      335.0,
+      244.1,
+      360.7
+     ],
+     "text": "договору на поставку) на месте укладки у",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      308.4,
+      344.4,
+      378.5,
+      362.6
+     ],
+     "text": "П4(16-20 см.)",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      34.3,
+      347.5,
+      100.3,
+      362.9
+     ],
+     "text": "потребителя",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      34.1,
+      361.2,
+      116.2,
+      379.2
+     ],
+     "text": "Сохраняемость",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      114.5,
+      366.0,
+      278.6,
+      389.3
+     ],
+     "text": "удобоукладываемости и других",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      32.9,
+      374.6,
+      202.1,
+      395.5
+     ],
+     "text": "нормируемых показателей, ч-мин",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      31.9,
+      386.9,
+      235.9,
+      413.5
+     ],
+     "text": "Наибольшая крупность заполнителя, мм",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      305.8,
+      389.0,
+      446.4,
+      411.1
+     ],
+     "text": "От 1 ч 30 мин до 3 ч 00 мин",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      303.1,
+      402.7,
+      321.4,
+      417.6
+     ],
+     "text": "20",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      30.2,
+      421.7,
+      283.9,
+      450.2
+     ],
+     "text": "Знак соответствия (в случае, если бетонная смесь",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      29.8,
+      434.6,
+      125.3,
+      453.1
+     ],
+     "text": "сертифицирована)",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      301.7,
+      450.0,
+      468.5,
+      473.3
+     ],
+     "text": "РОСС RU Д-RU.РА01.В.44924/25",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      26.9,
+      468.5,
+      427.2,
+      507.4
+     ],
+     "text": "Проектный класс бетона по прочности и требуемая прочность бетона в партии:",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      27.8,
+      486.5,
+      149.3,
+      505.0
+     ],
+     "text": "- в проектном возрасте",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      187.0,
+      493.9,
+      203.8,
+      507.6
+     ],
+     "text": "28",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      240.5,
+      498.5,
+      263.8,
+      513.4
+     ],
+     "text": "сут;",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      355.4,
+      504.0,
+      379.4,
+      517.9
+     ],
+     "text": "В15",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      464.4,
+      510.2,
+      490.3,
+      526.6
+     ],
+     "text": "19,2",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      24.0,
+      518.9,
+      278.9,
+      548.2
+     ],
+     "text": "Наименование, масса добавки (в расчете на сухое",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      320.9,
+      517.9,
+      411.6,
+      534.2
+     ],
+     "text": "класс по прочности",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      516.5,
+      514.3,
+      543.1,
+      528.2
+     ],
+     "text": "МПа",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      437.5,
+      524.6,
+      536.9,
+      542.6
+     ],
+     "text": "требуемая прочность",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      23.8,
+      532.6,
+      108.5,
+      548.4
+     ],
+     "text": "вещество), кг/м3",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      20.9,
+      554.9,
+      131.8,
+      576.2
+     ],
+     "text": "; Криопласт Премиум",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      19.7,
+      591.1,
+      307.7,
+      622.8
+     ],
+     "text": "Класс материалов по удельной эффективной активности",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      19.0,
+      605.5,
+      292.1,
+      633.4
+     ],
+     "text": "естественных радионуклидов и значение Аэфф, Бк/кг",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      341.3,
+      622.6,
+      435.8,
+      642.5
+     ],
+     "text": "1 класс (241 Бк/кг)",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      17.5,
+      638.2,
+      84.5,
+      655.0
+     ],
+     "text": "Дата выдачи",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      253.2,
+      651.1,
+      345.6,
+      668.4
+     ],
+     "text": "7 февраля 2026 г.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      15.6,
+      670.6,
+      139.2,
+      692.4
+     ],
+     "text": "Начальник лаборатории",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      396.2,
+      690.7,
+      471.8,
+      707.5
+     ],
+     "text": "/Баринов С.В./",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      250.8,
+      699.1,
+      295.4,
+      713.5
+     ],
+     "text": "подпись",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      573.1,
+      798.7,
+      585.8,
+      813.8
+     ],
+     "text": "5",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      421,
+      500,
+      429,
+      513
+     ],
+     "text": ";",
+     "src": "added"
+    }
+   ],
+   "excluded_zones": [
+    {
+     "bbox": [
+      212,
+      126,
+      318,
+      216
+     ],
+     "type": "STAMP_BLUE_RECT"
+    },
+    {
+     "bbox": [
+      318,
+      150,
+      390,
+      216
+     ],
+     "type": "STAMP_BLUE_RECT"
+    },
+    {
+     "bbox": [
+      318,
+      158,
+      548,
+      245
+     ],
+     "type": "SEAL_ROUND_OCCLUDING_TEXT"
+    },
+    {
+     "bbox": [
+      45,
+      18,
+      112,
+      80
+     ],
+     "type": "QR_CODE"
+    },
+    {
+     "bbox": [
+      350,
+      405,
+      410,
+      465
+     ],
+     "type": "CERT_MARK_LOGO"
+    }
+   ],
+   "n_chars": 1232,
+   "note": "Документ о качестве бетонной смеси; 299-dpi colour scan; GT transcribed visually from 170-dpi band renders + OCR prefill; homoglyph convention: concrete class/Д/РОСС Cyrillic, F/W/RU Latin",
+   "verification": "transcribed by the analysis agent from 150-220 dpi renders viewed band by band, starting from an OCR prefill; every prefill line adjudicated (kept, corrected or excluded); homoglyph convention documented per page; needs one human re-check pass (~40 min) before it is quoted as acceptance evidence"
+  },
+  "B02": {
+   "file_id": "F0001",
+   "pdf_page_number": 15,
+   "lines": [
+    {
+     "bbox": [
+      309.4,
+      41.5,
+      619.0,
+      59.0
+     ],
+     "text": "ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      419.8,
+      58.1,
+      508.6,
+      70.6
+     ],
+     "text": "«СТРОЙМАТ и К»",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      414.7,
+      68.6,
+      514.1,
+      82.8
+     ],
+     "text": "Основано в 1992 году",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      227.8,
+      77.0,
+      698.6,
+      98.2
+     ],
+     "text": "Российская Федерация, 119526, г.Москва, просп.Вернадского, д.101, корп.1, эт/пом/ком 1/I/54,",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      287.5,
+      91.4,
+      638.9,
+      110.2
+     ],
+     "text": "т/ф (495) 430-76-97, (495) 433-61-31, (916) 600-98-93, E-mail: klib@list.ru",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      334.3,
+      105.1,
+      588.5,
+      120.2
+     ],
+     "text": "ОГРН 1027739418024, ИНН 7728046701, КПП 772901001",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      242.9,
+      117.1,
+      682.6,
+      135.1
+     ],
+     "text": "Аттестат аккредитации испытательной лаборатории №RU.АСК.ИЛ.816 от 25.08.2020 г.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      71.3,
+      132.0,
+      205.2,
+      146.9
+     ],
+     "text": "Исх. № 250 от 16.02.2026 г.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      663.4,
+      140.2,
+      752.4,
+      155.3
+     ],
+     "text": "«УТВЕРЖДАЮ»",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      672.0,
+      155.8,
+      752.2,
+      169.4
+     ],
+     "text": "Генеральный директор",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      641.5,
+      161.5,
+      753.8,
+      187.4
+     ],
+     "text": "ООО «Строймат и К»",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      679.2,
+      182.4,
+      751.4,
+      195.6
+     ],
+     "text": "Клибанов А.Л.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      661.0,
+      196.1,
+      755.3,
+      209.5
+     ],
+     "text": "« 16 » февраля 2026 г.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      369.1,
+      207.6,
+      479.8,
+      220.8
+     ],
+     "text": "Протокол испытаний",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      330.0,
+      219.6,
+      503.5,
+      234.5
+     ],
+     "text": "Договор № 25/1230 от 30.12.2025 г.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      37.9,
+      228.5,
+      281.3,
+      245.8
+     ],
+     "text": "Наименование организации: ООО «МегаСтрой»",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      36.5,
+      241.2,
+      396.0,
+      262.1
+     ],
+     "text": "Наименование продукции: образцы-кубы бетона проектного класса В15",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      37.4,
+      256.8,
+      567.1,
+      279.4
+     ],
+     "text": "Объект строительства: « Жилой дом с подземной автостоянкой и встроенно-пристроенными помещениями »",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      37.0,
+      270.5,
+      767.8,
+      295.7
+     ],
+     "text": "Адрес строительства: г.Москва,внутригородская территория, муниципальный округ Тверской, ул. Новослободская на земельном участке с кадастровым",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      36.7,
+      285.4,
+      178.6,
+      298.3
+     ],
+     "text": "номером 77:01:0004009:3829",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      35.0,
+      297.1,
+      568.1,
+      321.1
+     ],
+     "text": "Методика испытаний: ГОСТ 10180-12 \"Бетоны. Методы определения прочности по контрольным образцам\"",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      35.0,
+      312.2,
+      460.1,
+      334.6
+     ],
+     "text": "Методика оценки: ГОСТ 18105-2018 \"Бетоны. Правила контроля и оценки прочности\"",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      34.1,
+      326.4,
+      672.2,
+      350.9
+     ],
+     "text": "Испытательное оборудование: пресс Matest C040PN132, свидетельство о поверке № С-ГЦЧ/12-09-2025/465529479 от 12.09.2025 г.,",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      34.3,
+      340.8,
+      528.2,
+      362.9
+     ],
+     "text": "Весы электронные HW-10KGV, зав. M7 802289, сертификат о калибровке № В 030-26 от 23.01.2026 г.,",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      37.0,
+      354.2,
+      526.8,
+      376.8
+     ],
+     "text": "Штангенциркуль ШЦ-II-250-0,05, зав. Г401291,сертификат о калибровке № В 053-26 от 23.01.2026 г.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      383.8,
+      375.4,
+      509.0,
+      389.3
+     ],
+     "text": "Результаты испытания:",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      57.6,
+      383.0,
+      82.1,
+      396.0
+     ],
+     "text": "Дата",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      394.6,
+      392.6,
+      498.0,
+      407.5
+     ],
+     "text": "Размер образцов-кубов,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      39.4,
+      397.0,
+      99.4,
+      406.8
+     ],
+     "text": "изготовления",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      135.6,
+      397.4,
+      200.4,
+      409.4
+     ],
+     "text": "Наименование",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      511.4,
+      395.5,
+      540.0,
+      407.8
+     ],
+     "text": "Плот-",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      554.6,
+      396.5,
+      604.3,
+      409.9
+     ],
+     "text": "Разрушаю-",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      621.4,
+      396.0,
+      689.0,
+      409.7
+     ],
+     "text": "Прочность при",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      708.7,
+      398.2,
+      741.8,
+      410.4
+     ],
+     "text": "Факти-",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      766.8,
+      398.2,
+      791.8,
+      411.1
+     ],
+     "text": "% от",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      248.2,
+      404.9,
+      273.1,
+      418.3
+     ],
+     "text": "Дата",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      297.8,
+      399.8,
+      335.3,
+      412.3
+     ],
+     "text": "Возраст",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      54.7,
+      409.4,
+      83.8,
+      421.2
+     ],
+     "text": "серии",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      111.6,
+      410.9,
+      223.2,
+      423.6
+     ],
+     "text": "конструкции, маркировка",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      351.8,
+      405.8,
+      383.3,
+      418.8
+     ],
+     "text": "Масса",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      438.5,
+      408.0,
+      453.6,
+      418.6
+     ],
+     "text": "см",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      512.6,
+      410.4,
+      538.8,
+      419.5
+     ],
+     "text": "ность",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      569.5,
+      410.6,
+      590.4,
+      421.2
+     ],
+     "text": "щая",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      625.4,
+      408.5,
+      685.4,
+      421.0
+     ],
+     "text": "сжатии, МПа",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      298.8,
+      412.1,
+      333.4,
+      425.3
+     ],
+     "text": "бетона,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      708.7,
+      411.8,
+      741.6,
+      422.6
+     ],
+     "text": "ческий",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      752.4,
+      412.6,
+      804.0,
+      425.5
+     ],
+     "text": "проектного",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      47.5,
+      420.5,
+      90.5,
+      434.6
+     ],
+     "text": "образцов",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      235.2,
+      419.3,
+      284.6,
+      428.9
+     ],
+     "text": "испытаний",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      344.4,
+      418.8,
+      391.4,
+      433.0
+     ],
+     "text": "образца, г",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      505.7,
+      420.2,
+      545.3,
+      434.9
+     ],
+     "text": "образца,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      558.2,
+      422.9,
+      600.2,
+      435.8
+     ],
+     "text": "нагрузка,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      133.4,
+      423.4,
+      201.1,
+      435.4
+     ],
+     "text": "серии образцов",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      305.3,
+      425.8,
+      325.9,
+      439.2
+     ],
+     "text": "сут.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      711.8,
+      426.0,
+      737.8,
+      435.1
+     ],
+     "text": "класс",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      763.9,
+      426.2,
+      793.7,
+      435.6
+     ],
+     "text": "класса",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      395.0,
+      431.3,
+      499.2,
+      443.3
+     ],
+     "text": "длина ширина высота",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      512.9,
+      433.4,
+      538.1,
+      445.7
+     ],
+     "text": "г/см³",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      572.4,
+      434.4,
+      589.0,
+      446.6
+     ],
+     "text": "кН",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      607.7,
+      432.0,
+      646.1,
+      446.6
+     ],
+     "text": "образца",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      661.2,
+      433.9,
+      698.6,
+      445.9
+     ],
+     "text": "среднее",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      700.1,
+      435.6,
+      748.3,
+      449.8
+     ],
+     "text": "бетона Вф",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      763.4,
+      437.5,
+      794.6,
+      449.0
+     ],
+     "text": "бетона",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      161.5,
+      447.1,
+      172.1,
+      457.7
+     ],
+     "text": "2",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      255.1,
+      449.0,
+      263.3,
+      458.6
+     ],
+     "text": "3",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      311.3,
+      450.7,
+      319.9,
+      459.6
+     ],
+     "text": "4",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      361.0,
+      450.5,
+      372.5,
+      461.0
+     ],
+     "text": "5",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      404.9,
+      451.2,
+      414.7,
+      461.3
+     ],
+     "text": "6",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      439.7,
+      451.2,
+      452.9,
+      462.0
+     ],
+     "text": "7",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      476.6,
+      451.7,
+      487.9,
+      462.5
+     ],
+     "text": "8",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      521.0,
+      452.4,
+      530.2,
+      463.0
+     ],
+     "text": "9",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      572.6,
+      451.9,
+      586.6,
+      463.9
+     ],
+     "text": "10",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      626.4,
+      452.9,
+      640.3,
+      464.6
+     ],
+     "text": "11",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      671.8,
+      453.1,
+      686.6,
+      465.4
+     ],
+     "text": "12",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      717.1,
+      453.6,
+      732.5,
+      466.1
+     ],
+     "text": "13",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      772.8,
+      454.8,
+      786.0,
+      466.3
+     ],
+     "text": "14",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      121.7,
+      469.2,
+      211.9,
+      482.9
+     ],
+     "text": "Технологическая",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      353.0,
+      465.1,
+      379.4,
+      479.3
+     ],
+     "text": "2290",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      397.7,
+      465.4,
+      421.4,
+      481.2
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      433.2,
+      465.4,
+      457.7,
+      482.2
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      469.7,
+      465.8,
+      493.9,
+      482.4
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      513.1,
+      466.8,
+      537.1,
+      482.6
+     ],
+     "text": "2,29",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      569.0,
+      467.3,
+      589.4,
+      481.4
+     ],
+     "text": "140",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      617.8,
+      467.5,
+      648.2,
+      484.6
+     ],
+     "text": "13,3*",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      40.6,
+      481.7,
+      94.3,
+      495.4
+     ],
+     "text": "07.02.2026",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      146.6,
+      485.8,
+      185.8,
+      499.0
+     ],
+     "text": "дорога",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      232.3,
+      485.3,
+      285.6,
+      498.7
+     ],
+     "text": "14.02.2026",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      310.8,
+      487.9,
+      319.0,
+      497.5
+     ],
+     "text": "7",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      352.6,
+      486.7,
+      379.2,
+      501.4
+     ],
+     "text": "2300",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      397.0,
+      486.5,
+      421.4,
+      503.3
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      432.7,
+      487.0,
+      457.2,
+      504.5
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      469.9,
+      487.9,
+      493.4,
+      503.8
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      512.4,
+      488.2,
+      537.1,
+      504.5
+     ],
+     "text": "2,30",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      568.8,
+      489.1,
+      589.4,
+      502.8
+     ],
+     "text": "147",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      620.9,
+      490.1,
+      644.6,
+      505.7
+     ],
+     "text": "14,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      666.7,
+      490.1,
+      690.2,
+      505.7
+     ],
+     "text": "13,9",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      717.4,
+      492.2,
+      730.8,
+      503.8
+     ],
+     "text": "11",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      771.1,
+      492.0,
+      785.5,
+      504.7
+     ],
+     "text": "73",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      124.3,
+      499.0,
+      205.2,
+      511.9
+     ],
+     "text": "в/о 1.1-4 / А-Х1",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      351.8,
+      507.4,
+      379.0,
+      522.5
+     ],
+     "text": "2290",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      396.2,
+      507.8,
+      421.7,
+      525.1
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      433.2,
+      508.8,
+      456.7,
+      524.9
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      469.4,
+      509.0,
+      493.4,
+      526.1
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      511.9,
+      509.5,
+      537.1,
+      526.1
+     ],
+     "text": "2,29",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      568.6,
+      510.5,
+      589.4,
+      524.4
+     ],
+     "text": "145",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      620.6,
+      511.4,
+      644.9,
+      527.0
+     ],
+     "text": "13,8",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      29.8,
+      526.1,
+      676.8,
+      550.3
+     ],
+     "text": "Примечание: *прочность образца в серии является минимальной и не учитывается при подсчете средней прочности в серии (п.8.4 ГОСТ 10180-2012)",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      32.2,
+      542.9,
+      736.3,
+      567.1
+     ],
+     "text": "Вывод: Фактический класс бетона в возрасте 7 суток составляет 73% от проектного класса В15 и соответствует бетону класса В11 ( ГОСТ 18105-2018 \"схема Г\" ).",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      799.9,
+      551.5,
+      820.1,
+      567.8
+     ],
+     "text": "15",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      75.8,
+      561.8,
+      128.2,
+      578.4
+     ],
+     "text": "Инженер",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      549.6,
+      568.3,
+      625.2,
+      582.7
+     ],
+     "text": "Тебекина Л.В.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      63,
+      446,
+      71,
+      458
+     ],
+     "text": "1",
+     "src": "added"
+    }
+   ],
+   "excluded_zones": [
+    {
+     "bbox": [
+      560,
+      140,
+      668,
+      262
+     ],
+     "type": "SEAL_ROUND_WITH_SIGNATURE"
+    },
+    {
+     "bbox": [
+      38,
+      38,
+      112,
+      112
+     ],
+     "type": "LOGO"
+    },
+    {
+     "bbox": [
+      370,
+      555,
+      425,
+      595
+     ],
+     "type": "HANDWRITING_SIGNATURE"
+    }
+   ],
+   "n_chars": 1992,
+   "note": "Протокол испытаний бетонных кубов; 150-dpi landscape scan; ruled table; GT from 220-dpi renders + OCR prefill",
+   "verification": "transcribed by the analysis agent from 150-220 dpi renders viewed band by band, starting from an OCR prefill; every prefill line adjudicated (kept, corrected or excluded); homoglyph convention documented per page; needs one human re-check pass (~40 min) before it is quoted as acceptance evidence"
+  },
+  "B04": {
+   "file_id": "F0004",
+   "pdf_page_number": 25,
+   "lines": [
+    {
+     "bbox": [
+      552.6,
+      796.7,
+      574.9,
+      816.1
+     ],
+     "text": "25",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      544.3,
+      319.0,
+      563.0,
+      628.2
+     ],
+     "text": "ОБЩЕСТВО С ОГРАНИЧЕННОЙ ОТВЕТСТВЕННОСТЬЮ",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      532.4,
+      428.0,
+      547.2,
+      518.0
+     ],
+     "text": "«СТРОЙМАТ и К»",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      520.6,
+      423.0,
+      536.4,
+      523.4
+     ],
+     "text": "Основано в 1992 году",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      504.4,
+      236.9,
+      528.1,
+      707.4
+     ],
+     "text": "Российская Федерация, 119526, г.Москва, просп.Вернадского, д.101, корп.1, эт/пом/ком 1/I/54,",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      492.8,
+      296.6,
+      513.4,
+      648.4
+     ],
+     "text": "т/ф (495) 430-76-97, (495) 433-61-31, (916) 600-98-93, E-mail: klib@list.ru",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      483.1,
+      343.8,
+      500.4,
+      597.6
+     ],
+     "text": "ОГРН 1027739418024, ИНН 7728046701, КПП 772901001",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      466.9,
+      252.4,
+      489.2,
+      692.3
+     ],
+     "text": "Аттестат аккредитации испытательной лаборатории №RU.АСК.ИЛ.816 от 25.08.2020 г.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      457.6,
+      79.9,
+      472.7,
+      214.6
+     ],
+     "text": "Исх. № 284 от 20.02.2026 г.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      447.1,
+      679.3,
+      463.3,
+      761.4
+     ],
+     "text": "«УТВЕРЖДАЮ»",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      432.4,
+      648.4,
+      449.6,
+      760.3
+     ],
+     "text": "Генеральный директор",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      419.4,
+      680.0,
+      434.9,
+      760.7
+     ],
+     "text": "ООО «Строймат и К»",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      406.1,
+      688.3,
+      421.6,
+      760.0
+     ],
+     "text": "Клибанов А.Л.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      392.8,
+      688.3,
+      407.9,
+      763.6
+     ],
+     "text": "« 20 » февраля 2026 г.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      381.2,
+      377.3,
+      398.2,
+      489.6
+     ],
+     "text": "Протокол испытаний",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      369.0,
+      339.1,
+      385.9,
+      512.3
+     ],
+     "text": "Договор № 25/1230 от 30.12.2025 г.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      358.2,
+      46.1,
+      376.9,
+      292.3
+     ],
+     "text": "Наименование организации: ООО «МегаСтрой»",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      342.0,
+      44.6,
+      363.6,
+      405.0
+     ],
+     "text": "Наименование продукции: образцы-кубы бетона проектного класса В25",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      323.6,
+      45.4,
+      348.5,
+      576.4
+     ],
+     "text": "Объект строительства: « Жилой дом с подземной автостоянкой и встроенно-пристроенными помещениями»",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      307.8,
+      44.6,
+      334.1,
+      778.0
+     ],
+     "text": "Адрес строительства: г.Москва,внутригородская территория, муниципальный округ Тверской, ул. Новослободская на земельном участке с кадастровым",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      306.4,
+      44.3,
+      319.3,
+      187.2
+     ],
+     "text": "номером 77:01:0004009:3829",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      283.0,
+      43.6,
+      308.2,
+      575.6
+     ],
+     "text": "Методика испытаний: ГОСТ 10180-12 \"Бетоны. Методы определения прочности по контрольным образцам\"",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      270.0,
+      43.2,
+      292.3,
+      468.4
+     ],
+     "text": "Методика оценки: ГОСТ 18105-2018 \"Бетоны. Правила контроля и оценки прочности\"",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      252.4,
+      42.8,
+      278.6,
+      679.7
+     ],
+     "text": "Испытательное оборудование: пресс Matest C040PN132, свидетельство о поверке № С-ГЦЧ/12-09-2025/465529479 от 12.09.2025 г.,",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      241.6,
+      43.2,
+      265.0,
+      535.7
+     ],
+     "text": "Весы электронные HW-10KGV, зав. M7 802289, сертификат о калибровке № В 030-26 от 23.01.2026 г.,",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      227.2,
+      45.0,
+      250.9,
+      535.0
+     ],
+     "text": "Штангенциркуль ШЦ-II-250-0,05, зав. Г401291,сертификат о калибровке № В 053-26 от 23.01.2026 г.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      213.1,
+      391.3,
+      230.0,
+      515.9
+     ],
+     "text": "Результаты испытания:",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      207.7,
+      64.8,
+      222.8,
+      92.2
+     ],
+     "text": "Дата",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      195.8,
+      401.0,
+      212.8,
+      505.8
+     ],
+     "text": "Размер образцов-кубов,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      194.8,
+      517.0,
+      209.9,
+      548.3
+     ],
+     "text": "Плот-",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      196.6,
+      46.8,
+      208.4,
+      109.1
+     ],
+     "text": "изготовления",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      194.0,
+      142.9,
+      208.4,
+      209.9
+     ],
+     "text": "Наименование",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      189.7,
+      304.6,
+      207.0,
+      345.2
+     ],
+     "text": "Возраст",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      193.3,
+      562.0,
+      208.4,
+      611.6
+     ],
+     "text": "Разрушаю-",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      193.0,
+      627.8,
+      208.8,
+      696.2
+     ],
+     "text": "Прочность при",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      191.5,
+      714.2,
+      205.9,
+      748.8
+     ],
+     "text": "Факти-",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      189.0,
+      770.8,
+      206.3,
+      799.2
+     ],
+     "text": "% от",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      186.5,
+      255.6,
+      200.5,
+      282.2
+     ],
+     "text": "Дата",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      184.0,
+      358.6,
+      199.4,
+      391.7
+     ],
+     "text": "Масса",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      182.9,
+      62.6,
+      195.5,
+      93.2
+     ],
+     "text": "серии",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      180.7,
+      119.5,
+      194.8,
+      232.2
+     ],
+     "text": "конструкции, маркировка",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      178.6,
+      306.4,
+      193.3,
+      342.0
+     ],
+     "text": "бетона,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      186.8,
+      446.0,
+      196.9,
+      461.2
+     ],
+     "text": "см",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      182.9,
+      518.0,
+      195.5,
+      547.2
+     ],
+     "text": "ность",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      182.9,
+      576.4,
+      193.3,
+      597.2
+     ],
+     "text": "щая",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      182.2,
+      630.7,
+      195.1,
+      691.9
+     ],
+     "text": "сжатии, МПа",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      180.7,
+      715.0,
+      191.5,
+      747.7
+     ],
+     "text": "ческий",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      177.8,
+      759.2,
+      191.2,
+      811.4
+     ],
+     "text": "проектного",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      175.7,
+      243.7,
+      186.5,
+      293.4
+     ],
+     "text": "испытаний",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      170.6,
+      351.4,
+      186.5,
+      399.2
+     ],
+     "text": "образца, г",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      171.0,
+      55.8,
+      183.6,
+      99.4
+     ],
+     "text": "образцов",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      168.1,
+      140.4,
+      182.5,
+      211.0
+     ],
+     "text": "серии образцов",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      166.7,
+      313.2,
+      179.3,
+      333.7
+     ],
+     "text": "сут.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      168.8,
+      511.6,
+      183.6,
+      552.6
+     ],
+     "text": "образца,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      167.0,
+      565.2,
+      182.2,
+      608.4
+     ],
+     "text": "нагрузка,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      162.0,
+      402.1,
+      173.5,
+      433.1
+     ],
+     "text": "длина",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      160.6,
+      433.1,
+      173.5,
+      506.9
+     ],
+     "text": "ширина высота",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      168.1,
+      717.8,
+      178.6,
+      744.5
+     ],
+     "text": "класс",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      165.6,
+      769.0,
+      177.8,
+      800.6
+     ],
+     "text": "класса",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      155.9,
+      517.0,
+      172.8,
+      546.8
+     ],
+     "text": "г/см³",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      157.3,
+      578.2,
+      170.3,
+      596.2
+     ],
+     "text": "кН",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      157.7,
+      613.8,
+      171.7,
+      652.3
+     ],
+     "text": "образца",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      157.3,
+      666.7,
+      169.9,
+      706.0
+     ],
+     "text": "среднее",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      152.6,
+      705.2,
+      168.5,
+      755.6
+     ],
+     "text": "бетона Вф",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      151.9,
+      767.9,
+      166.3,
+      801.7
+     ],
+     "text": "бетона",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      147.6,
+      169.6,
+      159.1,
+      180.0
+     ],
+     "text": "2",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      146.5,
+      263.5,
+      157.3,
+      272.9
+     ],
+     "text": "3",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      145.4,
+      319.0,
+      155.9,
+      328.3
+     ],
+     "text": "4",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      144.0,
+      369.0,
+      156.2,
+      379.1
+     ],
+     "text": "5",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      142.6,
+      410.0,
+      155.9,
+      422.3
+     ],
+     "text": "6",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      143.6,
+      448.2,
+      154.4,
+      457.2
+     ],
+     "text": "7",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      142.6,
+      484.2,
+      153.7,
+      493.6
+     ],
+     "text": "8",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      141.8,
+      526.0,
+      153.4,
+      537.5
+     ],
+     "text": "9",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      141.1,
+      579.2,
+      153.4,
+      594.0
+     ],
+     "text": "10",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      139.3,
+      631.8,
+      151.6,
+      645.8
+     ],
+     "text": "11",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      139.0,
+      678.2,
+      151.2,
+      693.0
+     ],
+     "text": "12",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      137.9,
+      724.0,
+      150.5,
+      738.0
+     ],
+     "text": "13",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      136.8,
+      776.9,
+      148.7,
+      792.0
+     ],
+     "text": "14",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      125.3,
+      360.4,
+      140.0,
+      387.0
+     ],
+     "text": "2340",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      122.8,
+      403.6,
+      139.3,
+      429.1
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      121.7,
+      439.6,
+      139.7,
+      465.8
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      122.0,
+      476.3,
+      138.2,
+      501.5
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      121.3,
+      518.0,
+      137.9,
+      544.3
+     ],
+     "text": "2,34",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      122.8,
+      574.9,
+      136.8,
+      596.5
+     ],
+     "text": "240",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      119.2,
+      625.7,
+      136.8,
+      652.3
+     ],
+     "text": "22,8",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      113.4,
+      151.9,
+      130.3,
+      196.6
+     ],
+     "text": "ВСС-1а",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      108.4,
+      49.7,
+      123.5,
+      104.4
+     ],
+     "text": "10.02.2026",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      105.5,
+      240.5,
+      120.6,
+      294.5
+     ],
+     "text": "17.02.2026",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      100.1,
+      159.1,
+      114.5,
+      187.2
+     ],
+     "text": "№81",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      107.6,
+      318.6,
+      118.1,
+      327.6
+     ],
+     "text": "7",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      103.0,
+      359.6,
+      118.8,
+      387.7
+     ],
+     "text": "2330",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      101.5,
+      403.2,
+      117.7,
+      428.8
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      100.1,
+      439.9,
+      117.7,
+      464.8
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      99.4,
+      475.9,
+      117.0,
+      501.5
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      99.7,
+      517.7,
+      116.3,
+      543.6
+     ],
+     "text": "2,33",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      100.4,
+      574.2,
+      115.6,
+      596.5
+     ],
+     "text": "224",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      98.6,
+      622.8,
+      114.5,
+      653.4
+     ],
+     "text": "21,3*",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      97.9,
+      670.7,
+      114.1,
+      697.3
+     ],
+     "text": "22,6",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      98.6,
+      722.9,
+      112.3,
+      738.4
+     ],
+     "text": "18",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      97.9,
+      776.2,
+      111.6,
+      791.3
+     ],
+     "text": "72",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      82.4,
+      358.9,
+      96.8,
+      386.3
+     ],
+     "text": "2340",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      79.9,
+      402.5,
+      96.5,
+      428.4
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      78.5,
+      438.8,
+      96.1,
+      464.8
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      78.5,
+      475.6,
+      95.4,
+      500.8
+     ],
+     "text": "10,0",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      78.1,
+      517.3,
+      94.7,
+      543.6
+     ],
+     "text": "2,34",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      78.8,
+      573.5,
+      94.3,
+      596.2
+     ],
+     "text": "236",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      76.7,
+      625.0,
+      93.6,
+      650.9
+     ],
+     "text": "22,4",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      54.4,
+      38.5,
+      78.1,
+      682.2
+     ],
+     "text": "Примечание: *прочность образца в серии является минимальной и не учитывается при подсчете средней прочности в серии (п.8.4 ГОСТ 10180-2012)",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      36.4,
+      40.3,
+      62.3,
+      742.0
+     ],
+     "text": "Вывод: Фактический класс бетона в возрасте 7 суток составляет 72% от проектного класса В25 и соответствует бетону класса В18 ( ГОСТ 18105-2018 \"схема Г\" ).",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      26.3,
+      84.6,
+      44.3,
+      136.4
+     ],
+     "text": "Инженер",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      20.2,
+      555.1,
+      36.7,
+      630.4
+     ],
+     "text": "Тебекина Л.В.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      147,
+      70,
+      158,
+      80
+     ],
+     "text": "1",
+     "src": "added"
+    }
+   ],
+   "excluded_zones": [
+    {
+     "bbox": [
+      365,
+      585,
+      480,
+      700
+     ],
+     "type": "SEAL_ROUND_WITH_SIGNATURE"
+    },
+    {
+     "bbox": [
+      500,
+      40,
+      590,
+      130
+     ],
+     "type": "LOGO"
+    },
+    {
+     "bbox": [
+      10,
+      470,
+      75,
+      560
+     ],
+     "type": "HANDWRITING_SIGNATURE"
+    }
+   ],
+   "n_chars": 1967,
+   "note": "Протокол испытаний; content rotated 90 deg inside a portrait scan (/Rotate 0), 200 dpi; GT from upright 200-dpi render + OCR prefill; prefill lines not overridden were verified visually as correct",
+   "verification": "transcribed by the analysis agent from 150-220 dpi renders viewed band by band, starting from an OCR prefill; every prefill line adjudicated (kept, corrected or excluded); homoglyph convention documented per page; needs one human re-check pass (~40 min) before it is quoted as acceptance evidence"
+  },
+  "B06": {
+   "file_id": "F0201",
+   "pdf_page_number": 7,
+   "lines": [
+    {
+     "bbox": [
+      71.3,
+      34.8,
+      144.2,
+      46.1
+     ],
+     "text": "СОГЛАСОВАНО",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      344.6,
+      35.5,
+      418.6,
+      47.5
+     ],
+     "text": "СОГЛАСОВАНО",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      70.3,
+      47.0,
+      117.4,
+      59.8
+     ],
+     "text": "Заказчик:_",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      343.7,
+      48.2,
+      483.4,
+      62.6
+     ],
+     "text": "Генеральный проектировщик:",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      70.1,
+      59.0,
+      124.3,
+      71.8
+     ],
+     "text": "АНО «РСИ»",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      30.0,
+      71.5,
+      43.7,
+      133.0
+     ],
+     "text": "Перв. примен.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      71.0,
+      126.2,
+      77.3,
+      133.7
+     ],
+     "text": "«",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      96.0,
+      126.2,
+      102.0,
+      133.7
+     ],
+     "text": "»",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      197.8,
+      124.3,
+      211.7,
+      133.7
+     ],
+     "text": "20",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      222.2,
+      126.2,
+      229.4,
+      133.9
+     ],
+     "text": "г.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      344.2,
+      122.9,
+      367.9,
+      136.6
+     ],
+     "text": "«22»",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      84.2,
+      189.6,
+      108.0,
+      203.0
+     ],
+     "text": "№№",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      29.5,
+      196.8,
+      41.3,
+      233.8
+     ],
+     "text": "Справ №",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      198.7,
+      197.0,
+      264.5,
+      210.2
+     ],
+     "text": "Наименование",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      87.8,
+      202.3,
+      104.6,
+      216.0
+     ],
+     "text": "п/п",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      431.0,
+      197.8,
+      474.7,
+      211.0
+     ],
+     "text": "Значение",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      90.0,
+      216.7,
+      101.8,
+      228.7
+     ],
+     "text": "1.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      225.4,
+      217.2,
+      237.4,
+      229.2
+     ],
+     "text": "2.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      445.7,
+      217.4,
+      458.4,
+      230.6
+     ],
+     "text": "3.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      88.6,
+      231.4,
+      102.0,
+      245.3
+     ],
+     "text": "I.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      123.1,
+      231.6,
+      154.3,
+      246.7
+     ],
+     "text": "Адрес",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      350.2,
+      232.8,
+      554.6,
+      247.4
+     ],
+     "text": "г. Москва, р-н Богородское, ул. Тюменская, вл.5",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      90.0,
+      252.2,
+      103.9,
+      264.0
+     ],
+     "text": "II.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      375.8,
+      252.2,
+      529.0,
+      267.8
+     ],
+     "text": "Общественное (школа на 600 мест)",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      124.1,
+      252.7,
+      209.5,
+      265.2
+     ],
+     "text": "Назначение здания",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      89.0,
+      273.1,
+      105.1,
+      285.6
+     ],
+     "text": "III.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      123.8,
+      272.6,
+      249.8,
+      287.3
+     ],
+     "text": "Строительный объем здания",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      425.3,
+      275.5,
+      473.3,
+      290.4
+     ],
+     "text": "60997,93м",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      471.8,
+      273.6,
+      476.4,
+      280.1
+     ],
+     "text": "3",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      88.1,
+      297.4,
+      102.5,
+      310.6
+     ],
+     "text": "IV.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      123.8,
+      298.6,
+      215.5,
+      311.5
+     ],
+     "text": "Система отопления",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      363.6,
+      326.4,
+      541.4,
+      341.5
+     ],
+     "text": "2-х трубная, горизонтальная с поэтажной",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      82.1,
+      332.4,
+      91.0,
+      343.0
+     ],
+     "text": "1.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      123.4,
+      331.4,
+      155.0,
+      345.1
+     ],
+     "text": "Схема",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      428.4,
+      339.4,
+      475.9,
+      354.7
+     ],
+     "text": "разводкой",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      79.9,
+      363.1,
+      91.9,
+      376.8
+     ],
+     "text": "2.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      131.3,
+      364.3,
+      185.3,
+      378.2
+     ],
+     "text": "Циркуляция",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      431.3,
+      367.4,
+      472.6,
+      377.3
+     ],
+     "text": "насосная",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      80.2,
+      389.5,
+      91.7,
+      402.2
+     ],
+     "text": "3.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      122.9,
+      390.0,
+      281.0,
+      404.9
+     ],
+     "text": "Параметры воды в местной системе",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      429.1,
+      391.0,
+      474.7,
+      404.2
+     ],
+     "text": "85 ÷ 60°C",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      122.6,
+      415.9,
+      330.2,
+      431.5
+     ],
+     "text": "Расчетный расход тепла на отопление при tн = -",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      81.1,
+      423.1,
+      91.0,
+      434.9
+     ],
+     "text": "4.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      390.7,
+      423.1,
+      512.6,
+      439.4
+     ],
+     "text": "389,893 кВт (0,335 Гкал/час)",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      121.9,
+      428.4,
+      148.3,
+      443.0
+     ],
+     "text": "26°C",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      36.5,
+      457.0,
+      49.4,
+      518.6
+     ],
+     "text": "Подп. и дата.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      80.2,
+      461.8,
+      91.2,
+      474.7
+     ],
+     "text": "5.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      122.6,
+      462.7,
+      336.0,
+      476.6
+     ],
+     "text": "Гидравлическое сопротивление местной системы",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      427.0,
+      463.7,
+      476.2,
+      477.6
+     ],
+     "text": "7 м.вод.ст.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      379.7,
+      496.1,
+      524.2,
+      511.0
+     ],
+     "text": "Стальные панельные радиаторы,",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      79.7,
+      499.9,
+      91.2,
+      513.8
+     ],
+     "text": "6.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      121.9,
+      500.4,
+      236.4,
+      516.2
+     ],
+     "text": "Нагревательные приборы",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      397.9,
+      509.3,
+      505.4,
+      523.0
+     ],
+     "text": "гладкотрубные регистры",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      35.8,
+      532.1,
+      48.7,
+      589.2
+     ],
+     "text": "Инв.№ дубл.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      79.7,
+      535.7,
+      90.5,
+      548.6
+     ],
+     "text": "7.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      121.9,
+      535.9,
+      244.1,
+      551.5
+     ],
+     "text": "Рабочее давление системы",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      432.5,
+      536.6,
+      470.4,
+      551.5
+     ],
+     "text": "4,0 атм.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      121.9,
+      558.0,
+      312.0,
+      573.6
+     ],
+     "text": "Максимальное рабочее давление приборов",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      79.7,
+      564.2,
+      90.7,
+      577.4
+     ],
+     "text": "8.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      434.2,
+      565.2,
+      469.7,
+      580.1
+     ],
+     "text": "10 атм.",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      123.1,
+      573.8,
+      170.2,
+      583.7
+     ],
+     "text": "отопления",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      79.7,
+      591.4,
+      91.0,
+      604.6
+     ],
+     "text": "9.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      121.7,
+      591.8,
+      285.8,
+      606.2
+     ],
+     "text": "Расположение расширительного бака",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      410.6,
+      592.6,
+      492.2,
+      607.2
+     ],
+     "text": "В помещении ИТП",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      36.0,
+      600.5,
+      47.3,
+      658.8
+     ],
+     "text": "Взам.инв.№",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      79.7,
+      616.6,
+      95.8,
+      630.7
+     ],
+     "text": "10.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      122.6,
+      618.0,
+      194.4,
+      630.7
+     ],
+     "text": "Объем системы",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      434.9,
+      618.0,
+      468.0,
+      632.4
+     ],
+     "text": "3100 л",
+     "src": "prefill_corrected"
+    },
+    {
+     "bbox": [
+      35.0,
+      677.5,
+      49.0,
+      753.6
+     ],
+     "text": "Подпись и дата",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      63.6,
+      726.5,
+      86.4,
+      741.4
+     ],
+     "text": "Изм",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      88.8,
+      727.0,
+      112.3,
+      741.4
+     ],
+     "text": "Кол.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      184.6,
+      727.2,
+      214.3,
+      743.8
+     ],
+     "text": "Подп.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      120.0,
+      727.9,
+      145.4,
+      740.9
+     ],
+     "text": "Лист",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      157.9,
+      727.7,
+      172.1,
+      740.9
+     ],
+     "text": "№",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      229.7,
+      728.2,
+      255.1,
+      742.8
+     ],
+     "text": "Дата",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      457.7,
+      743.3,
+      487.7,
+      757.0
+     ],
+     "text": "Стадия",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      503.8,
+      743.3,
+      525.1,
+      756.2
+     ],
+     "text": "Лист",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      542.9,
+      744.0,
+      571.2,
+      755.5
+     ],
+     "text": "Листов",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      34.1,
+      767.0,
+      48.0,
+      825.8
+     ],
+     "text": "Инв.№ подл.",
+     "src": "prefill_verified"
+    },
+    {
+     "bbox": [
+      168,
+      165,
+      474,
+      178
+     ],
+     "text": "АНКЕТА АБОНЕНТА, ПРИСОЕДИНЯЕМОГО К ТЕПЛОВЫМ СЕТЯМ.",
+     "src": "added"
+    }
+   ],
+   "excluded_zones": [
+    {
+     "bbox": [
+      148,
+      80,
+      237,
+      186
+     ],
+     "type": "SEAL_ROUND"
+    },
+    {
+     "bbox": [
+      60,
+      55,
+      160,
+      112
+     ],
+     "type": "HANDWRITING_SIGNATURE"
+    },
+    {
+     "bbox": [
+      385,
+      46,
+      512,
+      165
+     ],
+     "type": "SEAL_ROUND"
+    },
+    {
+     "bbox": [
+      355,
+      90,
+      440,
+      122
+     ],
+     "type": "HANDWRITING_SIGNATURE"
+    },
+    {
+     "bbox": [
+      238,
+      785,
+      280,
+      826
+     ],
+     "type": "QR_CODE"
+    }
+   ],
+   "n_chars": 860,
+   "note": "Анкета абонента (heat-network connection form) in Тюменская RD ОВ1; 424-dpi colour scan, /Rotate 270; two round seals + signatures over the approval block; GT from 170-dpi renders + OCR prefill",
+   "verification": "transcribed by the analysis agent from 150-220 dpi renders viewed band by band, starting from an OCR prefill; every prefill line adjudicated (kept, corrected or excluded); homoglyph convention documented per page; needs one human re-check pass (~40 min) before it is quoted as acceptance evidence"
+  },
+  "D03": {
+   "file_id": "F0107",
+   "pdf_page_number": 4,
+   "lines": [
+    {
+     "bbox": [
+      177,
+      163,
+      454,
+      176
+     ],
+     "text": "СПРАВКА ГЛАВНОГО КОНСТРУКТОРА",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      112,
+      228,
+      562,
+      246
+     ],
+     "text": "Настоящая проектная документация разработана в соответствии с",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      69,
+      248,
+      561,
+      262
+     ],
+     "text": "действующими техническими регламентами, градостроительным регламентом,",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      69,
+      265,
+      561,
+      279
+     ],
+     "text": "правилами, заданием на проектирование и руководящими материалами, а также",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      70,
+      280,
+      561,
+      296
+     ],
+     "text": "согласно градостроительного плана земельного участка. Технические решения и",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      69,
+      297,
+      562,
+      313
+     ],
+     "text": "мероприятия, принятые в проектной документации, соответствуют требованиям",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      70,
+      315,
+      561,
+      329
+     ],
+     "text": "экологических, санитарно– гигиенических, противопожарных и других",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      70,
+      330,
+      561,
+      346
+     ],
+     "text": "строительных норм и ГОСТов, действующих на территории Российской",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      69,
+      347,
+      561,
+      364
+     ],
+     "text": "Федерации, обеспечивают безопасную для жизни и здоровья людей эксплуатацию",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      69,
+      364,
+      561,
+      381
+     ],
+     "text": "объекта и прилегающих к нему территорий при соблюдении предусмотренных",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      69,
+      382,
+      356,
+      397
+     ],
+     "text": "проектом мероприятий и технических условий.",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      429,
+      477,
+      527,
+      493
+     ],
+     "text": "Мартинович М.",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      322,
+      788,
+      441,
+      804
+     ],
+     "text": "ИДК-ДУП-25-2178-КР2",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      544,
+      792,
+      569,
+      804
+     ],
+     "text": "Лист",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      56,
+      810,
+      79,
+      824
+     ],
+     "text": "Изм",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      82,
+      810,
+      106,
+      824
+     ],
+     "text": "Лист",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      114,
+      809,
+      159,
+      824
+     ],
+     "text": "№ докум.",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      172,
+      809,
+      204,
+      824
+     ],
+     "text": "Подп.",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      210,
+      811,
+      239,
+      825
+     ],
+     "text": "Дата",
+     "src": "added"
+    }
+   ],
+   "excluded_zones": [
+    {
+     "bbox": [
+      295,
+      440,
+      430,
+      545
+     ],
+     "type": "HANDWRITING_SIGNATURE"
+    }
+   ],
+   "n_chars": 690,
+   "note": "PD КР3 «Справка главного конструктора»: text drawn as vector outlines (no text layer), justified Times; GT typed from 150-dpi render",
+   "verification": "transcribed by the analysis agent from 150-220 dpi renders viewed band by band, starting from an OCR prefill; every prefill line adjudicated (kept, corrected or excluded); homoglyph convention documented per page; needs one human re-check pass (~40 min) before it is quoted as acceptance evidence"
+  },
+  "B07": {
+   "file_id": "F0146",
+   "pdf_page_number": 40,
+   "lines": [
+    {
+     "bbox": [
+      265,
+      15,
+      583,
+      35
+     ],
+     "text": "разных частях здания предусмотреть возможность деления",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      265,
+      28,
+      582,
+      47
+     ],
+     "text": "лаборантской (тип АВ) на две лаборантские (площадью не",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      265,
+      41,
+      582,
+      60
+     ],
+     "text": "менее 18 кв.м), каждая из которых должна располагаться",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      265,
+      54,
+      539,
+      76
+     ],
+     "text": "смежно с кабинетом естествознания (тип А и тип В).",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      289,
+      69,
+      582,
+      90
+     ],
+     "text": "В кабинете естествознания (тип А) предусмотреть зону",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      265,
+      82,
+      581,
+      102
+     ],
+     "text": "физического эксперимента, зону биолого-химического",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      264,
+      98,
+      541,
+      116
+     ],
+     "text": "практикума, зону моделирования и конструирования.",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      286,
+      110,
+      581,
+      131
+     ],
+     "text": "В кабинете естествознания (тип В) предусмотреть зону",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      263,
+      123,
+      458,
+      144
+     ],
+     "text": "биолого-экологического практикума.",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      286,
+      138,
+      581,
+      159
+     ],
+     "text": "Предусмотреть IT-полигон для практических занятий по",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      264,
+      152,
+      581,
+      172
+     ],
+     "text": "предмету «Технология» и дополнительного образования",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      263,
+      167,
+      581,
+      184
+     ],
+     "text": "площадью не менее 250 кв.м с возможностью",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      263,
+      180,
+      580,
+      199
+     ],
+     "text": "одновременного проведения занятий у нескольких групп и",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      263,
+      195,
+      580,
+      213
+     ],
+     "text": "зонированием: зона программирования, зона обработки",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      261,
+      207,
+      579,
+      228
+     ],
+     "text": "материалов, зона моделирования, зона испытания устройств,",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      262,
+      222,
+      580,
+      242
+     ],
+     "text": "зона пилотирования беспилотных летательных аппаратов",
+     "src": "added"
+    },
+    {
+     "bbox": [
+      262,
+      233,
+      580,
+      254
+     ],
+     "text": "(БПЛА), зона разработки устройств, помещение для",
+     "src": "added"
+    }
+   ],
+   "excluded_zones": [
+    {
+     "bbox": [
+      538,
+      13,
+      558,
+      31
+     ],
+     "type": "PAGE_NUMBER_OVERLAY"
+    }
+   ],
+   "n_chars": 769,
+   "note": "Тюменская PD ПЗ scanned ИРД text (задание на проектирование), 150-dpi greyscale, skew about 1.2 deg, justified Times; GT region = top 17 lines of the right column",
+   "verification": "transcribed by the analysis agent from 150-220 dpi renders viewed band by band, starting from an OCR prefill; every prefill line adjudicated (kept, corrected or excluded); homoglyph convention documented per page; needs one human re-check pass (~40 min) before it is quoted as acceptance evidence"
+  }
+ },
+ "tooling": "scratchpad recog/: bench_lib.py (render, engines, ocr_v2 pipeline, metric), run_bench.py, score_bench.py, scan_eval.py, run_scans.py, keyfields.py, scan_keyfields.py, expl_parse.py, codefix.py; to be re-created as tools/ocr_eval in the repo (B02-T13)",
+ "results_summary_2026_09_27": {
+  "note": "Measured on an M2 Max under load from other agents; details and caveats in 96_recognition_real_data.md §3, §10.",
+  "group_A_vector_rendered": {
+   "n_regions": 30,
+   "n_chars": 32263,
+   "ca_strict": {
+    "rapidocr_default_v5mobile_cls": [
+     0.87,
+     0.835,
+     0.908
+    ],
+    "v2_v5mobile": [
+     0.952,
+     0.933,
+     0.969
+    ],
+    "v2_v5mobile_eslav": [
+     0.944,
+     0.922,
+     0.962
+    ],
+    "v2_v5server_det": [
+     0.966,
+     0.949,
+     0.977
+    ],
+    "v2_v6small_det": [
+     0.967,
+     0.952,
+     0.978
+    ],
+    "v2_v6small_det_200dpi": [
+     0.972,
+     0.957,
+     0.982
+    ],
+    "v2_v6medium_det": [
+     0.969,
+     0.954,
+     0.98
+    ],
+    "tesseract_rus_best_psm3": [
+     0.793,
+     0.671,
+     0.875
+    ],
+    "tesseract_rus_best_psm11": [
+     0.804,
+     0.674,
+     0.89
+    ]
+   },
+   "format": "[estimate, ci_low, ci_high]"
+  },
+  "scans_hand_gt": {
+   "n_pages": 6,
+   "n_chars_scored": 7316,
+   "ca_strict": {
+    "v2_v6small_native_dpi": [
+     0.968,
+     0.955,
+     0.983
+    ],
+    "v2_v6medium_native_dpi": [
+     0.973,
+     0.962,
+     0.986
+    ],
+    "v2_v5mobile_native_dpi": [
+     0.951,
+     0.928,
+     0.966
+    ],
+    "tesseract_psm3": [
+     0.898,
+     0.861,
+     0.935
+    ],
+    "tesseract_psm6": [
+     0.898,
+     0.845,
+     0.94
+    ]
+   },
+   "ca_relaxed_v6small": 0.976,
+   "ca_relaxed_ci_v6small": 0.982
+  },
+  "key_fields": {
+   "scan_values_n42": {
+    "v6small_strict": 0.905,
+    "v6small_relaxed": 0.952,
+    "tesseract_strict": 0.738
+   },
+   "room_numbers_vector_n507": {
+    "v6small": 0.919,
+    "v6medium": 0.933,
+    "tesseract": 0.44
+   },
+   "codes_vector_n11": {
+    "v6small_raw": 0.09,
+    "v6small_after_codefix": 0.91,
+    "tesseract_raw": 0.45
+   },
+   "outlined_title_blocks_n19": {
+    "v6small_raw": "14/19",
+    "after_codefix": "19/19"
+   }
+  },
+  "throughput": {
+   "single_thread_cpu_s_per_A4_scan": [
+    5.3,
+    9.8
+   ],
+   "parallel10_loaded_pages_per_min": {
+    "A3_300dpi": 25.8,
+    "A3_200dpi": 37.5,
+    "A4_dense_300dpi": 16.2,
+    "A4_dense_200dpi": 23.1
+   },
+   "coreml_det_speedup": 2.0,
+   "int8_rec": "1.3-1.6x faster rec, -0.3..-3.3 pp CA, rejected"
+  }
+ }
+}

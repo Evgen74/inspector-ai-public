@@ -1,0 +1,845 @@
+{
+ "schema_version": 1,
+ "file_id": "F0201",
+ "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+ "file_sha256": "0c398d7bca356455568413a6fc3b14044b7e538a902251b80e2a5574d80184fd",
+ "stage": "RD",
+ "pipeline_version": "fixture-ag04-tyumen-1",
+ "generated_at": "2026-09-28T00:00:00Z",
+ "pages_total": 676,
+ "ext": {
+  "fixture": "AG-04 hand-made development fixture (not recognition output)",
+  "sources": [
+   "docs/analysis/95_tyumen_dev_fixtures.json page_facts, markup_zone_bboxes",
+   "docs/analysis/95_corpus_train_objects.md §3.3"
+  ]
+ },
+ "title_blocks": [
+  {
+   "pdf_page_number": 17,
+   "sheet_number": 4,
+   "sheets_total": null,
+   "document_code_raw": "АНО/150321/1-РД-ОВ1",
+   "document_code": "АНО/150321/1-РД-ОВ1",
+   "stage_raw": "Р",
+   "stage": "RD",
+   "sheet_title": "План подвала (вентиляция)",
+   "revision": "4",
+   "change_rows": [
+    {
+     "change_no": "4",
+     "count": null,
+     "sheet": null,
+     "doc_no": "839-24",
+     "date": "11.08.2024"
+    }
+   ],
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.93
+   }
+  },
+  {
+   "pdf_page_number": 18,
+   "sheet_number": 5,
+   "sheets_total": null,
+   "document_code_raw": "АНО/150321/1-РД-ОВ1",
+   "document_code": "АНО/150321/1-РД-ОВ1",
+   "stage_raw": "Р",
+   "stage": "RD",
+   "sheet_title": "План 1-го этажа (вентиляция)",
+   "revision": "4",
+   "change_rows": [
+    {
+     "change_no": "4",
+     "count": null,
+     "sheet": null,
+     "doc_no": "839-24",
+     "date": "11.08.2024"
+    }
+   ],
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.93
+   }
+  },
+  {
+   "pdf_page_number": 20,
+   "sheet_number": 7,
+   "sheets_total": null,
+   "document_code_raw": "АНО/150321/1-РД-ОВ1",
+   "document_code": "АНО/150321/1-РД-ОВ1",
+   "stage_raw": "Р",
+   "stage": "RD",
+   "sheet_title": "План 3-го этажа (вентиляция)",
+   "revision": "4",
+   "change_rows": [
+    {
+     "change_no": "4",
+     "count": null,
+     "sheet": null,
+     "doc_no": "839-24",
+     "date": "11.08.2024"
+    }
+   ],
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.93
+   }
+  },
+  {
+   "pdf_page_number": 32,
+   "sheet_number": 17,
+   "sheets_total": null,
+   "document_code_raw": "АНО/150321/1-РД-ОВ1",
+   "document_code": "АНО/150321/1-РД-ОВ1",
+   "stage_raw": "Р",
+   "stage": "RD",
+   "sheet_title": "План венткамеры в осях 16-18 / К-Н (М1:50)",
+   "revision": "4",
+   "change_rows": [
+    {
+     "change_no": "4",
+     "count": null,
+     "sheet": null,
+     "doc_no": "839-24",
+     "date": "11.08.2024"
+    }
+   ],
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.93
+   }
+  }
+ ],
+ "sheet_page_map": [
+  {
+   "pdf_page_number": 17,
+   "sheet_number": 4,
+   "document_code": "АНО/150321/1-РД-ОВ1",
+   "basis": "TITLE_BLOCK",
+   "confidence": 0.95
+  },
+  {
+   "pdf_page_number": 18,
+   "sheet_number": 5,
+   "document_code": "АНО/150321/1-РД-ОВ1",
+   "basis": "TITLE_BLOCK",
+   "confidence": 0.95
+  },
+  {
+   "pdf_page_number": 20,
+   "sheet_number": 7,
+   "document_code": "АНО/150321/1-РД-ОВ1",
+   "basis": "TITLE_BLOCK",
+   "confidence": 0.95
+  },
+  {
+   "pdf_page_number": 32,
+   "sheet_number": 17,
+   "document_code": "АНО/150321/1-РД-ОВ1",
+   "basis": "TITLE_BLOCK",
+   "confidence": 0.95
+  }
+ ],
+ "rooms": [
+  {
+   "room_token": "012",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.859,
+    0.537,
+    0.875,
+    0.549
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   },
+   "name": "Венткамера"
+  },
+  {
+   "room_token": "012",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.492,
+    0.494,
+    0.508,
+    0.506
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   },
+   "name": "Венткамера"
+  },
+  {
+   "room_token": "140",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.914,
+    0.188,
+    0.93,
+    0.2
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "142",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.898,
+    0.133,
+    0.914,
+    0.145
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "141",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.907,
+    0.159,
+    0.923,
+    0.171
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "147",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.899,
+    0.286,
+    0.915,
+    0.298
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "198",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.697,
+    0.136,
+    0.713,
+    0.148
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "314",
+   "pdf_page_number": 20,
+   "bbox": [
+    0.717,
+    0.075,
+    0.733,
+    0.087
+   ],
+   "source": "PLAN_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  }
+ ],
+ "tags": [
+  {
+   "tag": "П9",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.821,
+    0.5031,
+    0.833,
+    0.5111
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9,
+    "layer": "ОВ-Вентиляция-Выноски"
+   }
+  },
+  {
+   "tag": "П15",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.8564,
+    0.5031,
+    0.8684,
+    0.5111
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9,
+    "layer": "ОВ-Вентиляция-Выноски"
+   }
+  },
+  {
+   "tag": "П17.1, 17.2",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.8917,
+    0.5031,
+    0.9037,
+    0.5111
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9,
+    "layer": "ОВ-Вентиляция-Выноски"
+   }
+  },
+  {
+   "tag": "П18",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.9271,
+    0.5031,
+    0.9391,
+    0.5111
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9,
+    "layer": "ОВ-Вентиляция-Выноски"
+   }
+  },
+  {
+   "tag": "B2.1",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.821,
+    0.5677,
+    0.833,
+    0.5757
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.88
+   }
+  },
+  {
+   "tag": "Пароувлажнитель (П2)",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.832,
+    0.574,
+    0.848,
+    0.586
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "Пароувлажнитель (П2)",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 17,
+   "bbox": [
+    0.872,
+    0.574,
+    0.888,
+    0.586
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "П2",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.292,
+    0.544,
+    0.308,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П2.1",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.342,
+    0.544,
+    0.358,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П3",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.392,
+    0.544,
+    0.408,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П8",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.442,
+    0.544,
+    0.458,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П9",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.492,
+    0.544,
+    0.508,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П10",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.542,
+    0.544,
+    0.558,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П15",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.592,
+    0.544,
+    0.608,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П17.1",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.642,
+    0.544,
+    0.658,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П17.2",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.692,
+    0.544,
+    0.708,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "П18",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.742,
+    0.544,
+    0.758,
+    0.556
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.92
+   }
+  },
+  {
+   "tag": "Пароувлажнитель (П2/П3)",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 32,
+   "bbox": [
+    0.592,
+    0.594,
+    0.608,
+    0.606
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "П2/ВЕ ±400 м³/ч",
+   "tag_kind": "AIR_TERMINAL",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.922,
+    0.194,
+    0.938,
+    0.206
+   ],
+   "room_token": "140",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "П2/ВЕ ±400 м³/ч",
+   "tag_kind": "AIR_TERMINAL",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.902,
+    0.139,
+    0.918,
+    0.151
+   ],
+   "room_token": "142",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В2.7,8,9 −950 м³/ч",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.912,
+    0.164,
+    0.928,
+    0.176
+   ],
+   "room_token": "141",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В2.2",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.8424,
+    0.2883,
+    0.8544,
+    0.2963
+   ],
+   "room_token": "147",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В2.3",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.8675,
+    0.2883,
+    0.8795,
+    0.2963
+   ],
+   "room_token": "147",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В2.4",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.8927,
+    0.2883,
+    0.9047,
+    0.2963
+   ],
+   "room_token": "147",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В2.3,4 −150 м³/ч",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.9178,
+    0.2883,
+    0.9298,
+    0.2963
+   ],
+   "room_token": "147",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В2.8",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.6996,
+    0.1366,
+    0.7117,
+    0.1446
+   ],
+   "room_token": "198",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В2.9",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.7279,
+    0.1366,
+    0.7399,
+    0.1446
+   ],
+   "room_token": "198",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В2.10",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.7562,
+    0.1366,
+    0.7682,
+    0.1446
+   ],
+   "room_token": "198",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "М.О. поз.159/162",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.7845,
+    0.1366,
+    0.7965,
+    0.1446
+   ],
+   "room_token": "198",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "П2/ВЕ ±150",
+   "tag_kind": "AIR_TERMINAL",
+   "pdf_page_number": 18,
+   "bbox": [
+    0.6996,
+    0.1618,
+    0.7117,
+    0.1698
+   ],
+   "room_token": "198",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "В3.1 −600 м³/ч (над 3D-принтером, поз.133)",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 20,
+   "bbox": [
+    0.712,
+    0.064,
+    0.728,
+    0.076
+   ],
+   "room_token": "314",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  },
+  {
+   "tag": "П3/ВЕ ±350",
+   "tag_kind": "AIR_TERMINAL",
+   "pdf_page_number": 20,
+   "bbox": [
+    0.742,
+    0.084,
+    0.758,
+    0.096
+   ],
+   "room_token": "314",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "OCR_LAYER_ISOLATED",
+    "confidence": 0.9
+   }
+  }
+ ],
+ "qr_links": [
+  {
+   "pdf_page_number": 17,
+   "payload": "exon 3eb2aa9d/1/wd/17",
+   "doc_key": "3eb2aa9d",
+   "doc_page": 17,
+   "target_file_id": "F0201",
+   "target_pdf_page_number": 17
+  },
+  {
+   "pdf_page_number": 18,
+   "payload": "exon 3eb2aa9d/1/wd/18",
+   "doc_key": "3eb2aa9d",
+   "doc_page": 18,
+   "target_file_id": "F0201",
+   "target_pdf_page_number": 18
+  },
+  {
+   "pdf_page_number": 20,
+   "payload": "exon 3eb2aa9d/1/wd/20",
+   "doc_key": "3eb2aa9d",
+   "doc_page": 20,
+   "target_file_id": "F0201",
+   "target_pdf_page_number": 20
+  }
+ ]
+}

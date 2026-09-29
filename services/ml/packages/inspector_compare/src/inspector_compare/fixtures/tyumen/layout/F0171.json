@@ -1,0 +1,888 @@
+{
+ "schema_version": 1,
+ "file_id": "F0171",
+ "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+ "file_sha256": "a9070055b75adeea0d47651cf9dca3ca818ca5f54ac7ce9ddcd86efc817db7dc",
+ "stage": "PD",
+ "pipeline_version": "fixture-ag04-tyumen-1",
+ "generated_at": "2026-09-28T00:00:00Z",
+ "pages_total": 177,
+ "ext": {
+  "fixture": "AG-04 hand-made development fixture (not recognition output)",
+  "sources": [
+   "docs/analysis/95_tyumen_dev_fixtures.json page_facts, markup_zone_bboxes",
+   "docs/analysis/95_corpus_train_objects.md §3.3"
+  ]
+ },
+ "title_blocks": [
+  {
+   "pdf_page_number": 88,
+   "sheet_number": 10,
+   "stage_raw": "П",
+   "stage": "PD",
+   "sheet_title": "Принципиальная схема систем общеобменной вентиляции (продолжение №3)",
+   "document_code_raw": "АНО/150321/1-П-ИОС5.4.2",
+   "document_code": "АНО/150321/1-П-ИОС5.4.2",
+   "object_name": "Школа на 600 мест, р-н Богородское, ул. Тюменская, влд. 5",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "pdf_page_number": 99,
+   "sheet_number": 21,
+   "stage_raw": "П",
+   "stage": "PD",
+   "sheet_title": "Принципиальная схема системы отопления",
+   "document_code_raw": "АНО/150321/1-П-ИОС5.4.2",
+   "document_code": "АНО/150321/1-П-ИОС5.4.2",
+   "object_name": "Школа на 600 мест, р-н Богородское, ул. Тюменская, влд. 5",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "pdf_page_number": 104,
+   "sheet_number": 26,
+   "stage_raw": "П",
+   "stage": "PD",
+   "sheet_title": "Принципиальная схема системы теплоснабжения приточных установок",
+   "document_code_raw": "АНО/150321/1-П-ИОС5.4.2",
+   "document_code": "АНО/150321/1-П-ИОС5.4.2",
+   "object_name": "Школа на 600 мест, р-н Богородское, ул. Тюменская, влд. 5",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  }
+ ],
+ "sheet_page_map": [
+  {
+   "pdf_page_number": 88,
+   "sheet_number": 10,
+   "basis": "TITLE_BLOCK",
+   "confidence": 1.0
+  },
+  {
+   "pdf_page_number": 99,
+   "sheet_number": 21,
+   "basis": "TITLE_BLOCK",
+   "confidence": 1.0
+  },
+  {
+   "pdf_page_number": 104,
+   "sheet_number": 26,
+   "basis": "TITLE_BLOCK",
+   "confidence": 1.0
+  }
+ ],
+ "rooms": [
+  {
+   "room_token": "012",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.855,
+    0.317,
+    0.871,
+    0.329
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   },
+   "name": "Венткамера"
+  },
+  {
+   "room_token": "006",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.292,
+    0.317,
+    0.308,
+    0.329
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "007",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.592,
+    0.317,
+    0.608,
+    0.329
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "142",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.16,
+    0.649,
+    0.176,
+    0.661
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "140",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.213,
+    0.649,
+    0.229,
+    0.661
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "141",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.252,
+    0.649,
+    0.268,
+    0.661
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "147",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.314,
+    0.659,
+    0.33,
+    0.671
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "198",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.701,
+    0.659,
+    0.717,
+    0.671
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "314",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.749,
+    0.355,
+    0.765,
+    0.367
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "012",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.092,
+    0.844,
+    0.108,
+    0.856
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "267",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.285,
+    0.414,
+    0.301,
+    0.426
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "270",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.289,
+    0.424,
+    0.305,
+    0.436
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "271",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.305,
+    0.414,
+    0.321,
+    0.426
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "272",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.309,
+    0.424,
+    0.325,
+    0.436
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "012",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.712,
+    0.794,
+    0.728,
+    0.806
+   ],
+   "source": "SCHEMATIC_LABEL",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "267",
+   "pdf_page_number": 11,
+   "bbox": [
+    0.292,
+    0.494,
+    0.308,
+    0.506
+   ],
+   "source": "TEXT_MENTION",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "270",
+   "pdf_page_number": 11,
+   "bbox": [
+    0.332,
+    0.494,
+    0.348,
+    0.506
+   ],
+   "source": "TEXT_MENTION",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "271",
+   "pdf_page_number": 11,
+   "bbox": [
+    0.372,
+    0.494,
+    0.388,
+    0.506
+   ],
+   "source": "TEXT_MENTION",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "room_token": "272",
+   "pdf_page_number": 11,
+   "bbox": [
+    0.412,
+    0.494,
+    0.428,
+    0.506
+   ],
+   "source": "TEXT_MENTION",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  }
+ ],
+ "tags": [
+  {
+   "tag": "П2",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.715,
+    0.3202,
+    0.727,
+    0.3282
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П2.1",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.7628,
+    0.3202,
+    0.7748,
+    0.3282
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П3",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.8107,
+    0.3202,
+    0.8227,
+    0.3282
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П8",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.8585,
+    0.3202,
+    0.8705,
+    0.3282
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П9",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.715,
+    0.4202,
+    0.727,
+    0.4282
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П10",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.7628,
+    0.4202,
+    0.7748,
+    0.4282
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П15",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.8107,
+    0.4202,
+    0.8227,
+    0.4282
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П17",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.8585,
+    0.4202,
+    0.8705,
+    0.4282
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П18",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.715,
+    0.5201,
+    0.727,
+    0.5281
+   ],
+   "room_token": "012",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Теплоснабжение-Текст"
+   }
+  },
+  {
+   "tag": "П20",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 104,
+   "bbox": [
+    0.622,
+    0.408,
+    0.638,
+    0.42
+   ],
+   "room_token": "007",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.4",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.1772,
+    0.6278,
+    0.1892,
+    0.6358
+   ],
+   "room_token": "142",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.5",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.2094,
+    0.6278,
+    0.2214,
+    0.6358
+   ],
+   "room_token": "142",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.6",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.2416,
+    0.6278,
+    0.2536,
+    0.6358
+   ],
+   "room_token": "142",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.7",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.1772,
+    0.6278,
+    0.1892,
+    0.6358
+   ],
+   "room_token": "140",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.8",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.2094,
+    0.6278,
+    0.2214,
+    0.6358
+   ],
+   "room_token": "140",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.9",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.2416,
+    0.6278,
+    0.2536,
+    0.6358
+   ],
+   "room_token": "140",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.10",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.3457,
+    0.6239,
+    0.3577,
+    0.6319
+   ],
+   "room_token": "147",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.2",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.7025,
+    0.6231,
+    0.7145,
+    0.6311
+   ],
+   "room_token": "198",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В2.3",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.7329,
+    0.6231,
+    0.745,
+    0.6311
+   ],
+   "room_token": "198",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В3.1",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.7231,
+    0.3488,
+    0.7351,
+    0.3568
+   ],
+   "room_token": "314",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "В3.2",
+   "tag_kind": "VENT_SYSTEM",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.7581,
+    0.3488,
+    0.7701,
+    0.3568
+   ],
+   "room_token": "314",
+   "room_link": "NEAREST",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "М.О. поз.169",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.162,
+    0.594,
+    0.178,
+    0.606
+   ],
+   "room_token": "142",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "М.О. поз.169",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 88,
+   "bbox": [
+    0.212,
+    0.594,
+    0.228,
+    0.606
+   ],
+   "room_token": "140",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "Контур тёплого пола",
+   "tag_kind": "HEATING_SYSTEM",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.2844,
+    0.4252,
+    0.2964,
+    0.4332
+   ],
+   "room_token": "267",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Отопление-Схема"
+   }
+  },
+  {
+   "tag": "Контур тёплого пола",
+   "tag_kind": "HEATING_SYSTEM",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.2987,
+    0.4252,
+    0.3107,
+    0.4332
+   ],
+   "room_token": "270",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Отопление-Схема"
+   }
+  },
+  {
+   "tag": "Контур тёплого пола",
+   "tag_kind": "HEATING_SYSTEM",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.3131,
+    0.4252,
+    0.3251,
+    0.4332
+   ],
+   "room_token": "271",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Отопление-Схема"
+   }
+  },
+  {
+   "tag": "Контур тёплого пола",
+   "tag_kind": "HEATING_SYSTEM",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.3274,
+    0.4252,
+    0.3394,
+    0.4332
+   ],
+   "room_token": "272",
+   "room_link": "INSIDE",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0,
+    "layer": "ОВ-Отопление-Схема"
+   }
+  },
+  {
+   "tag": "Регулятор для системы “теплый пол” Multibox C/RTL",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.324,
+    0.386,
+    0.34,
+    0.398
+   ],
+   "room_token": "267",
+   "room_link": "LEADER",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  },
+  {
+   "tag": "Регулятор для системы “теплый пол” Multibox C/RTL",
+   "tag_kind": "EQUIPMENT",
+   "pdf_page_number": 99,
+   "bbox": [
+    0.324,
+    0.386,
+    0.34,
+    0.398
+   ],
+   "room_token": "271",
+   "room_link": "LEADER",
+   "provenance": {
+    "text_source": "TEXT_LAYER",
+    "confidence": 1.0
+   }
+  }
+ ],
+ "cad_layers": [
+  {
+   "name": "ОВ-Отопление-Схема",
+   "pages": [
+    99
+   ],
+   "is_text_layer": false,
+   "is_revision_layer": false,
+   "discipline_hint": "ОВ"
+  }
+ ]
+}

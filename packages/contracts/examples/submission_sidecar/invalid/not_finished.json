@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "run_id": "m1-tyumen-e2e",
+  "producer": "inspector-batch",
+  "command": "inspector-batch export --object OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "started_at": "2026-09-27T23:00:00Z",
+  "status": "SUCCEEDED",
+  "config_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+  "freeze_tag": null,
+  "versions": {
+    "pipeline_version": "0.1.0+dev",
+    "matrix_version": "1.1.0",
+    "dataset_version": null,
+    "model_version": "rules-baseline-1.0",
+    "code_version": "91947af",
+    "contract_version": "0.1.0",
+    "engine_versions": {
+      "pymupdf": "1.28.2"
+    }
+  },
+  "inputs": {
+    "manifest_sha256": "853225daec1888fbed19bbeb45e958154135f069799cea883dcd3c754c6c4ee7",
+    "catalog_sha256": "c6b73dffbea6bb366fc50f08392522c390bdf7b19420051802bd0bcbd32b4e4f",
+    "submission_schema_sha256": "75c58bef6b580528e7e4af8e4fdcdf5a5d40599b8966dae90df38b3a5f04a8d7",
+    "split_policy_sha256": "3ebe82cb742d802a943e7898be81e52ddc569d8f5ee399f162bad042c8104174"
+  },
+  "host": {
+    "platform": "macOS-27.0-arm64",
+    "machine": "arm64",
+    "python": "3.12.13",
+    "cpu_count": 12,
+    "onnxruntime_providers": [
+      "CoreMLExecutionProvider",
+      "CPUExecutionProvider"
+    ]
+  },
+  "objects": [
+    {
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "split": "TRAIN_PUBLIC",
+      "input_manifest_hash": "0000000000000000000000000000000000000000000000000000000000000001",
+      "files_total": 58,
+      "files_present": 58,
+      "missing_on_disk": [],
+      "scenario": "PD_RD_ONLY",
+      "artifacts": {
+        "submission": "submission/OBJ-TYUMENSKAYA-5-GOLD-SEED.json",
+        "submission_strict": "submission-strict/OBJ-TYUMENSKAYA-5-GOLD-SEED.json",
+        "sidecar": "submission/OBJ-TYUMENSKAYA-5-GOLD-SEED.sidecar.json"
+      },
+      "checks_total": 141
+    }
+  ],
+  "files": [
+    {
+      "file_id": "F0201",
+      "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+      "manifest_stage": "RD_ID_MIXED",
+      "stage_resolved": "RD",
+      "local_status": "PRESENT",
+      "sha256_verified": true,
+      "extension": ".pdf",
+      "pdf_pages": 24,
+      "page_basis": "PDF_NATIVE",
+      "status": "COMPLETED",
+      "pages_ocr": 20,
+      "duration_ms": 41000,
+      "warnings": [
+        "NO_TEXT_LAYER"
+      ]
+    }
+  ],
+  "timings_s": {
+    "inventory": 3.9
+  },
+  "stage_config_hashes": {
+    "recognize": "0000000000000000000000000000000000000000000000000000000000000001",
+    "layout": "0000000000000000000000000000000000000000000000000000000000000001",
+    "tables": "0000000000000000000000000000000000000000000000000000000000000001",
+    "compare": "0000000000000000000000000000000000000000000000000000000000000001",
+    "export": "0000000000000000000000000000000000000000000000000000000000000001"
+  }
+}

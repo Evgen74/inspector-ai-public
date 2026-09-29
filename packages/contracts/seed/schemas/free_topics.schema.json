@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/seed/free_topics.schema.json",
+  "title": "FREE-<TOPIC> vocabulary (93 §3.7, 97 §2.9)",
+  "description": "Built from seed/src/free_topics.yaml; topic codes equal enums.FreeTopic. Owner: AG-03 (data), AG-07 (enum semantics).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seed", "schema_version", "matrix_version", "numbering", "export_policy", "criticality", "criticality_level", "protocol_status", "sources", "topics"],
+  "properties": {
+    "seed": {"const": "free_topics"},
+    "schema_version": {"const": 1},
+    "matrix_version": {"type": "string"},
+    "numbering": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code_pattern", "scope", "order", "start"],
+      "properties": {
+        "code_pattern": {"type": "string"},
+        "scope": {"type": "string"},
+        "order": {"type": "array", "items": {"type": "string"}},
+        "start": {"type": "integer", "minimum": 1}
+      }
+    },
+    "export_policy": {"type": "object"},
+    "criticality": {"const": "Существенное (предписание) — требует утверждения"},
+    "criticality_level": {"$ref": "../schemas/enums.schema.json#/$defs/CriticalityLevel"},
+    "protocol_status": {"$ref": "../schemas/enums.schema.json#/$defs/ProtocolParamStatus"},
+    "sources": {"$ref": "params.schema.json#/$defs/Sources"},
+    "topics": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["topic", "label_ru", "code_example", "disciplines", "sections", "description", "change_map_families"],
+        "properties": {
+          "topic": {"$ref": "../schemas/enums.schema.json#/$defs/FreeTopic"},
+          "label_ru": {"type": "string", "minLength": 3},
+          "code_example": {"$ref": "../schemas/common.schema.json#/$defs/FreeParameterCode"},
+          "disciplines": {"type": "array", "items": {"type": "string"}},
+          "sections": {"type": "array", "items": {"type": "string"}},
+          "description": {"type": "string"},
+          "change_map_families": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"}}
+        }
+      }
+    }
+  }
+}

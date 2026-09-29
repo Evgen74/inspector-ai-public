@@ -1,0 +1,377 @@
+{
+ "meta": {
+  "purpose": "Seed candidates for the self-labelled internal check on OBJ-NOVOSLOBODSKAYA (unlabeled TRAIN_PUBLIC). label fields are to be filled by the user; system_hypothesis is ours, not gold.",
+  "report": "docs/analysis/95_corpus_train_objects.md",
+  "label_values": [
+   "VIOLATION_PRESENT",
+   "NO_VIOLATION",
+   "MISSING_DOCUMENT",
+   "COMPARISON_IMPOSSIBLE",
+   "UNSURE"
+  ]
+ },
+ "candidates": [
+  {
+   "id": "NS-C01",
+   "parameter_code": "KR-055",
+   "location": "БСС-1н (сваи-«пустышки») в/о 4-2.8/А-Х1",
+   "pd_value": "В15 П4 F200 W8 (текст КР1, p17); В15 П4 F100 W6 (ведомость КР1, p24)",
+   "rd_value": "В15, F200, W8 (СВГ, п.23)",
+   "id_value": "БСТ В15 П4 F150(I) W8; одна партия В15П4F(I)150W6",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 24
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0005",
+     "pdf_page_number": 7
+    }
+   ],
+   "system_hypothesis": "KR-055 → NO_VIOLATION by the trigger text (strength class В15 unchanged); the frost/water marks F150<F200 (and W6<W8 for one batch) are a candidate FREE-search finding (e.g. FREE-CONCRETE-001) or CLARIFICATION_REQUIRED because the PD contradicts itself (p17 F200 W8 vs p24 F100 W6)",
+   "why_interesting": "real ID↔RD mismatch outside the literal trigger; tests directional triggers, PD self-conflict and the matrix-vs-free-search routing",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C02",
+   "parameter_code": "KR-055",
+   "location": "БСС-1н в/о 4-2.8/А.1-Х1",
+   "pd_value": "as NS-C01",
+   "rd_value": "В15, F200, W8",
+   "id_value": "БСТ В15 П4 F150(I) W8",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0007",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "same as NS-C01",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C03",
+   "parameter_code": "KR-055",
+   "location": "БСС-1н в/о Х-2.8/А-Д",
+   "pd_value": "as NS-C01",
+   "rd_value": "В15, F200, W8",
+   "id_value": "БСТ В15 П4 F150(I) W8",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0009",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "same as NS-C01",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C04",
+   "parameter_code": "KR-055",
+   "location": "БСС-1А (армированные сваи) в/о 4-2.8/А-Х1",
+   "pd_value": "В25 П4 F200 W8",
+   "rd_value": "В25, F200, W8",
+   "id_value": "БСТ В25 П4 F(I)200 W8",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0004",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C05",
+   "parameter_code": "KR-055",
+   "location": "«Стена в грунте», захватка №8",
+   "pd_value": "В25 F200 W8",
+   "rd_value": "В25, F200, W8",
+   "id_value": "БСТ В25 П4 F(I)200 W8",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 17
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0014",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C06",
+   "parameter_code": "KR-055",
+   "location": "Форшахта в/о 1.1-9/А-Х2",
+   "pd_value": "В15 (F и W не регламентируются) p13; В15 F100 W4 (ведомость p23)",
+   "rd_value": "В15 (F и W не регламентируются)",
+   "id_value": "БСТ В15 П4 F(I)150 W6",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 13
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0069",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION (ID exceeds requirement)",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C07",
+   "parameter_code": "PZ-009",
+   "location": "Здание",
+   "pd_value": "0,000 = 159,95",
+   "rd_value": "0,000 = 159,95 (СВГ, РС, КЖ1.1.1)",
+   "id_value": null,
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0101",
+     "pdf_page_number": 13
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0145",
+     "pdf_page_number": 4
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C08",
+   "parameter_code": "KR-061",
+   "location": "«Стена в грунте» (ограждение котлована)",
+   "pd_value": "толщина 600 мм",
+   "rd_value": "толщина 600 мм",
+   "id_value": "to read from исполнительные схемы захваток",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 13
+    },
+    {
+     "stage": "PD",
+     "file_id": "F0112",
+     "pdf_page_number": 23
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION (mapping of СВГ to KR-061 «несущие монолитные стены» is itself debatable)",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C09",
+   "parameter_code": "KR-061 / PZ-009 (elevations)",
+   "location": "Захватка №8",
+   "pd_value": "низ свай 134,50",
+   "rd_value": "верх бетонирования БСС 158,90; низ 134,50",
+   "id_value": "Верх каркаса 159.45; низ каркаса 134.50; бетонирование на отм. 159.50",
+   "evidence": [
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0013",
+     "pdf_page_number": 3
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0014",
+     "pdf_page_number": 3
+    }
+   ],
+   "system_hypothesis": "expert call: cage and over-pour above design top are normal practice; FP trap for naive elevation diff",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C10",
+   "parameter_code": "PZ-001",
+   "location": "Здание",
+   "pd_value": "ПЗ: 1225,8 м² (наземная 767,0 + подземная 458,8)",
+   "rd_value": null,
+   "id_value": null,
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0101",
+     "pdf_page_number": 9
+    },
+    {
+     "stage": "PD",
+     "file_id": "F0126",
+     "pdf_page_number": 10
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION: ПЗУ «767,0*» is the ground part only; FP trap for total-vs-component comparison",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C11",
+   "parameter_code": "KR-057",
+   "location": "Армирование захваток СВГ",
+   "pd_value": "А500С, А240",
+   "rd_value": "А500С, А240",
+   "id_value": "А500С, А240С (сертификаты Северсталь)",
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0105",
+     "pdf_page_number": 14
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0137",
+     "pdf_page_number": 1
+    },
+    {
+     "stage": "ID",
+     "file_id": "F0013",
+     "pdf_page_number": 5
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION; tests «А240С»≡«А240» normalization",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C12",
+   "parameter_code": "FREE-DOC-xxx (document integrity)",
+   "location": "ТХ3 текстовая часть",
+   "pd_value": "ссылки на разделы «СГ-2404-63-П-ИОС5.5.3 / 5.5.9 / 5.5.10» другого проекта",
+   "rd_value": null,
+   "id_value": null,
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0110",
+     "pdf_page_number": 28
+    }
+   ],
+   "system_hypothesis": "SUSPICION only (copy-paste of foreign cipher), not a matrix finding",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C14",
+   "parameter_code": "KR-058",
+   "location": "Фундаментная плита",
+   "pd_value": "1000 и 1200 мм (КР2 p53)",
+   "rd_value": "1200 и 1500 мм, низ −14.950/−15.250 (КЖ1.1.1 p3)",
+   "id_value": null,
+   "evidence": [
+    {
+     "stage": "PD",
+     "file_id": "F0106",
+     "pdf_page_number": 53
+    },
+    {
+     "stage": "RD",
+     "file_id": "F0140",
+     "pdf_page_number": 3
+    }
+   ],
+   "system_hypothesis": "NO_VIOLATION (trigger is «уменьшение»; RD is thicker) — FP trap for undirected diffs",
+   "label": null,
+   "label_comment": null
+  },
+  {
+   "id": "NS-C13",
+   "parameter_code": "(integrity)",
+   "location": "АОСР «РЗ» ×16 и «РФ» ×3",
+   "pd_value": null,
+   "rd_value": null,
+   "id_value": "listed in document_manifest but absent in the local copy",
+   "evidence": [],
+   "system_hypothesis": "local data problem, NOT MISSING_DOCUMENT for the object; re-extract before labelling",
+   "label": null,
+   "label_comment": null
+  }
+ ]
+}

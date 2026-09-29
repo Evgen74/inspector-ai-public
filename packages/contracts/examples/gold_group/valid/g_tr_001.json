@@ -1,0 +1,35 @@
+{
+  "finding_group_id": "G-TR-001",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "split": "TRAIN_PUBLIC",
+  "matrix_scope": "MATRIX",
+  "parameter_id": 79,
+  "parameter_code": "IOS4-079",
+  "parameter_mapping_status": "PROVISIONAL_DOMAIN_MAPPING",
+  "title": "Несоответствие конфигурации приточных установок в венткамере 012",
+  "difference_type": "CONFIGURATION_MISMATCH",
+  "locations": [
+    "012"
+  ],
+  "criticality": "Критическое (приостановка работ)",
+  "source_label": "Перечень нарушений.txt, пункт 1",
+  "gold_status": "FINAL_GOLD_EXISTENCE",
+  "evidence": [
+    {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 104,
+      "document_sheet_number": 26,
+      "rendered_image": "evidence_pages/VIO-0001_PD_sheet26_pdf104.png",
+      "localization": "PAGE_LEVEL_VISUALLY_VERIFIED"
+    },
+    {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 17,
+      "document_sheet_number": 3,
+      "rendered_image": "evidence_pages/VIO-0001_RD_sheet3_pdf17.png",
+      "localization": "PAGE_LEVEL_VISUALLY_VERIFIED"
+    }
+  ]
+}

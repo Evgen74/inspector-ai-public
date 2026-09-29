@@ -1,0 +1,64 @@
+{
+  "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-FREE-HEATING-001",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "run_id": "m1-tyumen-e2e",
+  "matrix_scope": "MATRIX",
+  "parameter_code": "FREE-HEATING-001",
+  "parameter_id": null,
+  "parameter_mapping_status": "MATRIX_GAP_CONFIRMED",
+  "title": "Не выполнена предусмотренная ПД система тёплых полов в помещениях МГН",
+  "element_noun": "Тёплый пол",
+  "axis": "PD_RD",
+  "comparison_result": "MISSING_DESIGN_ELEMENT",
+  "discrepancy_type": "ELEMENT_MISSING",
+  "location_type": "ROOM",
+  "locations": [
+    "267",
+    "270",
+    "271",
+    "272"
+  ],
+  "pd_value": "Тёплый пол предусмотрен",
+  "rd_value": "Тёплый пол отсутствует",
+  "id_value": null,
+  "violation_label": "VIOLATION_PRESENT",
+  "protocol_status": "WARNING",
+  "criticality": "Существенное (предписание) — требует утверждения",
+  "criticality_level": "SUBSTANTIAL_ORDER",
+  "finding_status": "CANDIDATE",
+  "confidence": 0.9,
+  "anchor_evidence": [
+    {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 99,
+      "is_anchor": true,
+      "document_sheet_number": 21
+    },
+    {
+      "stage": "RD",
+      "file_id": "F0202",
+      "pdf_page_number": 17,
+      "is_anchor": true,
+      "document_sheet_number": 4
+    }
+  ],
+  "evidence": [
+    {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 11,
+      "is_anchor": false,
+      "role": "SUPPORTING_EXPECTED"
+    }
+  ],
+  "finding_ids": [
+    "OBJ-TYUMENSKAYA-5-GOLD-SEED-FREE-HEATING-001-PDRD-267",
+    "OBJ-TYUMENSKAYA-5-GOLD-SEED-FREE-HEATING-001-PDRD-270",
+    "OBJ-TYUMENSKAYA-5-GOLD-SEED-FREE-HEATING-001-PDRD-271",
+    "OBJ-TYUMENSKAYA-5-GOLD-SEED-FREE-HEATING-001-PDRD-272"
+  ],
+  "discovery_method": "GRAPHIC_DIFF",
+  "evidence_bind_status": "BOUND",
+  "card_no": "Б.2"
+}

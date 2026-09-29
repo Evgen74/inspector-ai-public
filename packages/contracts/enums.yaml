@@ -1,0 +1,1336 @@
+# «Инспектор ИИ» — canonical enum registry (single source of truth).
+#
+# Maintainer: AG-00. Semantics owner: the `owner` agent of each enum.
+# Sources: docs/analysis/90 §3.2.1 (canonical registry) + 97 §2.6–§2.9 (overrides and additions)
+#          + the organizers' package (submission_schema.json, document_manifest.jsonl, train gold).
+#
+# Rules
+# - Values are UPPER_SNAKE, except DataType, ExportFormat and SubmissionVariant (lowercase by source).
+# - A value is either a bare string or a mapping {code, label_ru?, description?, aliases?, ...attributes}.
+# - `open: true`  → an externally owned vocabulary (organizer data). Loaders keep unknown values raw and warn;
+#                   they never fail on them. Everything else is closed: an unknown value is a contract violation.
+# - `status: proposed` → added by AG-00 from the reports but not yet ratified by the semantics owner.
+# - Changing this file: edit it, run `make contracts` (regenerates schemas/enums.schema.json and the Python
+#   StrEnums), commit both. CI (`make test`) fails on drift. Never add values in code.
+
+schema_version: 1
+contract_version: "0.1.0"
+
+enums:
+
+  # ───────────────────────────── Submission / scoring (organizers + 97 §2.5–2.7) ─────────────────────────────
+
+  ViolationLabel:
+    owner: AG-04
+    source: "submission_schema.json; 97 §2.6"
+    stored_on: ["checks.violation_label", "submission.checks[].violation_label"]
+    values:
+      - {code: VIOLATION_PRESENT, label_ru: "Нарушение выявлено"}
+      - {code: NO_VIOLATION, label_ru: "Нарушений нет"}
+      - {code: MISSING_DOCUMENT, label_ru: "Отсутствует документ"}
+      - {code: COMPARISON_IMPOSSIBLE, label_ru: "Сравнение невозможно"}
+
+  ProtocolParamStatus:
+    owner: AG-04
+    source: "submission_schema.json; ТЗ v1.0 §9.2 status table (93 §3.4); 97 §2.6"
+    stored_on: ["checks.protocol_status", "submission.checks[].protocol_status"]
+    description: "Per-parameter protocol status. PARTIALLY_LOADED is display-only and never exported."
+    values:
+      - {code: OK, label_ru: "Нарушений нет", color_ru: "Зелёный", color: GREEN, indicator: GREEN, action_ru: "Не требует действий", in_submission: true}
+      - {code: WARNING, label_ru: "Существенное нарушение", color_ru: "Жёлтый", color: YELLOW, indicator: YELLOW, action_ru: "Выдать предписание", in_submission: true}
+      - {code: CRITICAL, label_ru: "Критическое нарушение", color_ru: "Красный", color: RED, indicator: RED, action_ru: "Приостановить работы", in_submission: true}
+      - {code: ID_MISSING, label_ru: "Отсутствует ИД", color_ru: "Оранжевый", color: ORANGE, indicator: YELLOW, action_ru: "Дозагрузить ИД", in_submission: true}
+      - {code: RD_MISSING, label_ru: "Отсутствует РД", color_ru: "Красный", color: RED, indicator: RED, action_ru: "Приостановить работы", in_submission: true}
+      - {code: PD_MISSING, label_ru: "Отсутствует ПД", color_ru: "Красный", color: RED, indicator: RED, action_ru: "Приостановить работы", in_submission: true}
+      - {code: PARTIALLY_LOADED, label_ru: "ИД загружена частично", color_ru: "Жёлтый", color: YELLOW, indicator: YELLOW, action_ru: "Дозагрузить недостающие файлы", in_submission: false, display_only: true}
+      - {code: COMPARISON_IMPOSSIBLE, label_ru: "Проверка невозможна", color_ru: "Красный", color: RED, indicator: RED, action_ru: "Загрузить документы", in_submission: true}
+
+  CriticalityLevel:
+    owner: AG-03
+    source: "parameter_catalog_132.jsonl `criticality`; 97 §2.7–2.8 (restored next to review_priority)"
+    stored_on: ["params.criticality_level"]
+    description: "`catalog_string` is the exact string exported as submission `criticality`."
+    values:
+      - {code: CRITICAL_SUSPEND, label_ru: "Критическое", catalog_string: "Критическое (приостановка работ)", review_priority: HIGH, protocol_status: CRITICAL}
+      - {code: SUBSTANTIAL_ORDER, label_ru: "Существенное", catalog_string: "Существенное (предписание)", review_priority: MEDIUM, protocol_status: WARNING}
+      - {code: INFORMATIONAL, label_ru: "Информационное", catalog_string: null, review_priority: LOW, protocol_status: OK, display_only: true}
+
+  ParameterMappingStatus:
+    owner: AG-03
+    source: "parameter_catalog_132.jsonl `mapping_status`; public_train_finding_groups.jsonl; 97 §2.7, §2.10"
+    stored_on: ["change_matrix_map.parameter_mapping_status", "submission extra"]
+    values:
+      - {code: SOURCE_MATRIX, label_ru: "Параметр матрицы"}
+      - {code: PROVISIONAL_DOMAIN_MAPPING, label_ru: "Предварительное отнесение по инженерной системе"}
+      - {code: MATRIX_GAP_CONFIRMED, label_ru: "Пробел матрицы (свободный поиск)"}
+
+  ComparisonResult:
+    owner: AG-04
+    source: "public_train_checks.jsonl `comparison_result`; 93 §3.5; 97 §2.7 (mapped from DiscrepancyType)"
+    stored_on: ["checks.comparison_result", "submission extra"]
+    values:
+      - {code: CONFIGURATION_MISMATCH, label_ru: "Изменена конфигурация"}
+      - {code: MISSING_DESIGN_ELEMENT, label_ru: "Отсутствует предусмотренный элемент"}
+      - {code: VALUE_MISMATCH, label_ru: "Расхождение значений"}
+      - {code: MATERIAL_SUBSTITUTION, label_ru: "Замена материала или класса"}
+      - {code: EXTRA_ELEMENT, label_ru: "Непредусмотренный элемент"}
+      - {code: TOLERANCE_EXCEEDED, label_ru: "Превышен допуск"}
+
+  LocationType:
+    owner: AG-04
+    source: "public_train_checks.jsonl `location_type`; 93 §2.7; 97 §2.7"
+    stored_on: ["checks.location_type", "submission extra"]
+    values:
+      - {code: ROOM, label_ru: "Помещение"}
+      - {code: FLOOR, label_ru: "Этаж"}
+      - {code: BUILDING, label_ru: "Корпус (здание)"}
+      - {code: AXES, label_ru: "Оси"}
+      - {code: ELEMENT, label_ru: "Конструктивный элемент"}
+      - {code: OBJECT, label_ru: "Объект в целом"}
+
+  MatrixScope:
+    owner: AG-04
+    source: "public_train_checks.jsonl `matrix_scope`; 97 §2.7"
+    values:
+      - {code: MATRIX, label_ru: "Матрица 132 параметров"}
+      - {code: FREE_SEARCH, label_ru: "Свободный поиск"}
+
+  DocumentStatus:
+    owner: AG-04
+    open: true
+    source: "public_train_checks.jsonl `document_status` (gold vocabulary); 93 §3.9; 97 §2.7"
+    description: >-
+      Stage availability for one check. Grammar: <stages>_AVAILABLE[_<stages>_MISSING | _<stage>_NOT_REQUIRED_FOR_PAIRWISE_CHECK].
+      Only PD_RD_AVAILABLE_ID_NOT_REQUIRED_FOR_PAIRWISE_CHECK is observed in the gold; the rest are proposed.
+    values:
+      - {code: PD_RD_AVAILABLE_ID_NOT_REQUIRED_FOR_PAIRWISE_CHECK, label_ru: "ПД и РД доступны; ИД не требуется для попарной проверки"}
+      - {code: PD_ID_AVAILABLE_RD_NOT_REQUIRED_FOR_PAIRWISE_CHECK, label_ru: "ПД и ИД доступны; РД не требуется для попарной проверки", status: proposed}
+      - {code: RD_ID_AVAILABLE_PD_NOT_REQUIRED_FOR_PAIRWISE_CHECK, label_ru: "РД и ИД доступны; ПД не требуется для попарной проверки", status: proposed}
+      - {code: PD_RD_ID_AVAILABLE, label_ru: "ПД, РД и ИД доступны", status: proposed}
+      - {code: PD_RD_AVAILABLE_ID_MISSING, label_ru: "ПД и РД доступны; ИД отсутствует", status: proposed}
+      - {code: PD_ID_AVAILABLE_RD_MISSING, label_ru: "ПД и ИД доступны; РД отсутствует", status: proposed}
+      - {code: RD_ID_AVAILABLE_PD_MISSING, label_ru: "РД и ИД доступны; ПД отсутствует", status: proposed}
+      - {code: PD_AVAILABLE_RD_ID_MISSING, label_ru: "Доступна только ПД", status: proposed}
+      - {code: RD_AVAILABLE_PD_ID_MISSING, label_ru: "Доступна только РД", status: proposed}
+      - {code: ID_AVAILABLE_PD_RD_MISSING, label_ru: "Доступна только ИД", status: proposed}
+      - {code: PD_RD_ID_MISSING, label_ru: "Документы отсутствуют", status: proposed}
+
+  FreeTopic:
+    owner: AG-07
+    source: "93 §3.7; 97 §2.9 (FREE-<TOPIC>-<NNN>, fixed topic vocabulary)"
+    description: "TOPIC of a FREE-<TOPIC>-<NNN> code. NNN is numbered per finding group within object and topic."
+    values:
+      - {code: HEATING, label_ru: "Отопление"}
+      - {code: VENTILATION, label_ru: "Вентиляция"}
+      - {code: WATER, label_ru: "Водоснабжение"}
+      - {code: SEWER, label_ru: "Водоотведение"}
+      - {code: ELECTRICAL, label_ru: "Электроснабжение"}
+      - {code: LIGHTING, label_ru: "Освещение"}
+      - {code: FIRE, label_ru: "Пожарная безопасность"}
+      - {code: EVACUATION, label_ru: "Эвакуация"}
+      - {code: ACCESSIBILITY, label_ru: "Доступность для МГН"}
+      - {code: ARCHITECTURE, label_ru: "Архитектурные решения"}
+      - {code: STRUCTURE, label_ru: "Конструктивные решения"}
+      - {code: SITE, label_ru: "Земельный участок и благоустройство"}
+      - {code: ROOF, label_ru: "Кровля"}
+      - {code: FACADE, label_ru: "Фасады"}
+      - {code: LIFT, label_ru: "Лифты"}
+      - {code: ENERGY, label_ru: "Энергоэффективность"}
+      - {code: OTHER, label_ru: "Прочее"}
+
+  SubmissionVariant:
+    owner: AG-04
+    source: "97 §2.5, §2.14 (GET /processes/{id}/submission?variant=full|strict)"
+    values:
+      - {code: full, label_ru: "Полный ответ (с дополнительными полями из gold)"}
+      - {code: strict, label_ru: "Строгий ответ (только поля схемы организаторов)"}
+
+  # ───────────────────────────── Organizer manifest and gold vocabularies (97 §2.7, §2.12) ─────────────────────────────
+
+  ManifestStage:
+    owner: AG-01
+    source: "document_manifest.jsonl `stage`; 97 §2.7 (kept raw next to the resolved DocStage)"
+    values:
+      - {code: PD, label_ru: "ПД"}
+      - {code: RD, label_ru: "РД"}
+      - {code: ID, label_ru: "ИД"}
+      - {code: RD_ID_MIXED, label_ru: "РД и ИД вперемешку (стадия определяется по файлу)"}
+      - {code: UNKNOWN, label_ru: "Стадия не указана"}
+
+  ManifestSplit:
+    owner: AG-10
+    source: "document_manifest.jsonl `split`; split_policy.json; 97 §2.7 (mapping to Split)"
+    values:
+      - {code: TRAIN_PUBLIC, label_ru: "Публичная обучающая выборка", maps_to_split: TRAIN}
+      - {code: TEST_HIDDEN, label_ru: "Скрытая тестовая выборка", maps_to_split: HIDDEN_TEST}
+
+  ManifestSection:
+    owner: AG-01
+    open: true
+    source: "document_manifest.jsonl `section` (observed values); labels are the usual discipline abbreviations"
+    values:
+      - {code: OTHER, label_ru: "Прочее", description: "Раздел не указан или не относится к перечисленным"}
+      - {code: AR, label_ru: "АР", description: "Архитектурные решения"}
+      - {code: KR, label_ru: "КР", description: "Конструктивные решения"}
+      - {code: POS, label_ru: "ПОС", description: "Проект организации строительства"}
+      - {code: GP, label_ru: "ГП", description: "Генеральный план"}
+      - {code: EOM, label_ru: "ЭОМ", description: "Электрооборудование и электроосвещение"}
+      - {code: VK, label_ru: "ВК", description: "Водоснабжение и канализация"}
+      - {code: OV, label_ru: "ОВ", description: "Отопление, вентиляция и кондиционирование"}
+      - {code: SS, label_ru: "СС", description: "Сети связи"}
+      - {code: PB, label_ru: "ПБ", description: "Пожарная безопасность"}
+
+  DatasetRole:
+    owner: AG-10
+    open: true
+    source: "document_manifest.jsonl `dataset_role` (observed values)"
+    values: [GOLD_SEED, UNLABELED_POOL]
+
+  AnnotationStatus:
+    owner: AG-01
+    open: true
+    source: "document_manifest.jsonl `annotation_status` (observed values); GROUND_TRUTH_INDEX files are never evidence (97 §2.5)"
+    values:
+      - {code: UNLABELED}
+      - {code: POSITIVE_EVIDENCE_SOURCE}
+      - {code: GROUND_TRUTH_INDEX, citable: false}
+
+  DistributionStatus:
+    owner: AG-01
+    open: true
+    source: "document_manifest.jsonl `distribution_status` (observed values)"
+    values: [INCLUDE]
+
+  LabelVisibility:
+    owner: AG-10
+    open: true
+    source: "document_manifest.jsonl `label_visibility` (observed values)"
+    values: [PUBLIC_TRAIN, ORGANIZER_ONLY]
+
+  GoldStatus:
+    owner: AG-10
+    open: true
+    source: "public_train_checks.jsonl `gold_status` (observed values); TEAM_LABEL_FROZEN for our own frozen dev labels (95 §5, N-GOLD)"
+    values:
+      - {code: FINAL_GOLD_EXISTENCE, label_ru: "Эталон организаторов"}
+      - {code: TEAM_LABEL_FROZEN, label_ru: "Разметка команды (зафиксирована)", description: "Never in organizer data; set by inspector_eval.devset on frozen N-GOLD rows"}
+
+  EvidenceLocalization:
+    owner: AG-10
+    open: true
+    source: "public_train_checks.jsonl evidence[].localization (observed values)"
+    values: [PAGE_LEVEL_VISUALLY_VERIFIED]
+
+  LocalFileStatus:
+    owner: AG-01
+    source: "97 §2.7, §2.12 (never MISSING_DOCUMENT)"
+    stored_on: ["files.local_status", "run_manifest.files[].local_status"]
+    values:
+      - {code: PRESENT, label_ru: "Файл на диске"}
+      - {code: RECOVERED, label_ru: "Восстановлен из исходного архива организаторов"}
+      - {code: MISSING_ON_DISK, label_ru: "Отсутствует на диске"}
+
+  ArchiveMemberRole:
+    owner: AG-01
+    source: "97 §2.7, §2.12 (archive members are never citable)"
+    stored_on: ["archive_members.role"]
+    values:
+      - {code: PDF_TWIN_SOURCE, label_ru: "Исходник PDF-двойника (DWG)"}
+      - {code: CONTEXT_ONLY, label_ru: "Только контекст"}
+      - {code: FOREIGN_OBJECT, label_ru: "Относится к другому объекту"}
+      - {code: DUPLICATE, label_ru: "Дубликат"}
+      - {code: IGNORED, label_ru: "Не используется"}
+
+  PageBasis:
+    owner: AG-02A
+    source: "97 §2.5, §2.7 (DOCX evidence only with RENDERED_LIBREOFFICE)"
+    values:
+      - {code: PDF_NATIVE, label_ru: "Страница исходного PDF"}
+      - {code: RENDERED_LIBREOFFICE, label_ru: "Страница DOCX, отрисованного LibreOffice"}
+
+  TextSource:
+    owner: AG-02A
+    source: "97 §2.7, §2.13"
+    stored_on: ["document_pages.text_source", "page_tokens.tokens[].source", "extracted_values.text_source"]
+    values:
+      - {code: TEXT_LAYER, label_ru: "Текстовый слой PDF"}
+      - {code: TEXT_LAYER_REPAIRED, label_ru: "Восстановленный текстовый слой"}
+      - {code: OCR, label_ru: "Распознавание (OCR)"}
+      - {code: OCR_LAYER_ISOLATED, label_ru: "OCR по изолированному слою САПР"}
+
+  # ───────────────────────────── Process, protocol, run (90 §3.2.1, owner B00/B04) ─────────────────────────────
+
+  ProcessStatus:
+    owner: AG-00
+    source: "ТЗ §9.1; 90 §3.2.2"
+    tz_mandated: true
+    values:
+      - {code: PENDING, label_ru: "Документы загружены, проверка не начата"}
+      - {code: PARSING, label_ru: "Парсинг документов"}
+      - {code: READY, label_ru: "Протокол сформирован"}
+      - {code: VERIFYING, label_ru: "Верификация"}
+      - {code: COMPLETED, label_ru: "Верификация завершена"}
+      - {code: FINALIZED, label_ru: "Протокол финализирован"}
+      - {code: FAILED, label_ru: "Обработка завершилась ошибкой"}
+
+  ProcessStage:
+    owner: AG-00
+    source: "90 §3.2.1 (informational)"
+    values: [QUEUED, VALIDATING, META, PARSING, OCR, EXTRACTING, COMPARING, HYPOTHESIS, PROTOCOL_BUILDING, RENDERING, DONE, FAILED]
+
+  RecheckState:
+    owner: AG-00
+    source: "90 §3.2.1"
+    values: [IDLE, RUNNING, FAILED]
+
+  ProcessPurpose:
+    owner: AG-10
+    source: "90 §3.2.1"
+    values: [INSPECTION, EVALUATION, SELFTEST]
+
+  ProcessSource:
+    owner: AG-01
+    source: "90 §3.2.1; BATCH_IMPORT (proposed, AG-00 M1) = created by POST /api/v1/admin/batch-runs/import from an inspector-batch run (97 §1.4, §2.14)"
+    values:
+      - {code: UI, label_ru: "Интерфейс"}
+      - {code: API, label_ru: "API"}
+      - {code: RIN, label_ru: "ИАИС «РиН»"}
+      - {code: BATCH_IMPORT, label_ru: "Импорт пакетного прогона", status: proposed}
+
+  FileSource:
+    owner: AG-01
+    source: "90 §3.2.1; BATCH_IMPORT = registered by POST /api/v1/admin/batch-runs/import from an inspector-batch run (97 §2.14)"
+    values:
+      - {code: UI, label_ru: "Загружен через интерфейс"}
+      - {code: API, label_ru: "Загружен через API"}
+      - {code: RIN, label_ru: "Получен из РиН"}
+      - {code: BATCH_IMPORT, label_ru: "Импортирован из пакетного прогона"}
+
+  ProtocolStatus:
+    owner: AG-04
+    source: "ТЗ §9.3; 90 §3.2.3"
+    values:
+      - {code: IN_VERIFICATION, label_ru: "На верификации"}
+      - {code: VERIFICATION_COMPLETED, label_ru: "Верификация завершена"}
+      - {code: PROTOCOL_FINALIZED, label_ru: "Протокол финализирован"}
+      - {code: SUPERSEDED, label_ru: "Заменён новой версией"}
+
+  ProtocolVersionReason:
+    owner: AG-04
+    source: "90 §3.2.1"
+    values: [INITIAL, INCREMENTAL_UPDATE, RECHECK, FINALIZATION, UNFINALIZATION]
+
+  RecheckReason:
+    owner: AG-04
+    source: "90 §3.2.1"
+    values: [REVISION_RESOLVED, FACT_OVERRIDE, COMPLETENESS_OVERRIDE, MATRIX_RECHECK, MANUAL]
+
+  IncrementalTrigger:
+    owner: AG-01
+    source: "90 §3.2.1"
+    values: [UPLOAD, REUPLOAD, REGISTRY_UPDATE, RIN_PULL]
+
+  StageUploadStatus:
+    owner: AG-01
+    source: "ТЗ §9.1; 90 §3.2.7"
+    tz_mandated: true
+    values:
+      - {code: PD_UPLOADED, label_ru: "ПД загружена полностью"}
+      - {code: PD_PARTIAL, label_ru: "ПД загружена частично"}
+      - {code: PD_MISSING, label_ru: "ПД отсутствует"}
+      - {code: RD_UPLOADED, label_ru: "РД загружена полностью"}
+      - {code: RD_PARTIAL, label_ru: "РД загружена частично"}
+      - {code: RD_MISSING, label_ru: "РД отсутствует"}
+      - {code: ID_UPLOADED, label_ru: "ИД загружена полностью"}
+      - {code: ID_PARTIAL, label_ru: "ИД загружена частично"}
+      - {code: ID_MISSING, label_ru: "ИД отсутствует"}
+
+  LoadScenario:
+    owner: AG-01
+    source: "ТЗ §9.2; 90 §3.2.7"
+    tz_mandated: true
+    values:
+      - {code: FULL, label_ru: "Полный комплект (ПД, РД, ИД)"}
+      - {code: PD_RD_ONLY, label_ru: "Только ПД и РД"}
+      - {code: PD_ID_ONLY, label_ru: "Только ПД и ИД"}
+      - {code: RD_ID_ONLY, label_ru: "Только РД и ИД"}
+      - {code: SINGLE_ONLY, label_ru: "Только один вид документации"}
+      - {code: PARTIALLY_LOADED, label_ru: "Частичная загрузка"}
+
+  ScenarioBase:
+    owner: AG-01
+    source: "90 §3.2.7"
+    values: [FULL, PD_RD_ONLY, PD_ID_ONLY, RD_ID_ONLY, SINGLE_ONLY, NONE]
+
+  JobStatus:
+    owner: AG-00
+    source: "90 §3.2.6"
+    values: [QUEUED, RUNNING, SUCCEEDED, RETRY_SCHEDULED, FAILED, DEAD_LETTERED, CANCELLED]
+
+  RunMode:
+    owner: AG-00
+    source: "90 §3.2.6"
+    values: [INITIAL, INCREMENTAL, RECHECK]
+
+  RunStatus:
+    owner: AG-00
+    source: "90 §3.2.6"
+    values: [QUEUED, RUNNING, SUCCEEDED, PARTIAL, FAILED]
+
+  EngineStatus:
+    owner: AG-00
+    source: "90 §3.2.1"
+    values: [QUEUED, RUNNING, OK, PARTIAL, TIMEOUT, FAILED]
+
+  # ───────────────────────────── Registry, files, revisions (90 §3.2.1, owner B01 → AG-01) ─────────────────────────────
+
+  DocStage:
+    owner: AG-01
+    source: "90 §3.2.1; submission_schema.json evidence[].stage"
+    values:
+      - {code: PD, label_ru: "ПД"}
+      - {code: RD, label_ru: "РД"}
+      - {code: ID, label_ru: "ИД"}
+
+  ApprovalStatus:
+    owner: AG-01
+    source: "90 §3.2.1"
+    values:
+      - {code: DRAFT, label_ru: "Черновик"}
+      - {code: APPROVED, label_ru: "Утверждено"}
+      - {code: FOR_CONSTRUCTION, label_ru: "В производство работ"}
+      - {code: SUPERSEDED, label_ru: "Заменено"}
+      - {code: CANCELLED, label_ru: "Аннулировано"}
+      - {code: UNKNOWN, label_ru: "Статус не определён"}
+
+  SignatureStatus:
+    owner: AG-01
+    source: "90 §3.2.1"
+    values: [UKEP, UNEP, WET_SCAN, ABSENT, NOT_REQUIRED, UNKNOWN]
+
+  RegistryStatus:
+    owner: AG-01
+    source: "90 §3.2.1; 97 §2.12 (the manifest is the registry, VALID_WITH_WARNINGS)"
+    values: [MISSING, INVALID, VALID_WITH_WARNINGS, VALID, DRAFT_UNCONFIRMED]
+
+  PackageStatus:
+    owner: AG-01
+    source: "90 §3.2.1"
+    values: [ACCEPTED, ACCEPTED_WITH_REJECTIONS, CLARIFICATION_REQUIRED, REJECTED_PACKAGE_LIMIT]
+
+  FileIntakeStatus:
+    owner: AG-01
+    source: "90 §3.2.1, §3.2.6"
+    values: [RECEIVED, STORED, VALIDATED, META_EXTRACTED, PARSE_QUEUED, PARSED, REJECTED_FORMAT, REJECTED_SIZE, REJECTED_EMPTY, REJECTED_CORRUPTED, REJECTED_ENCRYPTED, REJECTED_INFECTED, REJECTED_MISMATCH, FAILED_TIMEOUT]
+
+  FileIntegrityStatus:
+    owner: AG-00
+    source: "ТЗ §13.8; 90 §3.2.1"
+    values: [OK, CORRUPTED, MISSING]
+
+  MetaSource:
+    owner: AG-01
+    source: "90 §3.2.1; 97 §2.8"
+    values: [REGISTRY, DRAFT_CONFIRMED, EXTRACTED_UNCONFIRMED]
+
+  MetaStatus:
+    owner: AG-01
+    source: "90 §3.2.1"
+    values: [OK, CLARIFICATION_REQUIRED, NOT_COMPARABLE]
+
+  SelectionBasis:
+    owner: AG-01
+    source: "90 §3.2.1"
+    values: [SINGLE_APPROVED, EXPLICIT_CHAIN, SUPERSEDED_STATUS, INSPECTOR_DECISION, INFERRED_ORDER]
+
+  CompletenessItemStatus:
+    owner: AG-01
+    source: "90 §3.2.1"
+    values: [PRESENT, MISSING_EVIDENCE, DECLARED_NOT_RECEIVED, NOT_APPLICABLE, CLARIFICATION_REQUIRED, NOT_COMPARABLE]
+
+  ChecklistLevel:
+    owner: AG-01
+    source: "90 §3.2.1"
+    values: [CORE, EXPECTED, OPTIONAL]
+
+  # ───────────────────────────── Recognition and extraction (90 §3.2.1, owner B02 → AG-02A/B/C) ─────────────────────────────
+
+  PageClass:
+    owner: AG-02A
+    source: "90 §3.2.1; 97 §2.7 (STAMP_PAGE added; BROKEN_ENCODING = mojibake/lexicon/mixed-script; TEXT_UNDER/OVER_IMAGE → RASTER_HIDDEN_OCR)"
+    values:
+      - {code: VECTOR, label_ru: "Векторная страница с текстовым слоем"}
+      - {code: HYBRID, label_ru: "Векторная страница с растровыми вставками"}
+      - {code: RASTER_SCAN, label_ru: "Скан без текстового слоя"}
+      - {code: RASTER_HIDDEN_OCR, label_ru: "Скан со скрытым OCR-слоем"}
+      - {code: VECTOR_OUTLINED_TEXT, label_ru: "Текст в кривых"}
+      - {code: BROKEN_ENCODING, label_ru: "Искажённая кодировка текстового слоя"}
+      - {code: STAMP_PAGE, label_ru: "Служебная страница (штамп, обложка)"}
+      - {code: EMPTY, label_ru: "Пустая страница"}
+
+  QualityFlag:
+    owner: AG-02A
+    source: "ТЗ §9.1; 90 §3.2.1; 97 §2.13 (OK ≥ 0.85 / LOW_QUALITY ≥ 0.6 / ABSTAIN)"
+    values:
+      - {code: OK, label_ru: "Качество достаточное"}
+      - {code: LOW_QUALITY, label_ru: "Низкое качество"}
+      - {code: ABSTAIN, label_ru: "Исключено из анализа"}
+
+  ZoneSource:
+    owner: AG-02A
+    source: "90 §3.2.1"
+    values: [AUTO, PREMARKED, INSPECTOR]
+
+  ZoneKind:
+    owner: AG-02A
+    status: proposed
+    open: true
+    source: "97 §2.13 (seal, stamp, QR, handwriting zones; title-block cells; revision clouds); page_zones.zone_type"
+    values: [TITLE_BLOCK, STAMP, SEAL, QR, HANDWRITING, TABLE, REVISION_CLOUD, PREMARKED_UNREADABLE, OTHER]
+
+  ExtractionMethod:
+    owner: AG-02C
+    source: "90 §3.2.1"
+    values: [TEXT_LAYER, OCR, TABLE, REGEX, TOKEN_GRAMMAR, SEMANTIC, CV_MEASURE, XML_XPATH, DOCX, MANUAL, VLM_ASSIST]
+
+  ParamExtractionStatus:
+    owner: AG-02C
+    source: "90 §3.2.1"
+    values: [FOUND, NOT_FOUND, OUT_OF_SCOPE, LOW_QUALITY_ONLY, AMBIGUOUS]
+
+  ExtractionRunStatus:
+    owner: AG-02A
+    source: "90 §3.2.1, §3.2.6"
+    values: [QUEUED, RUNNING, CACHE_HIT, COMPLETED, REJECTED, FAILED_RETRYABLE, FAILED_FINAL]
+
+  # ───────────────────────────── Matrix and domain (90 §3.2.1, owner B03 → AG-03) ─────────────────────────────
+
+  DataType:
+    owner: AG-03
+    source: "ТЗ §8.1; 90 §3.2.1 (lowercase per ТЗ)"
+    tz_mandated: true
+    values: [number, string, boolean, coordinate, enum]
+
+  ReviewPriority:
+    owner: AG-03
+    source: "ТЗ §8.1, §9.2; 90 §3.2.1"
+    tz_mandated: true
+    values:
+      - {code: HIGH, label_ru: "Высокий"}
+      - {code: MEDIUM, label_ru: "Средний"}
+      - {code: LOW, label_ru: "Низкий"}
+
+  RiskLevel:
+    owner: AG-04
+    source: "ТЗ §9.2; 90 §3.2.1"
+    tz_mandated: true
+    values:
+      - {code: HIGH, label_ru: "Высокий"}
+      - {code: MEDIUM, label_ru: "Средний"}
+      - {code: LOW, label_ru: "Низкий"}
+
+  RuleType:
+    owner: AG-03
+    source: "90 §3.2.1"
+    values: [PAIRWISE_DELTA, NORMATIVE_BOUND, ORDINAL_COMPARE, ENUM_CHANGE, SET_DIFF, LAYER_STACK, PRESENCE, TOLERANCE_CHECK, GEOMETRY_OFFSET, GEOMETRY_CONTAINMENT, RATIO_BOUND, EXTERNAL_STATUS, SEMANTIC_DIFF]
+
+  CandidatePolicy:
+    owner: AG-03
+    source: "90 §3.2.1"
+    values: [TRIGGER, DEVIATION]
+
+  ViolationType:
+    owner: AG-03
+    source: "ТЗ §14.3; 90 §3.2.1"
+    values: [NUMERIC_DECREASE, NORM_BOUND_VIOLATION, NUMERIC_DEVIATION, CONFIG_CHANGE, ELEMENT_REMOVED, NUMERIC_INCREASE, CLASS_DOWNGRADE, COUNT_DECREASE, MATERIAL_SUBSTITUTION, ZONE_INTRUSION, EXTERNAL_NONCOMPLIANCE, TOLERANCE_EXCEEDED, INTERNAL_INCONSISTENCY, LAYER_CHANGE, GEOMETRY_OFFSET, RATIO_VIOLATION]
+
+  # Rule language and matrix seed vocabularies (AG-03, packages/contracts/seed/schemas/*; 90 §3.12, 97 §2.10).
+  # The seed schemas keep their own copies in $defs; a test pins them equal to these enums.
+
+  RuleDirection:
+    owner: AG-03
+    source: "seed/schemas/comparison_rule.schema.json $defs.RuleDirection; 97 §2.10 (directional triggers)"
+    values:
+      - {code: ANY, label_ru: "Любое изменение"}
+      - {code: DECREASE, label_ru: "Уменьшение"}
+      - {code: INCREASE, label_ru: "Увеличение"}
+      - {code: DOWNGRADE, label_ru: "Понижение класса"}
+
+  RuleOperator:
+    owner: AG-03
+    source: "seed/schemas/comparison_rule.schema.json $defs.RuleOperator"
+    values: [ABS_DELTA_GT, REL_DELTA_GT, OUTSIDE_BOUNDS, ORDINAL_LOWER, ORDINAL_NE, NE, SET_DIFF, LAYER_DIFF, PRESENT_IN_EXPECTED_ABSENT_IN_ACTUAL, ABS_DEVIATION_GT_TOLERANCE, DIST_GT, INTERSECTS_FORBIDDEN_ZONE, RATIO_LT, STATUS_NOT_OK, SEMANTIC_CONTRADICTION]
+
+  DetectKind:
+    owner: AG-03
+    source: "seed/schemas/comparison_rule.schema.json $defs.DetectKind (SET_DIFF / LAYER_DIFF)"
+    values: [MISSING, ADDED, CHANGED, LAYER_REMOVED, THICKNESS_DECREASED, MATERIAL_CHANGED, LAYER_ADDED]
+
+  AbstainReason:
+    owner: AG-03
+    source: "seed/schemas/comparison_rule.schema.json $defs.AbstainReason (a rule abstains instead of emitting SUSPICION, 90 C-53)"
+    values: [UNIT_MISMATCH, VALUE_NOT_FOUND, AMBIGUOUS_VALUE, UNKNOWN_SCALE_VALUE, ELEMENT_KEY_UNRESOLVED, SHEETS_NOT_MATCHED, ASSEMBLY_NOT_MATCHED, TOLERANCE_NOT_FOUND, CRS_MISMATCH, HEIGHT_SYSTEM_MISMATCH, PRICE_LEVEL_MISMATCH, VAT_BASIS_MISMATCH, METHOD_MISMATCH, GEOMETRY_NOT_EXTRACTED, EXTERNAL_DATA_UNAVAILABLE, TEXT_NOT_FOUND]
+
+  OrdinalScale:
+    owner: AG-03
+    source: "seed/schemas/comparison_rule.schema.json $defs.OrdinalScale"
+    values: [CONCRETE_B, STEEL_GRADE, REBAR_CLASS, FIRE_RESISTANCE_DEGREE, CONSTRUCTIVE_FIRE_HAZARD_CLASS, KM_CLASS, ENERGY_CLASS, RELIABILITY_CATEGORY, EI_LIMIT, FIRE_RESISTANCE_LIMIT_R, CABLE_FIRE_INDEX, WASTE_HAZARD_CLASS]
+
+  ParamExtractionStrategy:
+    owner: AG-03
+    source: "seed/schemas/params.schema.json $defs.ExtractionStrategy — the planned strategy per parameter (not ExtractionMethod, which records how a value was actually extracted)"
+    values: [TABLE_TEXT, FREE_TEXT_REGEX, SPEC_TABLE, DRAWING_GEOMETRY, SEMANTIC, EXTERNAL_SYSTEM, MANUAL]
+
+  ThresholdSource:
+    owner: AG-03
+    source: "seed/schemas/params.schema.json Param.threshold_source"
+    values: [MATRIX_TRIGGER, NONE, NORMATIVE, PD_VALUE, OBJECT_GPZU, ADMIN_REQUIRED, SHEET_OR_NORMATIVE, NORMATIVE_OVERRIDE]
+
+  FeasibilityTier:
+    owner: AG-03
+    source: "seed/schemas/params.schema.json Param.feasibility_tier; definitions from 03 §3.7"
+    values:
+      - {code: A, label_ru: "A — таблицы и текст", description: "A reliable MVP from tables or text with regex"}
+      - {code: B, label_ru: "B — умеренная автоматизация", description: "Tables reconstructed from drawings, per-element matching, OCR of tables, layer stacks"}
+      - {code: C, label_ru: "C — чертежи и семантика", description: "Needs drawing CV or semantic reasoning; partial result in MVP"}
+      - {code: D, label_ru: "D — внешние системы", description: "External systems; honest degradation to MISSING_EVIDENCE"}
+
+  HedgeKind:
+    owner: AG-03
+    source: "seed/schemas/params.schema.json hedge_groups[].kind; 97 §2.10 (top-2 code hedge over matrix near-duplicates)"
+    values:
+      - {code: SAME_SYSTEM, label_ru: "Одна инженерная система"}
+      - {code: DUPLICATE, label_ru: "Дублирующие параметры"}
+      - {code: PARTIAL_DUPLICATE, label_ru: "Частично дублирующие параметры"}
+
+  TextOrigin:
+    owner: AG-03
+    source: "seed/schemas/params.schema.json $defs.TextOrigin (protocol texts: verbatim from Приложение 2 or AG-03 draft awaiting expert review)"
+    values:
+      - {code: APPENDIX2, label_ru: "Из Приложения 2"}
+      - {code: AG03_DRAFT, label_ru: "Черновик, требует проверки экспертом"}
+
+  ObjectPhase:
+    owner: AG-03
+    source: "90 §3.2.1"
+    values: [DESIGN, CONSTRUCTION, COMPLETED]
+
+  FactSetBy:
+    owner: AG-03
+    source: "90 §3.2.1"
+    values: [SYSTEM, INSPECTOR]
+
+  MatrixVersionStatus:
+    owner: AG-03
+    source: "90 §3.2.10"
+    values: [DRAFT, PUBLISHED, RETIRED]
+
+  ReferenceConfidence:
+    owner: AG-03
+    source: "90 §3.2.1"
+    values: [HIGH, MEDIUM, LOW]
+
+  NormativeDocType:
+    owner: AG-08
+    source: "90 §3.2.1"
+    values: [SP, GOST, FZ, SANPIN, PP, GPZU, LOCAL, OTHER]
+
+  # ───────────────────────────── Comparison and findings (90 §3.2.1, §3.2.4, owner B04 → AG-04) ─────────────────────────────
+
+  DiscrepancyType:
+    owner: AG-04
+    source: "90 §3.2.1 (mapped to ComparisonResult, see mappings.discrepancy_to_comparison_result)"
+    values: [VALUE_DECREASED, VALUE_INCREASED, VALUE_CHANGED, THRESHOLD_BELOW_MIN, THRESHOLD_ABOVE_MAX, TOLERANCE_EXCEEDED, CLASS_DOWNGRADED, MATERIAL_SUBSTITUTED, ELEMENT_MISSING, ELEMENT_ADDED, FUNCTION_CHANGED, LAYER_REMOVED, LAYER_CHANGED, POSITION_SHIFTED, CONFIGURATION_CHANGED, COUNT_CHANGED, TOTAL_CHANGED, UNDOCUMENTED_WORK]
+
+  ComparisonAxis:
+    owner: AG-04
+    source: "90 §3.2.1"
+    values: [PD_RD, RD_ID, PD_ID, NORM_PD, NORM_RD, NORM_ID]
+
+  CompletenessStatus:
+    owner: AG-04
+    source: "СХЕМА GOLD; ТЗ §9.2; 90 §3.2.4 axis B"
+    tz_mandated: true
+    values:
+      - {code: COMPLETE, label_ru: "Данные полные"}
+      - {code: MISSING_EVIDENCE, label_ru: "Отсутствуют доказательства"}
+      - {code: NOT_APPLICABLE, label_ru: "Неприменимо"}
+      - {code: NOT_COMPARABLE, label_ru: "Несопоставимо"}
+      - {code: CLARIFICATION_REQUIRED, label_ru: "Требуется уточнение"}
+
+  CompletenessBasis:
+    owner: AG-04
+    source: "10 §3.7.2; 90 §3.2.4 (+ LOW_CONFIDENCE_SEMANTIC, PARAM_DEACTIVATED)"
+    description: "Basis codes printed in protocol table (1) «Причина / основание». `maps_to` is the CompletenessStatus."
+    values:
+      - {code: REGISTRY_MISSING, maps_to: CLARIFICATION_REQUIRED}
+      - {code: REGISTRY_ROW_INVALID, maps_to: CLARIFICATION_REQUIRED}
+      - {code: REGISTRY_HASH_MISMATCH, maps_to: CLARIFICATION_REQUIRED}
+      - {code: FILE_NOT_LISTED, maps_to: CLARIFICATION_REQUIRED}
+      - {code: OBJECT_MISMATCH, maps_to: CLARIFICATION_REQUIRED}
+      - {code: REVISION_UNRESOLVED, maps_to: CLARIFICATION_REQUIRED}
+      - {code: APPROVAL_MISSING, maps_to: CLARIFICATION_REQUIRED}
+      - {code: SUPERSEDED_ONLY, maps_to: CLARIFICATION_REQUIRED}
+      - {code: MANDATORY_SOURCE_MISSING, maps_to: MISSING_EVIDENCE}
+      - {code: DECLARED_NOT_RECEIVED, maps_to: MISSING_EVIDENCE}
+      - {code: CURRENT_REVISION_NOT_UPLOADED, maps_to: MISSING_EVIDENCE}
+      - {code: FILE_REJECTED, maps_to: MISSING_EVIDENCE}
+      - {code: SOURCE_UNREADABLE, maps_to: NOT_COMPARABLE}
+      - {code: FILE_NOT_PROCESSED, maps_to: NOT_COMPARABLE}
+      - {code: VALUE_ABSTAINED, maps_to: NOT_COMPARABLE}
+      - {code: UNIT_INCOMPATIBLE, maps_to: NOT_COMPARABLE}
+      - {code: VALUE_UNPARSEABLE, maps_to: NOT_COMPARABLE}
+      - {code: VALUE_IMPLAUSIBLE, maps_to: NOT_COMPARABLE}
+      - {code: SCOPE_MISMATCH, maps_to: NOT_COMPARABLE}
+      - {code: SHEETS_NOT_MATCHED, maps_to: NOT_COMPARABLE}
+      - {code: EVIDENCE_NOT_LOCALIZABLE, maps_to: NOT_COMPARABLE}
+      - {code: ENGINE_ERROR, maps_to: NOT_COMPARABLE}
+      - {code: LOW_CONFIDENCE_SEMANTIC, maps_to: NOT_COMPARABLE}
+      - {code: STAGE_NOT_APPLICABLE, maps_to: NOT_APPLICABLE}
+      - {code: PARAM_NOT_APPLICABLE_TO_OBJECT, maps_to: NOT_APPLICABLE}
+      - {code: PARAM_DEACTIVATED, maps_to: NOT_APPLICABLE}
+
+  FindingStatus:
+    owner: AG-04
+    source: "СХЕМА GOLD; 90 §3.2.4 axis A (SUSPICION only on suspicions)"
+    tz_mandated: true
+    values:
+      - {code: CANDIDATE, label_ru: "Кандидат в нарушения"}
+      - {code: NEGATIVE_VERIFIED, label_ru: "Нарушение не подтверждено"}
+      - {code: CONFIRMED_VIOLATION, label_ru: "Нарушение подтверждено"}
+      - {code: SUSPICION, label_ru: "Подозрение ИИ"}
+
+  DecidedBy:
+    owner: AG-04
+    source: "90 §3.2.1"
+    values: [SYSTEM, INSPECTOR]
+
+  CheckKind:
+    owner: AG-04
+    source: "90 §3.2.1"
+    values: [MATRIX, RULE, SUSPICION_CONVERTED, SPLIT_CHILD]
+
+  CheckLifecycle:
+    owner: AG-05
+    source: "90 §3.2.1, §3.2.4 axis D"
+    values: [ACTIVE, SPLIT, SUPERSEDED]
+
+  ReviewRequiredReason:
+    owner: AG-05
+    source: "90 §3.2.1"
+    values: [SOURCE_SUPERSEDED, VALUE_CHANGED, APPROVED_CHANGE_FOUND, OUTCOME_CHANGED]
+
+  EvidenceRole:
+    owner: AG-04
+    source: "ТЗ §10 #14; 90 §3.2.1"
+    values:
+      - {code: EXPECTED, label_ru: "Эталон (ожидаемое значение)"}
+      - {code: ACTUAL, label_ru: "Факт (фактическое значение)"}
+      - {code: SUPPORTING_EXPECTED, label_ru: "Дополнительно к эталону"}
+      - {code: SUPPORTING_ACTUAL, label_ru: "Дополнительно к факту"}
+      - {code: APPROVED_CHANGE, label_ru: "Согласованное изменение"}
+      - {code: NORMATIVE, label_ru: "Норматив"}
+      - {code: CONTEXT, label_ru: "Контекст"}
+
+  FragmentOrigin:
+    owner: AG-05
+    source: "90 §3.2.1"
+    values: [SYSTEM, INSPECTOR, SPLIT_COPY]
+
+  # ───────────────────────────── Verification (90 §3.2.1, §3.2.4, owner B05 → AG-05) ─────────────────────────────
+
+  InspectorStatus:
+    owner: AG-05
+    source: "ТЗ §9.3; 90 §3.2.4 axis C; 97 §2.6 (v1.0 API aliases CONFIRMED, REJECTED)"
+    tz_mandated: true
+    values:
+      - {code: PENDING, label_ru: "Ожидает решения"}
+      - {code: CONFIRMED_VIOLATION, label_ru: "Подтверждено", aliases: [CONFIRMED]}
+      - {code: NEGATIVE_VERIFIED, label_ru: "Отклонено", aliases: [REJECTED]}
+      - {code: CLARIFICATION_REQUIRED, label_ru: "Требует уточнения"}
+
+  DecisionType:
+    owner: AG-05
+    source: "ТЗ §9.3; 90 §3.2.1"
+    values: [CONFIRMED_VIOLATION, NEGATIVE_VERIFIED, CLARIFICATION_REQUIRED, REVERT_TO_PENDING]
+
+  DecisionCodeKind:
+    owner: AG-05
+    source: "90 §3.2.1"
+    values: [REJECT, CONFIRM, CLARIFY, REVISION_BASIS, SUSPICION_DISMISS, UNFINALIZE]
+
+  AiVerdict:
+    owner: AG-05
+    source: "ТЗ §10 #6; 90 §3.2.1"
+    values:
+      - {code: AGREE, label_ru: "ИИ согласен"}
+      - {code: UNCERTAIN, label_ru: "ИИ не уверен"}
+      - {code: DISAGREE, label_ru: "ИИ не согласен"}
+
+  DisputeResolutionStatus:
+    owner: AG-05
+    source: "90 §3.2.1"
+    values: [OPEN, INSPECTOR_UPHELD, AI_UPHELD, KEPT_CLARIFICATION, ESCALATED, WITHDRAWN]
+
+  PlannedAction:
+    owner: AG-05
+    source: "ТЗ §9.2; 90 §3.2.1"
+    values: [ISSUE_ORDER, REQUEST_EXPLANATION, REQUEST_DOCUMENTS, SCHEDULE_INSPECTION, NO_FURTHER_ACTION]
+
+  # ───────────────────────────── Hypotheses (90 §3.2.1, owner B07 → AG-07) ─────────────────────────────
+
+  DiscoveryMethod:
+    owner: AG-07
+    source: "ТЗ §9.5; 90 §3.2.1"
+    values:
+      - {code: LOGICAL_ANALYSIS, label_ru: "Логический анализ"}
+      - {code: SEMANTIC_DISSONANCE, label_ru: "Семантический диссонанс"}
+      - {code: NORMATIVE_ANALYSIS, label_ru: "Нормативный анализ"}
+      - {code: ML_PATTERN_ANALYSIS, label_ru: "ML-паттерн-анализ"}
+      - {code: GRAPHIC_DIFF, label_ru: "Графическое сравнение"}
+
+  SuspicionInspectorStatus:
+    owner: AG-07
+    source: "ТЗ §9.5; 90 §3.2.5"
+    values:
+      - {code: PENDING, label_ru: "Ожидает решения"}
+      - {code: CLARIFICATION_REQUIRED, label_ru: "Требует уточнения"}
+      - {code: CONVERTED_TO_CANDIDATE, label_ru: "Переведено в кандидаты"}
+      - {code: DISMISSED, label_ru: "Отклонено"}
+      - {code: STALE, label_ru: "Устарело после дозагрузки"}
+
+  PromotedBy:
+    owner: AG-07
+    source: "90 §3.2.1"
+    values: [INSPECTOR, SYSTEM]
+
+  EvidenceBindStatus:
+    owner: AG-07
+    source: "90 §3.2.1"
+    values: [UNBOUND, PARTIAL, BOUND]
+
+  # ───────────────────────────── ML loop, datasets, evaluation (90 §3.2.1, §3.2.9, owner B06 → AG-05/AG-10) ─────────────────────────────
+
+  RetrainingStatus:
+    owner: AG-05
+    source: "ТЗ §10 #6; 90 §3.2.9"
+    values: [NEW, IN_DRAFT, DISPUTED, CURATOR_ACCEPTED, CURATOR_EXCLUDED, RELEASED, USED_IN_TRAINING, REVOKED]
+
+  GoldLabel:
+    owner: AG-05
+    source: "ТЗ §14.1; 90 §3.2.1"
+    values: [POSITIVE, NEGATIVE]
+
+  DatasetItemStatus:
+    owner: AG-05
+    source: "ТЗ §9.4; 90 §3.2.9"
+    values: [DRAFT, PENDING_CURATION, INELIGIBLE, DISPUTED, SUSPENDED, ACCEPTED, EXCLUDED, RETURNED, RELEASED, REVOKE_PENDING]
+
+  Split:
+    owner: AG-10
+    source: "СХЕМА GOLD; 90 §3.2.1; 97 §2.7 (TRAIN_PUBLIC→TRAIN, TEST_HIDDEN→HIDDEN_TEST)"
+    tz_mandated: true
+    values: [TRAIN, VALIDATION, HIDDEN_TEST]
+
+  SourceType:
+    owner: AG-05
+    source: "90 §3.2.1"
+    values: [PRODUCTION, PILOT, SYNTHETIC, IMPORTED]
+
+  DatasetVersionStatus:
+    owner: AG-05
+    source: "ТЗ §9.4; 90 §3.2.9"
+    values: [DRAFT, IN_REVIEW, RELEASED, DEPRECATED, REVOKED]
+
+  ModelApprovalStatus:
+    owner: AG-05
+    source: "ТЗ §9.4; 90 §3.2.9"
+    values: [TRAINING, TRAINED, GATE_FAILED, PENDING_APPROVAL, APPROVED, REJECTED, DEPLOYED, ROLLED_BACK, RETIRED, FAILED]
+
+  TrainingJobStatus:
+    owner: AG-05
+    source: "90 §3.2.1"
+    values: [QUEUED, RUNNING, SUCCEEDED, FAILED]
+
+  EvalKind:
+    owner: AG-10
+    source: "ТЗ §14; 90 §3.2.1; 97 §2.7 (+ SUBMISSION_SCORE)"
+    values: [VALIDATION, HIDDEN_TEST, OCR_BENCH, EXTERNAL_GOLD, PILOT, SYNTHETIC, BATCH, SUBMISSION_SCORE]
+
+  # ───────────────────────────── Platform: integration, audit, ops, UI (90 §3.2.1, owner B08/B09 → AG-00/AG-08) ─────────────────────────────
+
+  SyncStatus:
+    owner: AG-00
+    source: "ТЗ §9.6; 90 §3.2.8 (РиН is a stub, 97 §2.15)"
+    values: [NOT_REQUIRED, QUEUED, SENDING, PENDING_SYNC, SYNCED, SYNC_FAILED, CANCELLED]
+
+  DeliveryAttemptOutcome:
+    owner: AG-00
+    source: "90 §3.2.1"
+    values: [SUCCESS, RETRYABLE_HTTP, TIMEOUT, NETWORK, NON_RETRYABLE, DUPLICATE_OK]
+
+  RinInboxStatus:
+    owner: AG-00
+    source: "ТЗ §9.6; 90 §3.2.8"
+    values: [NEW, DOWNLOADED, REJECTED_AV, FAILED_HASH, QUEUED_FOR_PROCESS, ATTACHED, BLOCKED_FINALIZED, AWAITING_INSPECTOR, NEW_CHECK_CREATED, DISMISSED]
+
+  PrescriptionStatus:
+    owner: AG-00
+    source: "ТЗ §9.6; 90 §3.2.8"
+    tz_mandated: true
+    values: [ISSUED, IN_PROGRESS, COMPLETED, CANCELLED, EXTENDED]
+
+  Role:
+    owner: AG-00
+    source: "ТЗ §12.2, §9.3, §9.4; 90 §3.10"
+    values:
+      - {code: INSPECTOR, label_ru: "Инспектор"}
+
+  AuditCategory:
+    owner: AG-00
+    source: "ТЗ §12.4–12.5; 90 §3.2.1"
+    values: [BUSINESS, SECURITY, SYSTEM, INTEGRATION, ACCESS]
+
+  RetentionClass:
+    owner: AG-00
+    source: "ТЗ §12.4–12.5; 90 §3.2.1"
+    values: [STANDARD, SECURITY, PERMANENT]
+
+  IndicatorColor:
+    owner: AG-08
+    source: "ТЗ §7 #7; 90 §3.2.1"
+    values:
+      - {code: RED, label_ru: "Красный"}
+      - {code: YELLOW, label_ru: "Жёлтый"}
+      - {code: GREEN, label_ru: "Зелёный"}
+      - {code: NONE, label_ru: "Нет данных"}
+
+  IssueScope:
+    owner: AG-10
+    source: "ТЗ §7 #12; 90 §3.2.1"
+    values: [PACKAGE, FILE, PAGE, ZONE, REGISTRY_ROW, REVISION_GROUP, PARAM, JOB, SYNC, SYSTEM]
+
+  IssueSeverity:
+    owner: AG-10
+    source: "90 §3.2.1"
+    values: [ERROR, WARNING, INFO]
+
+  IssueStatus:
+    owner: AG-10
+    source: "90 §3.2.1"
+    values: [OPEN, ACKNOWLEDGED, RESOLVED, SUPERSEDED]
+
+  ExportFormat:
+    owner: AG-04
+    source: "ТЗ §7 #7, §9.2; 90 §3.2.1 (lowercase)"
+    values: [pdf, docx, xml, json, gold_jsonl, gold_xlsx, gold_csv]
+
+  NotificationType:
+    owner: AG-00
+    source: "ТЗ §9.2 п.5, §13.7; 90 §3.2.1"
+    values: [PROTOCOL_READY, PROTOCOL_UPDATED, UPLOAD_REJECTED, FILE_REJECTED_ASYNC, PROCESSING_FAILED, NEW_DOCS_AFTER_FINALIZATION, SYNC_PENDING, SYNC_FAILED, PROTOCOL_UNFINALIZED, PRESCRIPTION_STATUS_CHANGED, MATRIX_UPDATED, DATASET_DRAFT_ITEMS, MODEL_PENDING_APPROVAL, WEEKLY_REPORT_READY, ADMIN_ALERT]
+
+  # ───────────────────────────── M1 additions (AG-00, 2026-09-28): run artifacts, layout, tables, protocol, decisions ─────────────────────────────
+
+  ArtifactKind:
+    owner: AG-00
+    source: "97 §1.4, §2.5 (one engine, two front-ends: the web imports the run directory); M1 run layout (run_layout.yaml)"
+    description: "Kinds of files in runs/<run_id>/. Path templates, schema, format and producer per kind live in run_layout.yaml."
+    values:
+      - {code: RUN_MANIFEST, label_ru: "Манифест прогона"}
+      - {code: RUN_CONTEXT, label_ru: "Контекст команды"}
+      - {code: RUN_ARTIFACTS, label_ru: "Реестр артефактов прогона"}
+      - {code: PIPELINE_SUMMARY, label_ru: "Итог сквозного прогона"}
+      - {code: INVENTORY_INDEX, label_ru: "Индекс инвентаризации"}
+      - {code: INVENTORY, label_ru: "Инвентаризация объекта"}
+      - {code: PAGE_TOKENS, label_ru: "Токены страницы"}
+      - {code: TOKENS_INDEX, label_ru: "Индекс распознавания"}
+      - {code: RECOGNIZE_SUMMARY, label_ru: "Сводка распознавания"}
+      - {code: LAYOUT, label_ru: "Разметка листов (штампы, помещения, марки, слои)"}
+      - {code: TABLES, label_ru: "Типизированные таблицы"}
+      - {code: EXTRACTED_VALUES, label_ru: "Извлечённые значения"}
+      - {code: FINDING_GROUPS, label_ru: "Группы находок"}
+      - {code: FINDINGS, label_ru: "Атомарные находки"}
+      - {code: PROTOCOL_JSON, label_ru: "Протокол (JSON)"}
+      - {code: PROTOCOL_DOCX, label_ru: "Протокол (DOCX)"}
+      - {code: PROTOCOL_PDF, label_ru: "Протокол (PDF)"}
+      - {code: SUBMISSION, label_ru: "Ответ (полный)"}
+      - {code: SUBMISSION_STRICT, label_ru: "Ответ (только поля схемы)"}
+      - {code: SUBMISSION_SIDECAR, label_ru: "Сопроводительный файл ответа"}
+      - {code: SCORE, label_ru: "Локальная оценка"}
+
+  ArtifactFormat:
+    owner: AG-00
+    source: "run_layout.yaml"
+    values: [JSON, JSONL, JSON_GZ, CSV, TXT, DOCX, PDF]
+
+  ArtifactScope:
+    owner: AG-00
+    source: "run_layout.yaml: how many files of a kind a run has"
+    values:
+      - {code: RUN, label_ru: "Один на прогон"}
+      - {code: OBJECT, label_ru: "Один на объект"}
+      - {code: FILE, label_ru: "Один на файл"}
+      - {code: PAGE, label_ru: "Один на страницу"}
+
+  TagKind:
+    owner: AG-02B
+    status: proposed
+    source: "96 R-15 (room index + tag grammar); 95 (PD tags in the text layer, RD tags drawn as curves)"
+    description: "What a printed token on a drawing denotes. ROOM_NUMBER keeps leading zeros («012»)."
+    values:
+      - {code: ROOM_NUMBER, label_ru: "Номер помещения"}
+      - {code: VENT_SYSTEM, label_ru: "Марка системы вентиляции (П1, В2, ПВ3)"}
+      - {code: HEATING_SYSTEM, label_ru: "Марка системы отопления / тёплого пола"}
+      - {code: AIR_TERMINAL, label_ru: "Воздухораспределитель / решётка"}
+      - {code: EQUIPMENT, label_ru: "Оборудование (установка, вентилятор, клапан)"}
+      - {code: PIPE_RISER, label_ru: "Стояк"}
+      - {code: AXIS, label_ru: "Координационная ось"}
+      - {code: LEVEL_MARK, label_ru: "Отметка уровня"}
+      - {code: SHEET_REF, label_ru: "Ссылка на лист / узел"}
+      - {code: OTHER, label_ru: "Прочее"}
+
+  TagRoomLink:
+    owner: AG-02B
+    status: proposed
+    source: "96 R-15 (room index + tag grammar): how a mark is attached to a room"
+    values:
+      - {code: INSIDE, label_ru: "Внутри контура помещения"}
+      - {code: NEAREST, label_ru: "Ближайший номер помещения"}
+      - {code: LEADER, label_ru: "По выноске"}
+
+  SheetMapBasis:
+    owner: AG-02B
+    status: proposed
+    source: "97 §2.13 F6 (sheet↔page map with smoothing and duplicate detection); 95 RT-01"
+    values:
+      - {code: TITLE_BLOCK, label_ru: "Лист из штампа"}
+      - {code: QR, label_ru: "Лист из QR-кода"}
+      - {code: SEQUENCE_SMOOTHED, label_ru: "Восстановлен по последовательности"}
+      - {code: CONTENTS_TABLE, label_ru: "Из ведомости листов / состава проекта"}
+      - {code: MANUAL, label_ru: "Указан вручную"}
+
+  RoomSource:
+    owner: AG-02B
+    status: proposed
+    source: "96 R-15 room index"
+    values:
+      - {code: PLAN_LABEL, label_ru: "Номер на плане"}
+      - {code: EXPLICATION_TABLE, label_ru: "Экспликация помещений"}
+      - {code: SCHEMATIC_LABEL, label_ru: "Подпись на схеме"}
+      - {code: TEXT_MENTION, label_ru: "Упоминание в тексте"}
+      - {code: MANUAL, label_ru: "Указан вручную"}
+
+  RevisionCloudSource:
+    owner: AG-02B
+    status: proposed
+    source: "95 (layer «ОВ-Отопление-Изм. №3» over rooms 270/272); 97 §2.13 F6"
+    values:
+      - {code: OCG_LAYER, label_ru: "Слой САПР изменения"}
+      - {code: VECTOR_SHAPE, label_ru: "Облако изменения по геометрии"}
+      - {code: MANUAL, label_ru: "Указано вручную"}
+
+  TableType:
+    owner: AG-02C
+    status: proposed
+    source: "97 §2.13 F7 (typed header-anchored tables); 96 (header-anchored parser)"
+    description: "`columns` are the canonical cell keys of TableArtifacts rows for the type (table_artifacts.schema.json pins them)."
+    values:
+      - {code: EXPLICATION, label_ru: "Экспликация помещений", columns: [room_no, name, area_m2, category, floor, note]}
+      - {code: TEP, label_ru: "Технико-экономические показатели", columns: [indicator, unit, value, note]}
+      - {code: SPEC_21110, label_ru: "Спецификация оборудования (ГОСТ 21.110)", columns: [position, name, type_mark, code, manufacturer, unit, quantity, mass, note]}
+      - {code: DEVIATION, label_ru: "Ведомость отклонений / исполнительная схема", columns: [element, axes, parameter, design_value, actual_value, deviation, tolerance, unit, note]}
+      - {code: CHANGE_LOG, label_ru: "Таблица регистрации изменений", columns: [change_no, sheets_changed, sheets_replaced, sheets_new, sheets_cancelled, total_sheets, doc_no, signature, date, note]}
+      - {code: AOSR, label_ru: "Акт освидетельствования скрытых работ", columns: [act_no, act_date, work_name, rd_refs, materials, quality_docs, deviations, next_works, start_date, end_date]}
+      - {code: ID_REGISTRY, label_ru: "Реестр исполнительной документации", columns: [row_no, doc_name, doc_no, doc_date, sheets, pages, note]}
+      - {code: PROJECT_COMPOSITION, label_ru: "Состав проекта / ведомость листов", columns: [volume, designation, name, revision, note]}
+
+  TableRowKind:
+    owner: AG-02C
+    status: proposed
+    source: "96 header-anchored parser (Σ checks, «в том числе» sub-zones)"
+    values:
+      - {code: DATA, label_ru: "Строка данных"}
+      - {code: SUBTOTAL, label_ru: "Промежуточный итог"}
+      - {code: TOTAL, label_ru: "Итог"}
+      - {code: SUBZONE, label_ru: "«В том числе» (входит в родительскую строку)"}
+      - {code: SECTION_HEADER, label_ru: "Заголовок раздела таблицы"}
+      - {code: NOTE, label_ru: "Примечание"}
+
+  TableCheckKind:
+    owner: AG-02C
+    status: proposed
+    source: "96 (sum checks expose real double counts); 97 §1.5 (F0201 p18 «в том числе» counted twice)"
+    values:
+      - {code: SUM_MATCHES_TOTAL, label_ru: "Сумма строк равна итогу"}
+      - {code: SUBZONE_DOUBLE_COUNT, label_ru: "Подзона «в том числе» учтена дважды"}
+      - {code: ROW_COUNT, label_ru: "Число строк"}
+      - {code: HEADER_MATCHED, label_ru: "Шапка таблицы распознана"}
+      - {code: UNIT_CONSISTENT, label_ru: "Единицы измерения согласованы"}
+      - {code: CONTINUATION_JOINED, label_ru: "Продолжение таблицы склеено"}
+
+  ProtocolSummaryRow:
+    owner: AG-04
+    source: "Приложение 2, Раздел 2 (verbatim labels); 93 §5.4 (added rows shown only when non-zero)"
+    description: "`partition: true` rows sum to 132 and use largest-remainder percentages (93 §5.3)."
+    values:
+      - {code: TOTAL_PARAMS, label_ru: "Всего параметров в Матрице", partition: false, verbatim: true}
+      - {code: CHECKED_OK, label_ru: "Проверено успешно (есть ПД, РД, ИД)", partition: true, verbatim: true}
+      - {code: NOT_CHECKED_NO_ID, label_ru: "Не проверено (отсутствует ИД)", partition: true, verbatim: true}
+      - {code: NOT_LOADED_TECH_ERRORS, label_ru: "Не загружены документы (технические ошибки)", partition: true, verbatim: true}
+      - {code: NOT_CHECKED_NO_PD_RD, label_ru: "Не проверено (отсутствует ПД/РД)", partition: true, verbatim: false}
+      - {code: NOT_CHECKED_REVISION_CONFLICT, label_ru: "Не проверено (конфликт редакций, требуется уточнение)", partition: true, verbatim: false}
+      - {code: NOT_APPLICABLE, label_ru: "Неприменимо к объекту", partition: true, verbatim: false}
+      - {code: VIOLATIONS_TOTAL, label_ru: "Выявлено нарушений (всего)", partition: false, verbatim: true}
+      - {code: VIOLATIONS_CRITICAL, label_ru: "─ Критических (приостановка)", partition: false, verbatim: true}
+      - {code: VIOLATIONS_SUBSTANTIAL, label_ru: "─ Существенных (предписание)", partition: false, verbatim: true}
+      - {code: VIOLATIONS_CONFIRMED, label_ru: "─ из них подтверждено инспектором", partition: false, verbatim: false}
+      - {code: AI_SUSPICIONS, label_ru: "Подозрений ИИ (свободный поиск)", partition: false, verbatim: true}
+
+  DeviationDirection:
+    owner: AG-04
+    source: "Приложение 2, Разделы 4–5 «Отклонение» (93 §5.4: arrow + verb + magnitude)"
+    values:
+      - {code: DECREASE, label_ru: "Снижение", marker: "⬇️"}
+      - {code: INCREASE, label_ru: "Превышение", marker: "⬆️"}
+      - {code: ABSENT, label_ru: "Отсутствие", marker: "❌"}
+      - {code: CHANGED, label_ru: "Изменение", marker: "🔄"}
+
+  DecisionRejectReason:
+    owner: AG-05
+    source: "05 §3.6.1 (decision_codes kind=REJECT → NEGATIVE_VERIFIED); 90 C-26"
+    description: "`requires` is kept empty: a rejection needs only the reason code; the comment and the extra fields are optional."
+    values:
+      - {code: WRONG_REVISION, label_ru: "Актуальная редакция выбрана неверно", family: MODEL_ERROR, requires: []}
+      - {code: APPROVED_CHANGE, label_ru: "Согласованное изменение", family: LEGIT_DEVIATION, requires: []}
+      - {code: OCR_ERROR, label_ru: "Ошибка распознавания (OCR)", family: MODEL_ERROR, requires: []}
+      - {code: EXTRACTION_ERROR, label_ru: "Ошибка извлечения значения (ячейка, единица измерения, множитель)", family: MODEL_ERROR, requires: []}
+      - {code: CV_ERROR, label_ru: "Ошибка распознавания графики (линии, условные обозначения, масштаб)", family: MODEL_ERROR, requires: []}
+      - {code: LINKING_ERROR, label_ru: "Ошибка привязки (не тот объект / лист / помещение / элемент)", family: MODEL_ERROR, requires: []}
+      - {code: WITHIN_TOLERANCE, label_ru: "Расхождение в пределах допуска / нормы", family: MODEL_ERROR, requires: []}
+      - {code: EQUIVALENT_SOLUTION, label_ru: "Равнозначное решение (иное обозначение / формулировка)", family: MODEL_ERROR, requires: []}
+      - {code: METHODOLOGY_DIFFERENCE, label_ru: "Различие методики подсчёта (без изменения решения)", family: LEGIT_DEVIATION, requires: []}
+      - {code: NOT_APPLICABLE_PARAM, label_ru: "Параметр неприменим к объекту / виду работ", family: LEGIT_DEVIATION, requires: []}
+      - {code: DUPLICATE, label_ru: "Дубликат другого finding", family: MODEL_ERROR, requires: []}
+      - {code: OTHER, label_ru: "Иное", family: OTHER, requires: []}
+
+  DecisionConfirmBasis:
+    owner: AG-05
+    source: "05 §3.6.2 (decision_codes kind=CONFIRM; GOLD expert_reason_code)"
+    values:
+      - {code: CV_DEVIATION_PD_RD, label_ru: "Решение РД не соответствует утверждённой ПД; согласованное изменение отсутствует"}
+      - {code: CV_MISSING_IN_RD, label_ru: "Решение ПД не отражено в РД"}
+      - {code: CV_NOT_PER_RD, label_ru: "Выполненные работы (ИД) не соответствуют РД"}
+      - {code: CV_TOLERANCE_EXCEEDED, label_ru: "Превышение допустимых отклонений по ИД"}
+      - {code: CV_UNAPPROVED_CHANGE, label_ru: "Изменение внесено без требуемого согласования / экспертизы"}
+      - {code: CV_NORM_VIOLATION, label_ru: "Нарушение нормативного требования (СП/ГОСТ)"}
+
+  DecisionClarifyBasis:
+    owner: AG-05
+    source: "05 §3.6.3 (decision_codes kind=CLARIFY)"
+    values:
+      - {code: REVISION_CONFLICT, label_ru: "Конфликт редакций"}
+      - {code: APPROVAL_UNKNOWN, label_ru: "Нет признака утверждения"}
+      - {code: AMBIGUOUS_CHAIN, label_ru: "Неоднозначная связь predecessor/successor"}
+      - {code: NO_REGISTRY, label_ru: "Реестр файлов не представлен"}
+      - {code: AWAITING_DOCUMENT, label_ru: "Ожидается документ от застройщика"}
+      - {code: AWAITING_APPROVAL_CHECK, label_ru: "Требуется проверка согласования изменения"}
+      - {code: SOURCE_UNREADABLE, label_ru: "Исходный документ нечитаем / листы не сопоставлены"}
+      - {code: EXPERT_CONSULTATION, label_ru: "Требуется консультация профильного специалиста"}
+
+  RevisionBasis:
+    owner: AG-05
+    source: "05 §3.6.3 (authoritative-revision basis codes)"
+    values:
+      - {code: REGISTRY_CONFIRMED, label_ru: "Подтверждено реестром"}
+      - {code: STAMP_IN_PRODUCTION, label_ru: "Штамп «В производство работ»"}
+      - {code: APPROVAL_LETTER, label_ru: "Письмо о согласовании"}
+      - {code: CUSTOMER_CONFIRMATION, label_ru: "Подтверждение заказчика"}
+      - {code: LATEST_UKEP_SIGNED, label_ru: "Последняя подписанная УКЭП редакция"}
+      - {code: OTHER, label_ru: "Иное"}
+
+  SuspicionDismissReason:
+    owner: AG-05
+    source: "05 §3.6.3 (suspicion dismissal codes)"
+    values:
+      - {code: NO_EVIDENCE, label_ru: "Нет доказательств"}
+      - {code: FALSE_HYPOTHESIS, label_ru: "Гипотеза неверна"}
+      - {code: DUPLICATE_OF_MATRIX_FINDING, label_ru: "Дублирует находку по матрице"}
+      - {code: OUT_OF_SCOPE, label_ru: "Вне предмета проверки"}
+      - {code: OTHER, label_ru: "Иное"}
+
+  UnfinalizeReason:
+    owner: AG-05
+    source: "05 §3.6.3 (un-finalization reason codes, text ≥ 20 chars)"
+    values:
+      - {code: DECISION_ERROR, label_ru: "Ошибка в решении"}
+      - {code: NEW_DOCUMENTS, label_ru: "Поступили новые документы"}
+      - {code: RIN_REJECTED, label_ru: "Отклонено РиН"}
+      - {code: SUPERVISOR_REVIEW, label_ru: "Повторная проверка решений"}
+      - {code: OTHER, label_ru: "Иное"}
+
+  CommentSource:
+    owner: AG-05
+    source: "05 §3.6.2 (comment_source)"
+    values:
+      - {code: TEMPLATE, label_ru: "Шаблон"}
+      - {code: EDITED, label_ru: "Шаблон, отредактирован"}
+      - {code: MANUAL, label_ru: "Вручную"}
+
+  GoldEffect:
+    owner: AG-05
+    source: "05 §4 event verification.decision.recorded (gold_effect)"
+    values: [POSITIVE_DRAFT, NEGATIVE_DRAFT, WITHDRAW, NONE]
+
+  # ───────────────────────────── M1 platform services (AG-00, 2026-09-28): auth, RBAC, audit ─────────────────────────────
+
+  PermissionScope:
+    owner: AG-00
+    source: "09 §3.3.3; 90 §3.10 (assigned / all / own); rbac.yaml grants"
+    description: "How far a granted permission reaches. ASSIGNED = objects in object_assignments; OWN = rows the user created or cases of the integration client."
+    values:
+      - {code: ALL, label_ru: "Все объекты"}
+      - {code: ASSIGNED, label_ru: "Назначенные объекты"}
+      - {code: OWN, label_ru: "Только собственные"}
+
+  AuditActorType:
+    owner: AG-00
+    source: "09 §3.9 audit_log.actor_type; ANONYMOUS = a request without a session (INSPECTOR_AUTH_MODE=optional, login attempts)"
+    values:
+      - {code: USER, label_ru: "Пользователь"}
+      - {code: SYSTEM, label_ru: "Система"}
+      - {code: INTEGRATION, label_ru: "Внешняя система"}
+      - {code: ANONYMOUS, label_ru: "Без входа в систему"}
+
+  AuditResult:
+    owner: AG-00
+    source: "09 §3.9 audit_log.result"
+    values:
+      - {code: SUCCESS, label_ru: "Успешно"}
+      - {code: FAILURE, label_ru: "Ошибка"}
+      - {code: DENIED, label_ru: "Отказано в доступе"}
+
+  AuditObjectType:
+    owner: AG-00
+    source: "ТЗ §10 #12 (object_id = affected entity); 09 §3.9 audit_log.object_type"
+    values:
+      - {code: USER, label_ru: "Пользователь"}
+      - {code: SESSION, label_ru: "Сессия"}
+      - {code: OBJECT, label_ru: "Объект"}
+      - {code: FILE, label_ru: "Файл"}
+      - {code: PAGE, label_ru: "Страница"}
+      - {code: BATCH_RUN, label_ru: "Пакетный прогон"}
+      - {code: PROCESS, label_ru: "Проверка"}
+      - {code: PROTOCOL, label_ru: "Протокол"}
+      - {code: FINDING, label_ru: "Находка"}
+      - {code: SUSPICION, label_ru: "Подозрение ИИ"}
+      - {code: DECISION, label_ru: "Решение инспектора"}
+      - {code: PARAM, label_ru: "Параметр матрицы"}
+      - {code: NORMATIVE, label_ru: "Норматив"}
+      - {code: CONFIG, label_ru: "Настройка"}
+
+  AuditAction:
+    owner: AG-00
+    source: "09 §3.4.2 (action catalogue); 05 §3.5, §3.12 (verification actions, written by AG-05 in the decision transaction); ТЗ §12.4"
+    description: "audit_log.action. `category` (AuditCategory) and `retention` (RetentionClass) are the defaults the audit writer stores. HTTP_<METHOD> = a mutation whose OpenAPI operation declares no x-audit-action."
+    values:
+      - {code: AUTH_LOGIN_SUCCESS, label_ru: "Вход в систему", category: SECURITY, retention: SECURITY}
+      - {code: AUTH_LOGIN_FAILED, label_ru: "Неудачная попытка входа", category: SECURITY, retention: SECURITY}
+      - {code: AUTH_LOCKED, label_ru: "Учётная запись заблокирована", category: SECURITY, retention: SECURITY}
+      - {code: AUTH_LOGOUT, label_ru: "Выход из системы", category: SECURITY, retention: SECURITY}
+      - {code: AUTH_REAUTH, label_ru: "Подтверждение паролем", category: SECURITY, retention: SECURITY}
+      - {code: AUTH_PASSWORD_CHANGED, label_ru: "Смена пароля", category: SECURITY, retention: SECURITY}
+      - {code: SESSION_REVOKED, label_ru: "Сессия отозвана", category: SECURITY, retention: SECURITY}
+      - {code: ACCESS_DENIED, label_ru: "Отказ в доступе", category: SECURITY, retention: SECURITY}
+      - {code: USER_CREATED, label_ru: "Пользователь создан", category: BUSINESS, retention: PERMANENT}
+      - {code: USER_UPDATED, label_ru: "Пользователь изменён", category: BUSINESS, retention: PERMANENT}
+      - {code: USER_ROLE_CHANGED, label_ru: "Роли пользователя изменены", category: SECURITY, retention: PERMANENT}
+      - {code: USER_DEACTIVATED, label_ru: "Пользователь отключён", category: SECURITY, retention: PERMANENT}
+      - {code: OBJECT_ASSIGNMENT_CHANGED, label_ru: "Назначение объекта изменено", category: BUSINESS, retention: PERMANENT}
+      - {code: CONFIG_CHANGED, label_ru: "Настройка изменена", category: BUSINESS, retention: PERMANENT}
+      - {code: PARAM_UPDATED, label_ru: "Параметр матрицы изменён", category: BUSINESS, retention: PERMANENT}
+      - {code: BATCH_RUN_IMPORTED, label_ru: "Импорт пакетного прогона", category: BUSINESS, retention: PERMANENT}
+      - {code: PROTOCOL_VERSION_CREATED, label_ru: "Создана версия протокола", category: BUSINESS, retention: PERMANENT}
+      - {code: PROTOCOL_OPENED, label_ru: "Протокол открыт", category: ACCESS, retention: STANDARD}
+      - {code: EVIDENCE_VIEWED, label_ru: "Просмотр доказательства", category: ACCESS, retention: STANDARD}
+      - {code: FINDING_CONFIRMED, label_ru: "Нарушение подтверждено", category: BUSINESS, retention: PERMANENT}
+      - {code: FINDING_REJECTED, label_ru: "Нарушение отклонено", category: BUSINESS, retention: PERMANENT}
+      - {code: FINDING_CLARIFICATION_REQUESTED, label_ru: "Запрошено уточнение", category: BUSINESS, retention: PERMANENT}
+      - {code: FINDING_DECISION_REVERTED, label_ru: "Решение отменено", category: BUSINESS, retention: PERMANENT}
+      - {code: DECISION_OVERRIDE, label_ru: "Решение заменено", category: BUSINESS, retention: PERMANENT}
+      - {code: FINDING_SPLIT, label_ru: "Находка разделена", category: BUSINESS, retention: PERMANENT}
+      - {code: REVISION_SELECTED, label_ru: "Выбрана действующая редакция", category: BUSINESS, retention: PERMANENT}
+      - {code: SUSPICION_PROMOTED, label_ru: "Подозрение переведено в кандидаты", category: BUSINESS, retention: PERMANENT}
+      - {code: SUSPICION_DISMISSED, label_ru: "Подозрение отклонено", category: BUSINESS, retention: PERMANENT}
+      - {code: VERIFICATION_COMPLETED, label_ru: "Верификация завершена", category: BUSINESS, retention: PERMANENT}
+      - {code: PROTOCOL_FINALIZED, label_ru: "Протокол финализирован", category: BUSINESS, retention: PERMANENT}
+      - {code: PROTOCOL_UNFINALIZED, label_ru: "Финализация отменена", category: BUSINESS, retention: PERMANENT}
+      - {code: PROTOCOL_EXPORTED, label_ru: "Протокол выгружен", category: BUSINESS, retention: STANDARD}
+      - {code: RIN_SYNC_REQUESTED, label_ru: "Отправка протокола в ИАИС «РиН» запрошена", category: INTEGRATION, retention: STANDARD}
+      - {code: RIN_SYNC_RESULT, label_ru: "Результат обмена с ИАИС «РиН»", category: INTEGRATION, retention: STANDARD}
+      - {code: SELFTEST_RUN, label_ru: "Запуск самопроверки", category: SYSTEM, retention: STANDARD}
+      - {code: RETENTION_PURGE_EXECUTED, label_ru: "Очистка журнала по срокам хранения", category: SYSTEM, retention: PERMANENT}
+      - {code: HTTP_POST, label_ru: "Изменение данных (POST)", category: BUSINESS, retention: STANDARD}
+      - {code: HTTP_PUT, label_ru: "Изменение данных (PUT)", category: BUSINESS, retention: STANDARD}
+      - {code: HTTP_PATCH, label_ru: "Изменение данных (PATCH)", category: BUSINESS, retention: STANDARD}
+      - {code: HTTP_DELETE, label_ru: "Удаление данных (DELETE)", category: BUSINESS, retention: STANDARD}
+
+# ───────────────────────────── Cross-enum mappings (data, not code) ─────────────────────────────
+mappings:
+
+  # 97 §2.7: DiscrepancyType (engine) → ComparisonResult (gold / submission). AG-04 ratifies the non-gold rows.
+  discrepancy_to_comparison_result:
+    VALUE_DECREASED: VALUE_MISMATCH
+    VALUE_INCREASED: VALUE_MISMATCH
+    VALUE_CHANGED: VALUE_MISMATCH
+    THRESHOLD_BELOW_MIN: VALUE_MISMATCH
+    THRESHOLD_ABOVE_MAX: VALUE_MISMATCH
+    COUNT_CHANGED: VALUE_MISMATCH
+    TOTAL_CHANGED: VALUE_MISMATCH
+    TOLERANCE_EXCEEDED: TOLERANCE_EXCEEDED
+    CLASS_DOWNGRADED: MATERIAL_SUBSTITUTION
+    MATERIAL_SUBSTITUTED: MATERIAL_SUBSTITUTION
+    ELEMENT_MISSING: MISSING_DESIGN_ELEMENT
+    LAYER_REMOVED: MISSING_DESIGN_ELEMENT
+    ELEMENT_ADDED: EXTRA_ELEMENT
+    UNDOCUMENTED_WORK: EXTRA_ELEMENT
+    FUNCTION_CHANGED: CONFIGURATION_MISMATCH
+    CONFIGURATION_CHANGED: CONFIGURATION_MISMATCH
+    LAYER_CHANGED: CONFIGURATION_MISMATCH
+    POSITION_SHIFTED: CONFIGURATION_MISMATCH
+
+  # 97 §2.6: which protocol_status is consistent with a violation_label (integrity rule R13, 93 §4.6).
+  protocol_status_by_label:
+    VIOLATION_PRESENT: [CRITICAL, WARNING]
+    NO_VIOLATION: [OK]
+    MISSING_DOCUMENT: [PD_MISSING, RD_MISSING, ID_MISSING]
+    COMPARISON_IMPOSSIBLE: [COMPARISON_IMPOSSIBLE]
+
+  # 97 §2.6: missing stage → protocol_status for MISSING_DOCUMENT; precedence RD > PD > ID when several.
+  missing_stage_status:
+    precedence: [RD, PD, ID]
+    status: {PD: PD_MISSING, RD: RD_MISSING, ID: ID_MISSING}
+
+  # 97 §2.5 / 93 §3.7: criticality string for FREE-* findings (protocol_status WARNING, never gated).
+  free_search:
+    criticality_string: "Существенное (предписание) — требует утверждения"
+    protocol_status: WARNING
+    criticality_level: SUBSTANTIAL_ORDER
+
+  # 97 §2.6: internal statuses → (violation_label, protocol_status). Batch mode exports every CANDIDATE.
+  status_mapping:
+    - {when: {completeness_status: [COMPLETE], finding_status: [CANDIDATE, CONFIRMED_VIOLATION]}, violation_label: VIOLATION_PRESENT, protocol_status: "CRITICAL if CRITICAL_SUSPEND else WARNING"}
+    - {when: {completeness_status: [COMPLETE], finding_status: [NEGATIVE_VERIFIED]}, violation_label: NO_VIOLATION, protocol_status: OK}
+    - {when: {completeness_status: [NOT_APPLICABLE]}, violation_label: NO_VIOLATION, protocol_status: OK}
+    - {when: {completeness_status: [MISSING_EVIDENCE], level: DOCUMENT}, violation_label: MISSING_DOCUMENT, protocol_status: "missing_stage_status"}
+    - {when: {completeness_status: [MISSING_EVIDENCE], level: FRAGMENT}, violation_label: COMPARISON_IMPOSSIBLE, protocol_status: COMPARISON_IMPOSSIBLE}
+    - {when: {completeness_status: [NOT_COMPARABLE, CLARIFICATION_REQUIRED]}, violation_label: COMPARISON_IMPOSSIBLE, protocol_status: COMPARISON_IMPOSSIBLE}
+    - {when: {finding_status: [SUSPICION], evidence_bound: true}, violation_label: VIOLATION_PRESENT, protocol_status: WARNING, parameter_code: "FREE-*"}
+    - {when: {finding_status: [SUSPICION], evidence_bound: false}, export: false}
+
+  # 97 §2.6: per-parameter precedence over stage availability (first match wins).
+  parameter_precedence:
+    - "≤ 1 required stage available → COMPARISON_IMPOSSIBLE"
+    - "a pairwise violation wins over a missing third stage → VIOLATION_PRESENT"
+    - "a required stage missing → MISSING_DOCUMENT (RD > PD > ID)"
+    - "otherwise → NO_VIOLATION"

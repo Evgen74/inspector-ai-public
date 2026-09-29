@@ -1,0 +1,193 @@
+{
+  "space": "PDF_VISIBLE_ROTATED_TL_V1",
+  "decimals": 4,
+  "source": "docs/analysis/02 §3.14 (probe P5); rect_pdf in PDF default user space (bottom-left origin)",
+  "cases": [
+    {
+      "name": "A4_plain",
+      "mediabox": [
+        0,
+        0,
+        595,
+        842
+      ],
+      "cropbox": null,
+      "rotate": 0,
+      "rect_pdf": [
+        100,
+        600,
+        200,
+        700
+      ],
+      "expected_bbox_norm": [
+        0.1681,
+        0.1686,
+        0.3361,
+        0.2874
+      ]
+    },
+    {
+      "name": "offset_crop_r0",
+      "mediabox": [
+        0,
+        0,
+        600,
+        800
+      ],
+      "cropbox": [
+        50,
+        100,
+        550,
+        750
+      ],
+      "rotate": 0,
+      "rect_pdf": [
+        100,
+        600,
+        200,
+        700
+      ],
+      "expected_bbox_norm": [
+        0.1,
+        0.0769,
+        0.3,
+        0.2308
+      ]
+    },
+    {
+      "name": "offset_crop_r90",
+      "mediabox": [
+        0,
+        0,
+        600,
+        800
+      ],
+      "cropbox": [
+        50,
+        100,
+        550,
+        750
+      ],
+      "rotate": 90,
+      "rect_pdf": [
+        100,
+        600,
+        200,
+        700
+      ],
+      "expected_bbox_norm": [
+        0.7692,
+        0.1,
+        0.9231,
+        0.3
+      ]
+    },
+    {
+      "name": "offset_crop_r180",
+      "mediabox": [
+        0,
+        0,
+        600,
+        800
+      ],
+      "cropbox": [
+        50,
+        100,
+        550,
+        750
+      ],
+      "rotate": 180,
+      "rect_pdf": [
+        100,
+        600,
+        200,
+        700
+      ],
+      "expected_bbox_norm": [
+        0.7,
+        0.7692,
+        0.9,
+        0.9231
+      ]
+    },
+    {
+      "name": "offset_crop_r270",
+      "mediabox": [
+        0,
+        0,
+        600,
+        800
+      ],
+      "cropbox": [
+        50,
+        100,
+        550,
+        750
+      ],
+      "rotate": 270,
+      "rect_pdf": [
+        100,
+        600,
+        200,
+        700
+      ],
+      "expected_bbox_norm": [
+        0.0769,
+        0.7,
+        0.2308,
+        0.9
+      ]
+    },
+    {
+      "name": "neg_origin_mediabox_r90",
+      "mediabox": [
+        -300,
+        -400,
+        300,
+        400
+      ],
+      "cropbox": [
+        -250,
+        -300,
+        250,
+        350
+      ],
+      "rotate": 90,
+      "rect_pdf": [
+        -200,
+        200,
+        -100,
+        300
+      ],
+      "expected_bbox_norm": [
+        0.7692,
+        0.1,
+        0.9231,
+        0.3
+      ]
+    },
+    {
+      "name": "rot_minus90_as_270",
+      "mediabox": [
+        0,
+        0,
+        600,
+        800
+      ],
+      "cropbox": null,
+      "rotate": -90,
+      "rect_pdf": [
+        100,
+        600,
+        200,
+        700
+      ],
+      "expected_bbox_norm": [
+        0.125,
+        0.6667,
+        0.25,
+        0.8333
+      ]
+    }
+  ]
+}

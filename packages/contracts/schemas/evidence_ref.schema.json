@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/evidence_ref.schema.json",
+  "title": "EvidenceRef",
+  "description": "One cited page of one source document (97 §2.5). The submission keeps only stage, file_id, pdf_page_number (+ document_sheet_number in the extended variant). Never cite DWG, archive members, BAK, excluded ids, duplicate non-representatives, superseded revisions, GROUND_TRUTH_INDEX files or other objects. Owner: AG-04.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["stage", "file_id", "pdf_page_number"],
+  "properties": {
+    "stage": {"$ref": "enums.schema.json#/$defs/DocStage"},
+    "file_id": {"$ref": "common.schema.json#/$defs/CitableFileId"},
+    "pdf_page_number": {"$ref": "common.schema.json#/$defs/PageNumber"},
+    "document_sheet_number": {"$ref": "common.schema.json#/$defs/SheetNumber"},
+    "file_sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+    "page_basis": {"$ref": "enums.schema.json#/$defs/PageBasis"},
+    "role": {"$ref": "enums.schema.json#/$defs/EvidenceRole"},
+    "is_anchor": {
+      "type": "boolean",
+      "description": "True for the one anchor page per stage per finding group (97 §2.5), reused for every atomic check."
+    },
+    "geometry": {"$ref": "common.schema.json#/$defs/Geometry"},
+    "geometry_space": {"$ref": "common.schema.json#/$defs/GeometrySpace"},
+    "localization": {"$ref": "enums.schema.json#/$defs/EvidenceLocalization"},
+    "document_code": {"type": ["string", "null"], "description": "Шифр as read from the title block (corrected)."},
+    "revision": {"type": ["string", "null"]},
+    "extracted_value_id": {"type": ["string", "null"]},
+    "note": {"type": ["string", "null"]}
+  }
+}

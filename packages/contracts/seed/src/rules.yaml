@@ -1,0 +1,136 @@
+# «Инспектор ИИ» — comparison-rule DSL patches applied on top of docs/analysis/matrix_enriched.json (B03 DSL,
+# 03 §3.4) when building params.json. Owner: AG-03. Every patch carries its reason; build_seed.py records them in
+# params.json `seed_changes`.
+#
+# Derived for EVERY atomic rule (build_seed.py, documented in seed/README.md):
+# - direction (97 §2.10 «directional triggers are enforced»): kept when set; otherwise ORDINAL_COMPARE/ENUM_CHANGE
+#   with a vocabulary → DOWNGRADE (free_text → ANY); PRESENCE, LAYER_STACK, RATIO_BOUND → DECREASE;
+#   NORMATIVE_BOUND → DECREASE for a min bound, INCREASE for a max bound, ANY for both/none;
+#   SET_DIFF → DECREASE when only MISSING is detected, else ANY; the rest → ANY. Overrides below.
+# - candidate_policy (90 C-56): TRIGGER for a numeric matrix trigger (REL_DELTA_GT, NORMATIVE_BOUND, RATIO_BOUND,
+#   TOLERANCE_CHECK, GEOMETRY_OFFSET), DEVIATION otherwise (qualitative trigger: any adverse change beyond ε).
+# - sub_id: «M-003.b» → «PZ-003.b» (catalog code is canonical, 97 §2.9).
+
+moved_to_logical_rules:
+  # 90 C-53: INTERNAL_CONSISTENCY sub-checks leave comparison_rule; B07/AG-07 Logical_Rules are the only producer
+  # of SUSPICION. logical_rule refers to the 03 §3.9 seed (HR-LOG-005 Σ explication = total, HR-LOG-006 apartments).
+  - {sub_id: PZ-002.b, logical_rule: HR-LOG-005, reason: 'Σ поэтажных итогов = общая площадь — внутренняя согласованность одной стадии (90 C-53)'}
+  - {sub_id: PZ-003.c, logical_rule: HR-LOG-005, reason: 'Σ площадей помещений = «Итого по этажу» (90 C-53)'}
+  - {sub_id: PZ-010.b, logical_rule: HR-LOG-006, reason: 'количество квартир = Σ квартирографии (90 C-53)'}
+  - {sub_id: PZ-019.c, logical_rule: null, reason: 'КЗ = площадь застройки / площадь участка; правила в Logical_Rules ещё нет — AG-07 (90 C-53)'}
+
+semantic_low_confidence:
+  # 90 C-53: a SEMANTIC_DIFF below min_confidence ends as NOT_COMPARABLE (basis LOW_CONFIDENCE_SEMANTIC), not SUSPICION.
+  low_confidence_status: NOT_COMPARABLE
+  low_confidence_basis: LOW_CONFIDENCE_SEMANTIC
+  reason: '90 C-53: SUSPICION выпускает только модуль гипотез (B07)'
+
+direction_overrides:
+  KR-054.b: {direction: ANY, reason: 'отклонения осей в ИД сверх допуска в любую сторону'}
+  KR-058.b: {direction: DECREASE, reason: 'триггер «уменьшение толщины плиты … по факту заливки (ИД)»; утолщение не нарушение (97 Q4b)'}
+  KR-059.b: {direction: DECREASE, reason: 'триггер «уменьшение толщины перекрытия»; утолщение не нарушение (97 Q4b)'}
+  KR-060.b: {direction: DECREASE, reason: 'триггер «уменьшение площади поперечного сечения»'}
+  KR-061.b: {direction: DECREASE, reason: 'триггер «уменьшение толщины стен»; смещение осей — KR-054'}
+  SPZU-029.b: {direction: ANY, reason: '«подмена на аналоги» — качество аналога не автоматизируется, кандидат на любую замену'}
+  KR-066.c: {direction: ANY, reason: 'замена состава — кандидат; снижение предела оценивает KR-066.a'}
+  POD-091: {direction: ANY, reason: '«самовольное изменение метода» — любое изменение'}
+
+set_diff_overrides:
+  # 97 §2.10: additions and relocations are context, not findings → context_detect (collected, never emitted).
+  PZ-003.b: {detect: [MISSING, CHANGED], context_detect: [ADDED], reason: 'добавленное помещение не «сокращение полезной площади» (97 §2.10)'}
+  AR-052: {detect: [MISSING, CHANGED], context_detect: [ADDED], reason: 'добавления — контекст (97 §2.10)'}
+  KR-054.a: {detect: [CHANGED, MISSING], context_detect: [ADDED], reason: 'добавленная ось — контекст; изменение шага фиксирует CHANGED (97 §2.10)'}
+  IOS4-078.b:
+    detect: [MISSING, CHANGED]
+    context_detect: [ADDED]
+    element_key: room_number
+    compare_attributes: [branch_multiset]
+    title: 'Вытяжная вентиляция помещения ПД отсутствует или её состав изменён в РД (мультимножество ветвей по помещению)'
+    note: 'Ключ — номер помещения, а не метка ветви: РД перенумеровывает ветви (Тюменская, 95 §3.4). Помещение без вытяжки в РД → MISSING (MISSING_DESIGN_ELEMENT, G-TR-003); иной состав ветвей → CHANGED (CONFIGURATION_MISMATCH, G-TR-004); помещение, где вытяжка появилась только в РД → контекст.'
+    reason: 'организаторская разметка G-TR-003/004 (97 §2.10, 95 §3.4)'
+  IOS4-079.b:
+    detect: [MISSING, CHANGED]
+    context_detect: [ADDED]
+    element_key: room_number
+    compare_attributes: [unit_set]
+    title: 'Состав или конфигурация установок в венткамере изменены относительно ПД (набор установок по помещению)'
+    note: 'Ключ — номер помещения (венткамеры); сравнивается набор установок с учётом разделения/слияния (П17 → П17.1 + П17.2, G-TR-001).'
+    reason: 'организаторская разметка G-TR-001 (97 §2.10)'
+  POS-083.b: {detect: [MISSING, CHANGED], context_detect: [ADDED], reason: 'добавления — контекст (97 §2.10)'}
+  POS-085.b: {detect: [MISSING], context_detect: [ADDED, CHANGED], reason: 'перенос площадок — контекст; размещение в опасной зоне оценивает POS-085.a (97 §2.10)'}
+  POD-097.b: {detect: [MISSING], context_detect: [ADDED, CHANGED], reason: 'перенос площадок — контекст; размещение на бровке/над сетями оценивает POD-097.a (97 §2.10)'}
+
+sub_check_patches:
+  SPZU-035.a: {note: 'Без извлечённой геометрии → NOT_COMPARABLE (GEOMETRY_NOT_EXTRACTED); SUSPICION выпускает только модуль гипотез (90 C-53).', reason: '90 C-53'}
+  IOS5-080.b: {note: 'Требует геометрии плана и параметров помещения (СП 484); без них → NOT_COMPARABLE (GEOMETRY_NOT_EXTRACTED) (90 C-53).', reason: '90 C-53'}
+  POS-081.a: {note: 'Требует геометрии границы участка и зоны; без неё → NOT_COMPARABLE (GEOMETRY_NOT_EXTRACTED) (90 C-53).', reason: '90 C-53'}
+  POS-087: {note: 'Классификатор методов (монолит/сборный ЖБ/сборно-монолитный/металлокаркас…) — enum; несовпадение класса → CANDIDATE; уверенность < 0,8 → NOT_COMPARABLE (LOW_CONFIDENCE_SEMANTIC) (90 C-53).', reason: '90 C-53'}
+  PPM-111.c: {note: 'Требует геометрии воздуховодов и преград; без неё → NOT_COMPARABLE (GEOMETRY_NOT_EXTRACTED) (90 C-53).', reason: '90 C-53'}
+  PPM-114.b: {note: 'Геометрия сети и контура здания; без неё → NOT_COMPARABLE (GEOMETRY_NOT_EXTRACTED) (90 C-53).', reason: '90 C-53'}
+  IOS4-077.c:
+    title: 'Отопительный прибор помещения ПД отсутствует в РД'
+    note: 'Тёплые полы не относятся к IOS4-077: это пробел Матрицы, маршрут FREE-HEATING (change_matrix_map: WARM_FLOOR; организаторская разметка G-TR-002, 97 §2.10).'
+    reason: 'маршрут тёплых полов — FREE-HEATING-001 (97 §2.10), ранее M-077.c'
+  POD-091:
+    note: 'Метод извлекается SEMANTIC-классификатором; уверенность < 0,8 → NOT_COMPARABLE (LOW_CONFIDENCE_SEMANTIC), не SUSPICION (90 C-53).'
+    reason: '90 C-53'
+
+anchor_removals:
+  IOS4-077: {remove: [тёплый пол, контур тёплого пола], reason: 'тёплые полы → FREE-HEATING (change_matrix_map WARM_FLOOR), 97 §2.10'}
+
+notes_append:
+  IOS4-077: 'Тёплые полы маршрутизируются в FREE-HEATING (97 §2.10).'
+  IOS4-078: 'Маршрутизация организаторов: отсутствие/изменение вытяжной вентиляции помещений → IOS4-078 (PROVISIONAL_DOMAIN_MAPPING, G-TR-003/004); топ-2 хедж с IOS4-079.'
+  IOS4-079: 'Маршрутизация организаторов: конфигурация приточных установок в венткамере → IOS4-079 (PROVISIONAL_DOMAIN_MAPPING, G-TR-001); топ-2 хедж с IOS4-078.'
+  KR-055: 'Снижение марок F/W при неизменном классе B — не KR-055, а FREE-STRUCTURE (решение по вопросу 97 Q4a).'
+  KR-058: 'Утолщение плиты в РД/ИД — не нарушение (направленный триггер, 97 Q4b; Новослободская NS-C14).'
+
+hedge_groups:
+  # 97 §2.10: matrix near-duplicates for the top-2 code hedge. The first three are named in 97; the rest are the other
+  # pairs of 03 §6 #5 («the 9»; AR-040/PPM-104 and AR-041/PPM-105 are inside the 97 groups).
+  - {codes: [IOS4-078, IOS4-079], kind: SAME_SYSTEM, basis: '97 §2.10; организаторская разметка делит изменения вентиляции между 078 и 079'}
+  - {codes: [AR-040, PPM-104, ODI-116], kind: DUPLICATE, basis: '97 §2.10; ширина коридоров/проходов в АР, ППМ и ОДИ'}
+  - {codes: [AR-041, PPM-105], kind: DUPLICATE, basis: '97 §2.10; ширина эвакуационных дверей'}
+  - {codes: [AR-043, PPM-106], kind: DUPLICATE, basis: '03 §6 #5; открывание эвакуационных дверей'}
+  - {codes: [AR-050, PPM-107], kind: DUPLICATE, basis: '03 §6 #5; класс КМ отделки путей эвакуации'}
+  - {codes: [IOS5-080, PPM-108], kind: DUPLICATE, basis: '03 §6 #5; извещатели АПС'}
+  - {codes: [IOS1-069, PPM-109], kind: PARTIAL_DUPLICATE, basis: '03 §6 #5; подмена FRLS на LS'}
+  - {codes: [PZ-021, ZU-124], kind: DUPLICATE, basis: '03 §6 #5; класс энергоэффективности'}
+  - {codes: [SPZU-038, ODI-121], kind: PARTIAL_DUPLICATE, basis: '03 §6 #5; места для МГН/инвалидов'}
+  - {codes: [AR-044, ZU-128], kind: PARTIAL_DUPLICATE, basis: '03 §6 #5; утеплитель в составе кровли'}
+
+regex_change_reasons:
+  # Specific reasons; every other rewritten pattern gets the generic hardening reason (see build_seed.py).
+  AR-044: 'катастрофический перебор (исходный шаблон > 5 с на строке CAD 10 тыс. символов): строковый шаблон (?m)^…$ с посессивными хвостами'
+  PPM-109: 'квадратичный перебор на длинных словах (0,46 с на 9 тыс. символов): якорь начала слова и ограниченная основа'
+  IOS4-079: '«\d[\d ]*\s*» квадратичен на пробелах; P и N не захватывались (ленивый фильтр вне необязательной группы)'
+  PPM-112: '«\d[\d ]*\s*» квадратичен на пробелах'
+  IOS2-073: 'H и N не захватывались (ленивый фильтр вне необязательной группы)'
+  IOS4-078: 'метка системы не захватывалась (ленивый фильтр вне необязательной группы); гейт VENT_DUCT против колонн/окон/проёмов'
+  KR-060: 'марка колонны не захватывалась; снят (?i) («к1»); гейт STRUCTURAL_SECTION против окон/дверей/воздуховодов'
+  KR-055: 'гейт CONCRETE_CLASS (В20 — класс бетона или система вентиляции); «В25,» с запятой теперь распознаётся'
+  AR-050: 'гейт KM_FIRE_CLASS (КМ1 — класс материала или марка «Конструкции металлические»); регистрозависимо'
+  PPM-107: 'гейт KM_FIRE_CLASS; регистрозависимо'
+  AR-041: 'марки дверей регистрозависимы (исключены даты «Дата 21.10»); «проём» с ё'
+  PPM-105: 'марки дверей регистрозависимы (исключены «дни 21.10»)'
+  IOS1-068: 'снят (?i): «ва»/«ав» внутри слов давали ложные срабатывания; начало токена'
+  IOS2-071: 'гейт WATER_SYSTEM_TAG (В1 — водопровод, а не вентиляция); «Ду» только как отдельный токен (не в «воздуховод»)'
+  IOS3-074: 'гейт SEWER_SYSTEM_TAG (К1 — канализация, а не колонна); регистрозависимо'
+  IOS4-076: 'гейт HEATING_SYSTEM_TAG (Т1/Т2 — трубопроводы, а не класс токсичности); регистрозависимо'
+  IOS4-077: 'убран «тёплый пол»: маршрут FREE-HEATING (97 §2.10)'
+  PZ-021: 'исходный фильтр [^A-GА-Д] с (?i) обрывался на буквах «д»/«е» («…здания — B» не распознавалось)'
+  ZU-124: 'как PZ-021'
+  PZ-022: 'явный разделитель вместо фильтра-исключения'
+  PZ-023: 'явный разделитель вместо фильтра-исключения (обрывался на «с»)'
+  AR-046: 'снят (?i): «Об…»/«Ок…» в начале обычных слов; допускается «ОП ОСП 15-15»'
+  AR-048: 'гейт STAIR для «150х300»'
+  PZ-003: 'экспликация: номера помещений из 3–4 цифр («012», «1.109»), без перехода строки'
+  PZ-002: 'исключена «общая площадь квартир/помещений»'
+  PZ-004: 'исключены объёмы подземной/надземной части (PZ-005/006)'
+  SPZU-032: 'значение не начинается внутри числа («h=150» → 150, не 50)'
+  KR-062: '«4Ø25А500С» — Ø после числа стержней'
+  KR-063: '«шов» (ед. ч.) не распознавался'
+  SPZU-039: 'ведущий \s* квадратичен на пробелах'
+  POD-094: 'ведущее \d+ квадратично на длинных числах: якорь (?<![\d.,])'
+  OOS-098: 'верификация норм: система называется АИС «ОССиГ» (в Матрице «ОСИГ») — распознаются оба написания'
+  OOS-100: 'с 01.07.2026 рейс фиксируется разрешением на рейс в АИС «ОССиГ» (КПТС не применяется)'

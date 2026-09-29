@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/tokens_index.schema.json",
+  "title": "TokensIndex",
+  "description": "Index of the recognized pages of a run (runs/<run_id>/tokens/index.json): per file, which pages have PageTokens, how their text was obtained and their page class, so layout/tables/compare can plan work without opening every page. Owner: AG-02A.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_id",
+    "pipeline_version",
+    "generated_at",
+    "files"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "pipeline_version": {
+      "type": "string",
+      "minLength": 1
+    },
+    "generated_at": {
+      "$ref": "common.schema.json#/$defs/Timestamp"
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FileEntry"
+      }
+    },
+    "ext": {
+      "$ref": "common.schema.json#/$defs/Extension"
+    }
+  },
+  "$defs": {
+    "FileEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_id",
+        "file_sha256",
+        "pages_total",
+        "pages"
+      ],
+      "properties": {
+        "file_id": {
+          "$ref": "common.schema.json#/$defs/FileId"
+        },
+        "object_id": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/ObjectId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "file_sha256": {
+          "$ref": "common.schema.json#/$defs/Sha256"
+        },
+        "stage": {
+          "oneOf": [
+            {
+              "$ref": "enums.schema.json#/$defs/DocStage"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "pages_total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "pages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/PageEntry"
+          }
+        }
+      }
+    },
+    "PageEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pdf_page_number",
+        "path"
+      ],
+      "properties": {
+        "pdf_page_number": {
+          "$ref": "common.schema.json#/$defs/PageNumber"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "description": "tokens/<file_id>/p<NNNNN>.json.gz"
+        },
+        "page_class": {
+          "$ref": "enums.schema.json#/$defs/PageClass"
+        },
+        "text_sources": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "$ref": "enums.schema.json#/$defs/TextSource"
+          }
+        },
+        "quality_flag": {
+          "$ref": "enums.schema.json#/$defs/QualityFlag"
+        },
+        "rotation": {
+          "$ref": "common.schema.json#/$defs/Rotation"
+        },
+        "tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "has_layers": {
+          "type": "boolean"
+        },
+        "cache_hit": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

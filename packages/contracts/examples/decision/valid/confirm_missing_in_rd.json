@@ -1,0 +1,19 @@
+{
+  "decision_id": "D-000001",
+  "finding_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-078-PDRD-140",
+  "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-078-MISS-01",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "run_id": "m1-tyumen-e2e",
+  "decided_by": "inspector-01",
+  "decided_role": "INSPECTOR",
+  "decided_at": "2026-10-01T10:00:00Z",
+  "decision": "CONFIRMED_VIOLATION",
+  "effective_status": "CONFIRMED_VIOLATION",
+  "basis_code": "CV_MISSING_IN_RD",
+  "comment": "Подтверждаю нарушение по параметру IOS4-078: в ПД (л. 10) предусмотрена местная вытяжка в пом. 140, в РД (л. 4) отсутствует. Согласованное изменение не представлено.",
+  "comment_source": "TEMPLATE",
+  "approved_change_ref": "NONE",
+  "planned_action": "ISSUE_ORDER",
+  "gold_effect": "POSITIVE_DRAFT",
+  "evidence_fingerprint": "0000000000000000000000000000000000000000000000000000000000000001"
+}

@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "file_id": "F0202",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "file_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+  "stage": "RD",
+  "pipeline_version": "layout-0.1.0",
+  "generated_at": "2026-10-01T09:00:00Z",
+  "pages_total": 30,
+  "title_blocks": [
+    {
+      "pdf_page_number": 17,
+      "bbox": [
+        0.62,
+        0.9,
+        0.99,
+        0.99
+      ],
+      "sheet_number": 4,
+      "sheets_total": null,
+      "document_code_raw": "O1-2020-OB2",
+      "document_code": "О1-2020-ОВ2",
+      "stage_raw": "Р",
+      "stage": "RD",
+      "sheet_title": "План 1-го этажа (отопление)",
+      "revision": "3",
+      "change_rows": [
+        {
+          "change_no": "3",
+          "count": "-",
+          "sheet": "4",
+          "doc_no": "12-24",
+          "date": "03.24",
+          "note": null
+        }
+      ],
+      "is_stamp_page": false,
+      "provenance": {
+        "text_source": "OCR_LAYER_ISOLATED",
+        "confidence": 0.93,
+        "layer": null
+      }
+    }
+  ],
+  "sheet_page_map": [
+    {
+      "pdf_page_number": 17,
+      "sheet_number": 4,
+      "document_code": "О1-2020-ОВ2",
+      "basis": "TITLE_BLOCK",
+      "confidence": 0.97,
+      "duplicate_of_page": null
+    }
+  ],
+  "rooms": [
+    {
+      "pdf_page_number": 17,
+      "bbox": [
+        0.41,
+        0.52,
+        0.43,
+        0.53
+      ],
+      "source": "PLAN_LABEL",
+      "floor": "1",
+      "provenance": {
+        "text_source": "TEXT_LAYER",
+        "confidence": 1.0
+      }
+    },
+    {
+      "room_token": "270",
+      "pdf_page_number": 17,
+      "bbox": [
+        0.45,
+        0.52,
+        0.47,
+        0.53
+      ],
+      "source": "PLAN_LABEL",
+      "floor": "1",
+      "provenance": {
+        "text_source": "TEXT_LAYER",
+        "confidence": 1.0
+      }
+    }
+  ],
+  "tags": [
+    {
+      "tag": "Ст.Т1",
+      "tag_kind": "PIPE_RISER",
+      "pdf_page_number": 17,
+      "bbox": [
+        0.44,
+        0.55,
+        0.46,
+        0.56
+      ],
+      "room_token": "270",
+      "room_link": "NEAREST",
+      "provenance": {
+        "text_source": "OCR",
+        "confidence": 0.88,
+        "layer": "ОВ-Отопление-Текст"
+      }
+    }
+  ],
+  "cad_layers": [
+    {
+      "name": "ОВ-Отопление-Изм. №3",
+      "xref": 1234,
+      "visible_default": true,
+      "pages": [
+        17
+      ],
+      "is_text_layer": false,
+      "is_revision_layer": true,
+      "revision_label": "Изм. №3",
+      "discipline_hint": "ОВ"
+    }
+  ],
+  "revision_clouds": [
+    {
+      "pdf_page_number": 17,
+      "bbox": [
+        0.4,
+        0.5,
+        0.49,
+        0.56
+      ],
+      "source": "OCG_LAYER",
+      "layer": "ОВ-Отопление-Изм. №3",
+      "revision_label": "Изм. №3",
+      "rooms_covered": [
+        "270",
+        "272"
+      ],
+      "confidence": 0.9
+    }
+  ],
+  "qr_links": [
+    {
+      "pdf_page_number": 17,
+      "bbox": [
+        0.93,
+        0.93,
+        0.98,
+        0.98
+      ],
+      "payload": "exon 87cc1a16/1/wd/17",
+      "doc_key": "87cc1a16",
+      "doc_page": 17,
+      "target_file_id": "F0202",
+      "target_pdf_page_number": 17
+    }
+  ],
+  "warnings": []
+}

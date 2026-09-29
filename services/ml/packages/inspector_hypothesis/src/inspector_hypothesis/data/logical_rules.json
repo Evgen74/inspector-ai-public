@@ -1,0 +1,1201 @@
+{
+ "schema_version": 1,
+ "language": "IAI-Logic v1",
+ "rules_set_version": "hr-log-1.1.0",
+ "owner": "AG-07",
+ "note": "Seed Logical_Rules (ТЗ §10 #9). Нормативные ссылки сверены с выверкой норм (docs/analysis/norms_staging, 2026-09-27; поле norm_check), до экспертной проверки verified=false. Правила HR-LOG-003/004/005/006 заменяют подпроверки PZ-002.b, PZ-019.c, PZ-003.c, PZ-010.b (params.json moved_to_logical_rules).",
+ "rules": [
+  {
+   "id": 1,
+   "rule_code": "HR-LOG-001",
+   "version": 1,
+   "rule_name": "Лифт при этажности более 10",
+   "description": "Пример ТЗ п. 9.5 («Если этажей > 10, должен быть лифт»): при этажности более 10 в РД должны быть лифт или лифтовая шахта.",
+   "scope": {
+    "for_each": null,
+    "subject_type": "OBJECT",
+    "subject": "object:LIFT",
+    "evidence": "let.evidence",
+    "stage": null
+   },
+   "let": {
+    "floors": {
+     "if": [
+      {
+       "missing": [
+        "params.PZ-007.RD"
+       ]
+      },
+      {
+       "var": "params.PZ-007.PD"
+      },
+      {
+       "var": "params.PZ-007.RD"
+      }
+     ]
+    },
+    "evidence": {
+     "merge": [
+      {
+       "var": "params.PZ-007.PD_evidence"
+      },
+      {
+       "var": "params.PZ-007.RD_evidence"
+      }
+     ]
+    }
+   },
+   "condition": {
+    "or": [
+     {
+      ">": [
+       {
+        "var": "params.PZ-007.PD"
+       },
+       10
+      ]
+     },
+     {
+      ">": [
+       {
+        "var": "params.PZ-007.RD"
+       },
+       10
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "or": [
+     {
+      "var": "elements.PASSENGER_LIFT.RD.present"
+     },
+     {
+      "var": "elements.LIFT_SHAFT.RD.present"
+     }
+    ]
+   },
+   "normative_base": "СП 54.13330.2022, п. 7.1.3",
+   "normative_refs": [
+    "СП 54.13330.2022 «Здания жилые многоквартирные» (ссылка из примера ТЗ п. 9.5; пункт требует проверки нормоконтролёром)"
+   ],
+   "severity": "HIGH",
+   "base_confidence": 0.87,
+   "message_template": "В РД отсутствует лифтовая шахта при {floors} этажах.",
+   "expected_template": "Лифт (лифтовая шахта) при этажности {floors}",
+   "actual_template": "В РД лифт и лифтовая шахта не найдены",
+   "cells": {
+    "PD": "Этажность {floors}",
+    "RD": "Отсутствует"
+   },
+   "overlaps_matrix_codes": [
+    "PZ-007"
+   ],
+   "example": "ТЗ п. 9.5: «В РД отсутствует лифтовая шахта при 15 этажах.»",
+   "norm_check": {
+    "status": "DOCUMENT_CONFIRMED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "note": "СП 54.13330.2022 действует (с Изм. № 1, 2); пункт 7.1.3 взят из примера ТЗ п. 9.5 и в выверке не подтверждался"
+   }
+  },
+  {
+   "id": 2,
+   "rule_code": "HR-LOG-002",
+   "version": 2,
+   "rule_name": "Ссылка ИД на документ, отсутствующий в составе документации",
+   "description": "Документ ИД (АОСР, исполнительная схема) ссылается на шифр РД/ПД, которого нет среди документов объекта (опечатка в шифре или чужой документ).",
+   "scope": {
+    "for_each": "tables.AOSR_REFS",
+    "subject_type": "ACT",
+    "subject": "{item[file_id]}:p{item[page]}:{item[key]}"
+   },
+   "condition": {
+    "!!": {
+     "var": "item.code"
+    }
+   },
+   "expected": {
+    "var": "item.in_registry"
+   },
+   "normative_base": "Приказ Минстроя России от 16.05.2023 № 344/пр (состав и порядок ведения исполнительной документации)",
+   "normative_refs": [
+    "Приказ Минстроя России от 16.05.2023 № 344/пр (состав и порядок ведения исполнительной документации)"
+   ],
+   "severity": "MEDIUM",
+   "base_confidence": 0.8,
+   "message_template": "Акт {item[act_no]}[[ ({item[field_ru]})]] ссылается на документ «{item[code]}», которого нет в составе документации объекта[[ (ближайший шифр: {item[closest_code]})]].",
+   "expected_template": "Ссылка на документ из состава документации объекта",
+   "actual_template": "Ссылка на «{item[code]}»",
+   "cells": {
+    "ID": "Ссылка на «{item[code]}»",
+    "RD": "Документ отсутствует"
+   },
+   "overlaps_matrix_codes": [],
+   "norm_check": {
+    "status": "NOT_IN_STAGING",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "note": "Приказ Минстроя России № 344/пр в выверке норм не проверялся"
+   }
+  },
+  {
+   "id": 3,
+   "rule_code": "HR-LOG-003",
+   "version": 1,
+   "rule_name": "Сумма поэтажных итогов равна общей площади здания",
+   "description": "Внутренняя согласованность одной стадии (PZ-002.b): сумма итогов экспликаций по этажам совпадает с общей площадью здания по ТЭП в пределах 0,5 %. Проверяется, только когда экспликации покрывают все этажи.",
+   "scope": {
+    "for_each": "stage_facts",
+    "subject_type": "STAGE",
+    "subject": "stage:{item[stage]}:total_area"
+   },
+   "let": {
+    "floors_sum": {
+     "sum": [
+      {
+       "var": "item.floor_totals"
+      },
+      {
+       "var": "total"
+      }
+     ]
+    },
+    "total_area": {
+     "var": "item.total_area_m2"
+    }
+   },
+   "applicability": {
+    "and": [
+     {
+      ">=": [
+       {
+        "var": "item.floor_count"
+       },
+       2
+      ]
+     },
+     {
+      ">=": [
+       {
+        "var": "item.floor_count"
+       },
+       {
+        "var": "item.floors"
+       }
+      ]
+     }
+    ]
+   },
+   "condition": {
+    ">": [
+     {
+      "var": "item.total_area_m2"
+     },
+     0
+    ]
+   },
+   "expected": {
+    "<=": [
+     {
+      "abs": [
+       {
+        "-": [
+         {
+          "var": "let.floors_sum"
+         },
+         {
+          "var": "let.total_area"
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "*": [
+       0.005,
+       {
+        "var": "let.total_area"
+       }
+      ]
+     }
+    ]
+   },
+   "normative_base": "СП 54.13330.2022, приложение А (правила подсчёта площадей); ГОСТ Р 21.101-2026",
+   "normative_refs": [
+    "СП 54.13330.2022, приложение А",
+    "ГОСТ Р 21.101-2026"
+   ],
+   "severity": "LOW",
+   "base_confidence": 0.7,
+   "message_template": "Сумма поэтажных итогов экспликаций ({stage_ru}) {floors_sum} м² отличается от общей площади здания по ТЭП {total_area} м² более чем на 0,5 %.",
+   "expected_template": "Общая площадь {total_area} м²",
+   "actual_template": "Сумма поэтажных итогов {floors_sum} м²",
+   "cells": {
+    "*": "Σ этажей {floors_sum} м² ≠ {total_area} м²"
+   },
+   "overlaps_matrix_codes": [
+    "PZ-002"
+   ],
+   "norm_check": {
+    "status": "CONFIRMED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "evidence": "PZ-001: СП 54.13330.2022, приложение А, п. А.1.1; PZ-009: ГОСТ Р 21.101-2026 введён 01.04.2026 взамен ГОСТ Р 21.101-2020"
+   }
+  },
+  {
+   "id": 4,
+   "rule_code": "HR-LOG-004",
+   "version": 2,
+   "rule_name": "Коэффициент застройки согласован с площадями",
+   "description": "Внутренняя согласованность ТЭП (PZ-019.c): коэффициент застройки равен отношению площади застройки к площади участка (в процентах или долях) в пределах 1 %.",
+   "scope": {
+    "for_each": "stage_facts",
+    "subject_type": "STAGE",
+    "subject": "stage:{item[stage]}:kz"
+   },
+   "let": {
+    "ratio": {
+     "/": [
+      {
+       "var": "item.building_area_m2"
+      },
+      {
+       "var": "item.plot_area_m2"
+      }
+     ]
+    },
+    "kz_pct": {
+     "*": [
+      100,
+      {
+       "/": [
+        {
+         "var": "item.building_area_m2"
+        },
+        {
+         "var": "item.plot_area_m2"
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "applicability": {
+    "and": [
+     {
+      ">": [
+       {
+        "var": "item.plot_area_m2"
+       },
+       0
+      ]
+     },
+     {
+      ">": [
+       {
+        "var": "item.building_area_m2"
+       },
+       0
+      ]
+     }
+    ]
+   },
+   "condition": {
+    ">": [
+     {
+      "var": "item.building_density_pct"
+     },
+     0
+    ]
+   },
+   "expected": {
+    "or": [
+     {
+      "<=": [
+       {
+        "abs": [
+         {
+          "-": [
+           {
+            "var": "item.building_density_pct"
+           },
+           {
+            "var": "let.kz_pct"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "max": [
+         0.05,
+         {
+          "*": [
+           0.01,
+           {
+            "var": "item.building_density_pct"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     },
+     {
+      "<=": [
+       {
+        "abs": [
+         {
+          "-": [
+           {
+            "var": "item.building_density_pct"
+           },
+           {
+            "var": "let.ratio"
+           }
+          ]
+         }
+        ]
+       },
+       {
+        "max": [
+         0.005,
+         {
+          "*": [
+           0.01,
+           {
+            "var": "item.building_density_pct"
+           }
+          ]
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "normative_base": "СП 42.13330.2026, приложение Б (коэффициент застройки)",
+   "normative_refs": [
+    "СП 42.13330.2026 «Градостроительство. Планировка и застройка территорий» (приказ Минстроя России от 11.06.2026 № 368/пр, с 12.07.2026), приложение Б"
+   ],
+   "severity": "LOW",
+   "base_confidence": 0.7,
+   "message_template": "Коэффициент застройки по ТЭП ({stage_ru}) {item[building_density_pct]} не согласуется с площадью застройки {item[building_area_m2]} м² и площадью участка {item[plot_area_m2]} м² (расчётно {kz_pct} %).",
+   "expected_template": "Коэффициент застройки {kz_pct} %",
+   "actual_template": "Коэффициент застройки {item[building_density_pct]}",
+   "cells": {
+    "*": "КЗ {item[building_density_pct]} ≠ {kz_pct} %"
+   },
+   "overlaps_matrix_codes": [
+    "PZ-019"
+   ],
+   "norm_check": {
+    "status": "CORRECTED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "evidence": "PZ-019: СП 42.13330.2016 заменён СП 42.13330.2026 (приказ Минстроя России от 11.06.2026 № 368/пр, с 12.07.2026), приложение Б"
+   }
+  },
+  {
+   "id": 5,
+   "rule_code": "HR-LOG-005",
+   "version": 2,
+   "rule_name": "Сумма площадей экспликации равна итогу",
+   "description": "Внутренняя согласованность экспликации (PZ-003.c): сумма площадей помещений равна строке итога («Итого по этажу», «Общий итог») с учётом округления, в пределах max(0,05 м²; округление строк). Случай повторного учёта подзон «в том числе» выделен в HR-LOG-011. Не применяется, когда структура итогов не распознана (итог верхнего уровня не сходится с итогами групп) или расхождение больше 10 % итога — это признак неполного распознавания таблицы, а не арифметической ошибки.",
+   "scope": {
+    "for_each": "tables.EXPLICATION_BLOCKS",
+    "subject_type": "TABLE",
+    "subject": "{item[block_id]}",
+    "dedup": "{item[label]}|{item[total_label]}|{item[total]}|{item[n_rows]}|{item[n_subzones]}"
+   },
+   "let": {
+    "sum_rows": {
+     "sum": [
+      {
+       "var": "item.rows"
+      },
+      {
+       "var": "area_m2"
+      }
+     ]
+    },
+    "sum_sub": {
+     "sum": [
+      {
+       "var": "item.subzones"
+      },
+      {
+       "var": "area_m2"
+      }
+     ]
+    },
+    "total": {
+     "var": "item.total"
+    },
+    "delta": {
+     "-": [
+      {
+       "var": "item.total"
+      },
+      {
+       "sum": [
+        {
+         "var": "item.rows"
+        },
+        {
+         "var": "area_m2"
+        }
+       ]
+      }
+     ]
+    },
+    "tol": {
+     "max": [
+      0.05,
+      {
+       "var": "item.rounding_tolerance"
+      }
+     ]
+    },
+    "rel": {
+     "/": [
+      {
+       "abs": [
+        {
+         "var": "let.delta"
+        }
+       ]
+      },
+      {
+       "var": "let.total"
+      }
+     ]
+    }
+   },
+   "applicability": {
+    "and": [
+     {
+      ">=": [
+       {
+        "var": "item.n_rows"
+       },
+       2
+      ]
+     },
+     {
+      "!": {
+       "var": "item.hierarchy_unresolved"
+      }
+     },
+     {
+      "<=": [
+       {
+        "var": "let.rel"
+       },
+       0.1
+      ]
+     }
+    ]
+   },
+   "condition": {
+    "and": [
+     {
+      ">": [
+       {
+        "var": "let.total"
+       },
+       0
+      ]
+     },
+     {
+      ">": [
+       {
+        "var": "let.sum_rows"
+       },
+       0
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "or": [
+     {
+      "<=": [
+       {
+        "abs": [
+         {
+          "var": "let.delta"
+         }
+        ]
+       },
+       {
+        "var": "let.tol"
+       }
+      ]
+     },
+     {
+      "and": [
+       {
+        ">": [
+         {
+          "var": "item.n_subzones"
+         },
+         0
+        ]
+       },
+       {
+        "<=": [
+         {
+          "abs": [
+           {
+            "-": [
+             {
+              "var": "let.total"
+             },
+             {
+              "+": [
+               {
+                "var": "let.sum_rows"
+               },
+               {
+                "var": "let.sum_sub"
+               }
+              ]
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "var": "let.tol"
+         }
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "normative_base": "ГОСТ 21.501-2018, п. 5.3.2 е) и форма 2 приложения А (экспликация помещений); ГОСТ Р 21.101-2026 (основные требования к проектной и рабочей документации; взамен ГОСТ Р 21.101-2020)",
+   "normative_refs": [
+    "ГОСТ 21.501-2018, п. 5.3.2 е), форма 2 приложения А (экспликация помещений)",
+    "ГОСТ Р 21.101-2026 (основные требования к проектной и рабочей документации; взамен ГОСТ Р 21.101-2020)"
+   ],
+   "severity": "MEDIUM",
+   "base_confidence": 0.9,
+   "message_template": "Сумма площадей помещений экспликации ({item[label]}) {sum_rows} м² не равна итогу «{item[total_label]}» {total} м²: расхождение {delta} м².",
+   "expected_template": "Итог = сумма площадей помещений = {sum_rows} м²",
+   "actual_template": "Итог в документе {total} м²",
+   "cells": {
+    "*": "Σ {sum_rows} м² ≠ итог {total} м²"
+   },
+   "overlaps_matrix_codes": [
+    "PZ-003"
+   ],
+   "example": "Пилот ALT79B, ПД: Σ 2795,04 м² ≠ «Общий итог по этажу» 2797,27 м² (07 §3.9)",
+   "norm_check": {
+    "status": "CONFIRMED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "evidence": "PZ-003: ГОСТ 21.501-2018 действует, п. 5.3.2 е), форма 2 «Экспликация помещений» (приложение А)"
+   }
+  },
+  {
+   "id": 6,
+   "rule_code": "HR-LOG-006",
+   "version": 1,
+   "rule_name": "Количество квартир равно сумме по квартирографии",
+   "description": "Внутренняя согласованность одной стадии (PZ-010.b): количество квартир по ТЭП равно сумме квартир по типам (квартирография).",
+   "scope": {
+    "for_each": "stage_facts",
+    "subject_type": "STAGE",
+    "subject": "stage:{item[stage]}:apartments"
+   },
+   "let": {
+    "types_sum": {
+     "sum": [
+      {
+       "var": "item.apartment_types"
+      },
+      {
+       "var": "count"
+      }
+     ]
+    }
+   },
+   "applicability": {
+    ">=": [
+     {
+      "count": [
+       {
+        "var": "item.apartment_types"
+       }
+      ]
+     },
+     1
+    ]
+   },
+   "condition": {
+    ">": [
+     {
+      "var": "item.apartments"
+     },
+     0
+    ]
+   },
+   "expected": {
+    "==": [
+     {
+      "var": "let.types_sum"
+     },
+     {
+      "var": "item.apartments"
+     }
+    ]
+   },
+   "normative_base": "Внутренняя согласованность документации (ГОСТ Р 21.101-2026)",
+   "normative_refs": [
+    "ГОСТ Р 21.101-2026"
+   ],
+   "severity": "MEDIUM",
+   "base_confidence": 0.8,
+   "message_template": "Количество квартир по ТЭП ({stage_ru}) {item[apartments]} не равно сумме по квартирографии {types_sum}.",
+   "expected_template": "{types_sum} квартир по квартирографии",
+   "actual_template": "{item[apartments]} квартир по ТЭП",
+   "cells": {
+    "*": "{item[apartments]} ≠ Σ {types_sum}"
+   },
+   "overlaps_matrix_codes": [
+    "PZ-010",
+    "PZ-011"
+   ],
+   "norm_check": {
+    "status": "DOCUMENT_CONFIRMED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "note": "ГОСТ Р 21.101-2026 введён 01.04.2026 (PZ-009); пункт о согласованности разделов не выверялся"
+   }
+  },
+  {
+   "id": 7,
+   "rule_code": "HR-LOG-007",
+   "version": 2,
+   "rule_name": "Работы в ИД без основания в РД",
+   "description": "Если ИД фиксирует работы (ремонт, усиление, устранение дефектов), то в РД должно быть их основание. Правило срабатывает, только когда РД раздела прочитана полностью и таких работ в ней нет (пилот IZM12).",
+   "scope": {
+    "for_each": "id_works",
+    "subject_type": "ELEMENT",
+    "subject": "id_works:{item[family]}"
+   },
+   "condition": {
+    "var": "item.id_present"
+   },
+   "expected": {
+    "var": "item.rd_present"
+   },
+   "normative_base": "ГрК РФ, ст. 52, ч. 6; Приказ Минстроя России от 16.05.2023 № 344/пр (состав и порядок ведения исполнительной документации)",
+   "normative_refs": [
+    "Градостроительный кодекс РФ, ст. 52, ч. 6 (строительство в соответствии с проектной и рабочей документацией)",
+    "Приказ Минстроя России от 16.05.2023 № 344/пр (состав и порядок ведения исполнительной документации)"
+   ],
+   "severity": "HIGH",
+   "base_confidence": 0.75,
+   "message_template": "В ИД зафиксированы работы «{item[phrase]}» ({item[label]}), не предусмотренные РД: в РД раздела ({item[rd_pages_read]} стр. прочитано) такие работы не найдены.",
+   "expected_template": "Работы предусмотрены РД",
+   "actual_template": "Работы выполнены без основания в РД",
+   "cells": {
+    "PD": "Работы не предусмотрены",
+    "RD": "Работы не предусмотрены",
+    "ID": "Работы выполнены"
+   },
+   "overlaps_matrix_codes": [],
+   "norm_check": {
+    "status": "CONFIRMED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "evidence": "POS-087: ГрК РФ, ст. 52, ч. 6 (действующая редакция); Приказ № 344/пр в выверке не проверялся"
+   }
+  },
+  {
+   "id": 8,
+   "rule_code": "HR-LOG-008",
+   "version": 1,
+   "rule_name": "Отклонение на исполнительной схеме в пределах допуска",
+   "description": "Фактическое отклонение на исполнительной схеме не превышает допуск, указанный на той же схеме. Отклонения параметров Матрицы (оси — KR-054) проверяет сравнение по Матрице; превышение отметки верха в пределах обычного перелива не нарушение (решение Q4c).",
+   "scope": {
+    "for_each": "tables.DEVIATION_ROWS",
+    "subject_type": "ELEMENT",
+    "subject": "{item[file_id]}:p{item[page]}:r{item[row_no]}"
+   },
+   "applicability": {
+    "!": {
+     "var": "item.matrix_mapped"
+    }
+   },
+   "condition": {
+    "and": [
+     {
+      ">": [
+       {
+        "var": "item.tolerance"
+       },
+       0
+      ]
+     },
+     {
+      ">=": [
+       {
+        "abs": [
+         {
+          "var": "item.deviation"
+         }
+        ]
+       },
+       0
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "or": [
+     {
+      "<=": [
+       {
+        "abs": [
+         {
+          "var": "item.deviation"
+         }
+        ]
+       },
+       {
+        "var": "item.tolerance"
+       }
+      ]
+     },
+     {
+      "and": [
+       {
+        "var": "item.increase_is_context"
+       },
+       {
+        ">": [
+         {
+          "var": "item.deviation"
+         },
+         0
+        ]
+       }
+      ]
+     }
+    ]
+   },
+   "normative_base": "СП 70.13330.2012 (допуски; с Изм. № 1, 3–8); допуск, указанный на исполнительной схеме",
+   "normative_refs": [
+    "СП 70.13330.2012 «Несущие и ограждающие конструкции»"
+   ],
+   "severity": "HIGH",
+   "base_confidence": 0.8,
+   "message_template": "Отклонение {item[deviation]}[[ {item[unit]}]] ({item[label]}) превышает допуск ±{item[tolerance]}, указанный на исполнительной схеме.",
+   "expected_template": "Отклонение не более ±{item[tolerance]}",
+   "actual_template": "Отклонение {item[deviation]}",
+   "cells": {
+    "ID": "{item[deviation]} при допуске ±{item[tolerance]}"
+   },
+   "overlaps_matrix_codes": [],
+   "norm_check": {
+    "status": "DOCUMENT_CONFIRMED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "evidence": "KR-054, KR-058: СП 70.13330.2012 с Изм. № 1, 3–8 действует (Изм. № 7 — приказ Минстроя от 06.02.2025 № 66/пр); допуски — п. 5.18.3, табл. 5.12"
+   }
+  },
+  {
+   "id": 9,
+   "rule_code": "HR-LOG-009",
+   "version": 1,
+   "rule_name": "Акт ссылается на неактуальную редакцию РД",
+   "description": "Акт, составленный после выпуска новой редакции (изменения) РД, должен ссылаться на действующую редакцию (ТЗ п. 9.1: устаревшая редакция не может использоваться как эталон). Редакции — по штампам и таблицам изменений, не по именам файлов.",
+   "scope": {
+    "for_each": "tables.AOSR_REFS",
+    "subject_type": "ACT",
+    "subject": "{item[file_id]}:p{item[page]}:{item[key]}:rev"
+   },
+   "applicability": {
+    "==": [
+     {
+      "var": "item.in_registry"
+     },
+     true
+    ]
+   },
+   "condition": {
+    "and": [
+     {
+      ">=": [
+       {
+        "var": "item.revision"
+       },
+       0
+      ]
+     },
+     {
+      ">=": [
+       {
+        "var": "item.current_revision"
+       },
+       0
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "or": [
+     {
+      ">=": [
+       {
+        "var": "item.revision"
+       },
+       {
+        "var": "item.current_revision"
+       }
+      ]
+     },
+     {
+      "<": [
+       {
+        "var": "item.act_date"
+       },
+       {
+        "var": "item.current_revision_date"
+       }
+      ]
+     }
+    ]
+   },
+   "normative_base": "ТЗ п. 9.1 (выбор актуальной редакции); Приказ Минстроя России от 16.05.2023 № 344/пр (состав и порядок ведения исполнительной документации)",
+   "normative_refs": [
+    "Приказ Минстроя России от 16.05.2023 № 344/пр (состав и порядок ведения исполнительной документации)"
+   ],
+   "severity": "HIGH",
+   "base_confidence": 0.85,
+   "message_template": "Акт {item[act_no]}[[ от {item[act_date]}]] ссылается на «{item[code]}» изм. {item[revision]}, тогда как действующая редакция — изм. {item[current_revision]}[[ от {item[current_revision_date]}]].",
+   "expected_template": "Ссылка на действующую редакцию: изм. {item[current_revision]}",
+   "actual_template": "Ссылка на изм. {item[revision]}",
+   "cells": {
+    "ID": "изм. {item[revision]}",
+    "RD": "изм. {item[current_revision]}"
+   },
+   "overlaps_matrix_codes": [],
+   "norm_check": {
+    "status": "NOT_IN_STAGING",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "note": "Приказ Минстроя России № 344/пр в выверке норм не проверялся"
+   }
+  },
+  {
+   "id": 10,
+   "rule_code": "HR-LOG-010",
+   "version": 1,
+   "rule_name": "Акт не ранее выпуска редакции РД",
+   "description": "Дата акта не может предшествовать дате выпуска редакции РД, на которую он ссылается.",
+   "scope": {
+    "for_each": "tables.AOSR_REFS",
+    "subject_type": "ACT",
+    "subject": "{item[file_id]}:p{item[page]}:{item[key]}:date"
+   },
+   "applicability": {
+    "==": [
+     {
+      "var": "item.in_registry"
+     },
+     true
+    ]
+   },
+   "condition": {
+    "and": [
+     {
+      "!!": {
+       "var": "item.act_date"
+      }
+     },
+     {
+      "!!": {
+       "var": "item.cited_revision_date"
+      }
+     }
+    ]
+   },
+   "expected": {
+    ">=": [
+     {
+      "var": "item.act_date"
+     },
+     {
+      "var": "item.cited_revision_date"
+     }
+    ]
+   },
+   "normative_base": "Приказ Минстроя России от 16.05.2023 № 344/пр (состав и порядок ведения исполнительной документации)",
+   "normative_refs": [
+    "Приказ Минстроя России от 16.05.2023 № 344/пр (состав и порядок ведения исполнительной документации)"
+   ],
+   "severity": "MEDIUM",
+   "base_confidence": 0.75,
+   "message_template": "Акт {item[act_no]} датирован {item[act_date]} — раньше выпуска «{item[code]}» изм. {item[revision]} ({item[cited_revision_date]}).",
+   "expected_template": "Дата акта не ранее {item[cited_revision_date]}",
+   "actual_template": "Дата акта {item[act_date]}",
+   "cells": {
+    "ID": "Акт от {item[act_date]}",
+    "RD": "Изм. {item[revision]} от {item[cited_revision_date]}"
+   },
+   "overlaps_matrix_codes": [],
+   "norm_check": {
+    "status": "NOT_IN_STAGING",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "note": "Приказ Минстроя России № 344/пр в выверке норм не проверялся"
+   }
+  },
+  {
+   "id": 11,
+   "rule_code": "HR-LOG-011",
+   "version": 2,
+   "rule_name": "Подзона «в том числе» не учитывается в итоге повторно",
+   "description": "Площадь подзоны «в том числе» входит в площадь родительского помещения; если итог экспликации равен сумме помещений плюс подзоны, подзона учтена дважды.",
+   "scope": {
+    "for_each": "tables.EXPLICATION_BLOCKS",
+    "subject_type": "TABLE",
+    "subject": "{item[block_id]}:subzones",
+    "dedup": "{item[label]}|{item[total_label]}|{item[total]}|{item[n_rows]}|{item[n_subzones]}"
+   },
+   "let": {
+    "sum_rows": {
+     "sum": [
+      {
+       "var": "item.rows"
+      },
+      {
+       "var": "area_m2"
+      }
+     ]
+    },
+    "sum_sub": {
+     "sum": [
+      {
+       "var": "item.subzones"
+      },
+      {
+       "var": "area_m2"
+      }
+     ]
+    },
+    "total": {
+     "var": "item.total"
+    },
+    "delta": {
+     "-": [
+      {
+       "var": "item.total"
+      },
+      {
+       "sum": [
+        {
+         "var": "item.rows"
+        },
+        {
+         "var": "area_m2"
+        }
+       ]
+      }
+     ]
+    },
+    "tol": {
+     "max": [
+      0.05,
+      {
+       "var": "item.rounding_tolerance"
+      }
+     ]
+    }
+   },
+   "applicability": {
+    "and": [
+     {
+      ">": [
+       {
+        "var": "item.n_subzones"
+       },
+       0
+      ]
+     },
+     {
+      "!": {
+       "var": "item.hierarchy_unresolved"
+      }
+     }
+    ]
+   },
+   "condition": {
+    "and": [
+     {
+      ">": [
+       {
+        "var": "let.total"
+       },
+       0
+      ]
+     },
+     {
+      ">": [
+       {
+        "var": "let.sum_rows"
+       },
+       0
+      ]
+     },
+     {
+      ">": [
+       {
+        "var": "let.sum_sub"
+       },
+       0
+      ]
+     }
+    ]
+   },
+   "expected": {
+    "!": {
+     "and": [
+      {
+       "<=": [
+        {
+         "abs": [
+          {
+           "-": [
+            {
+             "var": "let.total"
+            },
+            {
+             "+": [
+              {
+               "var": "let.sum_rows"
+              },
+              {
+               "var": "let.sum_sub"
+              }
+             ]
+            }
+           ]
+          }
+         ]
+        },
+        {
+         "var": "let.tol"
+        }
+       ]
+      },
+      {
+       ">": [
+        {
+         "abs": [
+          {
+           "var": "let.delta"
+          }
+         ]
+        },
+        {
+         "var": "let.tol"
+        }
+       ]
+      }
+     ]
+    }
+   },
+   "normative_base": "ГОСТ 21.501-2018, п. 5.3.2 е) и форма 2 приложения А (экспликация помещений); ГОСТ Р 21.101-2026 (основные требования к проектной и рабочей документации; взамен ГОСТ Р 21.101-2020)",
+   "normative_refs": [
+    "ГОСТ 21.501-2018, п. 5.3.2 е), форма 2 приложения А (экспликация помещений)",
+    "ГОСТ Р 21.101-2026 (основные требования к проектной и рабочей документации; взамен ГОСТ Р 21.101-2020)"
+   ],
+   "severity": "MEDIUM",
+   "base_confidence": 0.9,
+   "message_template": "В экспликации ({item[label]}) итог «{item[total_label]}» {total} м² повторно включает площадь подзон «в том числе» {sum_sub} м²: сумма помещений {sum_rows} м² + {sum_sub} м² = {total} м².",
+   "expected_template": "Итог = сумма помещений = {sum_rows} м²",
+   "actual_template": "Итог в документе {total} м² (подзоны учтены дважды)",
+   "cells": {
+    "*": "Итог {total} = {sum_rows} + {sum_sub} (в т. ч.) м²"
+   },
+   "overlaps_matrix_codes": [
+    "PZ-003"
+   ],
+   "example": "Тюменская, РД F0201 стр. 18: «Группа начальных классов» — Σ 1049,5 м² + «в том числе» 30,4 м² = «ИТОГО» 1079,9 м² (97 §1.5)",
+   "norm_check": {
+    "status": "CONFIRMED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "evidence": "PZ-003: ГОСТ 21.501-2018 действует, п. 5.3.2 е), форма 2 «Экспликация помещений» (приложение А)"
+   }
+  },
+  {
+   "id": 12,
+   "rule_code": "HR-LOG-012",
+   "version": 2,
+   "rule_name": "Высота здания правдоподобна при заявленной этажности",
+   "description": "Проверка правдоподобия ТЭП (не норматив): средняя высота этажа (высота здания / этажность) лежит в диапазоне 2,4–6,0 м.",
+   "scope": {
+    "for_each": "stage_facts",
+    "subject_type": "STAGE",
+    "subject": "stage:{item[stage]}:height"
+   },
+   "let": {
+    "per_floor": {
+     "/": [
+      {
+       "var": "item.height_m"
+      },
+      {
+       "var": "item.floors"
+      }
+     ]
+    }
+   },
+   "applicability": {
+    ">=": [
+     {
+      "var": "item.floors"
+     },
+     2
+    ]
+   },
+   "condition": {
+    ">": [
+     {
+      "var": "item.height_m"
+     },
+     0
+    ]
+   },
+   "expected": {
+    "<=": [
+     2.4,
+     {
+      "var": "let.per_floor"
+     },
+     6.0
+    ]
+   },
+   "normative_base": "СП 1.13130.2020, п. 3.1 (высота здания); СП 54.13330.2022, приложение А, п. А.1.7 (этажность) — проверка правдоподобия",
+   "normative_refs": [
+    "СП 1.13130.2020, п. 3.1 (высота здания)",
+    "СП 54.13330.2022, приложение А, п. А.1.7 (этажность)"
+   ],
+   "severity": "LOW",
+   "base_confidence": 0.5,
+   "message_template": "Высота здания {item[height_m]} м при этажности {item[floors]} ({stage_ru}) даёт {per_floor} м на этаж — вне правдоподобного диапазона 2,4–6,0 м.",
+   "expected_template": "2,4–6,0 м на этаж",
+   "actual_template": "{per_floor} м на этаж",
+   "cells": {
+    "*": "{item[height_m]} м / {item[floors]} эт."
+   },
+   "overlaps_matrix_codes": [
+    "PZ-007",
+    "PZ-008"
+   ],
+   "norm_check": {
+    "status": "CONFIRMED",
+    "source": "docs/analysis/norms_staging (web-verified 2026-09-27)",
+    "evidence": "PZ-008: СП 1.13130.2020 (с Изм. № 1–3), п. 3.1 — определение высоты здания; PZ-007: СП 54.13330.2022, приложение А, п. А.1.7 — определение этажности"
+   }
+  }
+ ]
+}

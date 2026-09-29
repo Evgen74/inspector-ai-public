@@ -1,0 +1,105 @@
+# «Инспектор ИИ» — fixed FREE-<TOPIC> vocabulary for out-of-matrix findings (93 §3.7, 97 §2.9).
+# Owner: AG-03 (data); the topic codes are the contract enum enums.FreeTopic (owner AG-07) and must match it
+# exactly (checked by build_seed.py and the tests). Built into free_topics.json.
+#
+# Code: FREE-<TOPIC>-<NNN>. NNN is numbered per finding group (not per room) within object and topic, from 001,
+# ordered by (PD file_id, PD page, first location): one heating group in an object is exactly FREE-HEATING-001 (gold).
+# Criticality and protocol status come from enums.yaml mappings.free_search (copied at build time).
+
+schema_version: 1
+numbering:
+  code_pattern: '^FREE-([A-Z]+)-(\d{3})$'
+  scope: per finding group within object and topic
+  order: [pd_file_id, pd_page, first_location]
+  start: 1
+export_policy:
+  evidence_bound_only: true
+  max_groups_per_object: 5
+  basis: 97 §1.6 (precision-first on FREE-*), 93 §3.7
+
+topics:
+  - topic: HEATING
+    label_ru: Отопление
+    disciplines: [ОВ, ТС, ТМ]
+    sections: [ИОС4]
+    description: Отопление и теплоснабжение вне параметров IOS4-076/077 (тёплые полы, оборудование ИТП).
+  - topic: VENTILATION
+    label_ru: Вентиляция
+    disciplines: [ОВ]
+    sections: [ИОС4]
+    description: Вентиляция и кондиционирование вне IOS4-078/079 и PPM-111/112 (напр. кондиционеры, воздушно-тепловые завесы).
+  - topic: WATER
+    label_ru: Водоснабжение
+    disciplines: [ВК, НВК]
+    sections: [ИОС2]
+    description: Водоснабжение вне IOS2-071…073 (санитарные приборы, водоподготовка).
+  - topic: SEWER
+    label_ru: Водоотведение
+    disciplines: [ВК, НВК]
+    sections: [ИОС3]
+    description: Канализация и водостоки вне IOS3-074/075 (трапы, лотки, локальные очистные).
+  - topic: ELECTRICAL
+    label_ru: Электроснабжение
+    disciplines: [ЭОМ, ЭС, ЭМ]
+    sections: [ИОС1]
+    description: Электроснабжение вне IOS1-068…070 (щиты, розеточные сети, электроотопление).
+  - topic: LIGHTING
+    label_ru: Освещение
+    disciplines: [ЭОМ, ЭО]
+    sections: [ИОС1, ЗУ]
+    description: Освещение вне ZU-130 (отсутствие светильников, аварийное и эвакуационное освещение).
+  - topic: FIRE
+    label_ru: Пожарная безопасность
+    disciplines: [ПБ, АПС, СС, ОВ, ВК]
+    sections: [ППМ]
+    description: Противопожарные мероприятия вне PPM-102…114 (напр. АУПТ, противопожарные занавесы).
+  - topic: EVACUATION
+    label_ru: Эвакуация
+    disciplines: [АР, ПБ]
+    sections: [АР, ППМ]
+    description: Пути эвакуации вне AR-040…043 и PPM-104…106 (напр. незадымляемость лестничных клеток).
+  - topic: ACCESSIBILITY
+    label_ru: Доступность для МГН
+    disciplines: [АР, ОДИ, ГП]
+    sections: [ОДИ]
+    description: Доступность вне ODI-115…123 и SPZU-038 (пандусы, зоны безопасности МГН).
+  - topic: ARCHITECTURE
+    label_ru: Архитектурные решения
+    disciplines: [АР]
+    sections: [АР]
+    description: Архитектурные решения вне AR-040…053 (перепланировки, внутренние перегородки).
+  - topic: STRUCTURE
+    label_ru: Конструктивные решения
+    disciplines: [КР, КЖ, КМ, КД]
+    sections: [КР]
+    description: Конструкции вне KR-054…067 (марки бетона F/W при неизменном классе — решение Q4a; отметки верха сверх допуска; работы без РД).
+  - topic: SITE
+    label_ru: Земельный участок и благоустройство
+    disciplines: [ГП, ПП]
+    sections: [СПЗУ]
+    description: Благоустройство вне SPZU-024…039 (освещение территории, контейнерные площадки).
+  - topic: ROOF
+    label_ru: Кровля
+    disciplines: [АР]
+    sections: [АР]
+    description: Кровля вне AR-044/045 и ZU-128 (ограждения кровли, выходы на кровлю).
+  - topic: FACADE
+    label_ru: Фасады
+    disciplines: [АР]
+    sections: [АР]
+    description: Фасады вне AR-052 (навесные фасадные системы, крепления).
+  - topic: LIFT
+    label_ru: Лифты
+    disciplines: [АР, ЛО]
+    sections: [АР, КР]
+    description: Пассажирские и грузовые лифты (в Матрице есть только шахты KR-064 и подъёмники МГН ODI-115).
+  - topic: ENERGY
+    label_ru: Энергоэффективность
+    disciplines: [ЭЭ, ОВ, ЭОМ]
+    sections: [ЗУ]
+    description: Энергоэффективность вне ZU-124…131 (автоматизация, рекуперация).
+  - topic: OTHER
+    label_ru: Прочее
+    disciplines: []
+    sections: []
+    description: Находки свободного поиска, не отнесённые ни к одной теме; использовать в последнюю очередь.

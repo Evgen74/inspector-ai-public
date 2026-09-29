@@ -1,0 +1,25 @@
+[project]
+name = "inspector-common"
+version = "0.1.0"
+description = "Инспектор ИИ: shared settings, paths, JSON logging, hashing, geometry and contract models"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "pydantic>=2.8",
+    "pydantic-settings>=2.4",
+    "pyyaml>=6.0",
+    "orjson>=3.10",
+    "jsonschema>=4.23",
+    "referencing>=0.35",
+    "shapely>=2.0",
+    "numpy>=2.0",
+]
+
+[project.scripts]
+inspector-contracts = "inspector_common.contracts.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/inspector_common"]

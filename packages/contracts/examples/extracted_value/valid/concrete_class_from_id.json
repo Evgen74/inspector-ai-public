@@ -1,0 +1,19 @@
+{
+  "value_id": "F0011-p2-KR055",
+  "file_id": "F0011",
+  "file_sha256": "0000000000000000000000000000000000000000000000000000000000000001",
+  "stage": "ID",
+  "page_no": 2,
+  "param_id": 55,
+  "param_code": "KR-055",
+  "value_raw": "B25",
+  "value_norm": {
+    "type": "enum",
+    "value": "B25",
+    "rank": 25
+  },
+  "method": "REGEX",
+  "confidence": 0.91,
+  "quality_flag": "OK",
+  "pipeline_version": "0.1.0+dev"
+}

@@ -1,0 +1,500 @@
+# «Инспектор ИИ» — D1 additions to the REST contract (owner AG-08), PENDING ADOPTION by AG-00.
+#
+# The contract lives in packages/contracts/openapi/openapi.yaml (owner AG-00, edits by request). Until AG-00
+# merges this file into it, the API loads the base document plus every `apps/api/openapi/pending/*.yaml`
+# overlay (paths, tags and components are added; a collision with the base is a startup error and a test
+# failure). Merging = copying `tags`, `paths` and `components.*` below into the base file verbatim, then
+# deleting this overlay. Web types (apps/web/src/api/schema.gen.ts) and MSW mocks are generated from the merged
+# document.
+#
+# Data sources (97 §1.4, one engine / two front-ends): protocols and finding groups are read from the run
+# directories of imported `inspector-batch` runs (`artifacts.json`, kinds PROTOCOL_JSON / PROTOCOL_DOCX /
+# PROTOCOL_PDF / FINDING_GROUPS / LAYOUT, paths per packages/contracts/run_layout.yaml) and validated against
+# the contract JSON Schemas before they are served. Objects of the hidden test split never expose artifacts
+# or page renders (403 HIDDEN_TEST_ACCESS_DENIED).
+#
+# Enums proposed for enums.yaml (marked `x-contract-enum-proposed`): IndicatorReason (owner AG-08).
+openapi: 3.0.3
+info:
+  title: «Инспектор ИИ» — D1 overlay (протоколы, дашборд, разметка страниц)
+  version: 0.2.0-d1
+tags:
+  - name: dashboard
+    description: 'Дашборд инспектора (модуль 7): индикация объектов, фильтры, сводка находок'
+  - name: protocols
+    description: Протоколы по форме Приложения 2 (версии, просмотр, выгрузка DOCX/PDF/JSON)
+  - name: pages
+    description: Разметка страниц документов для просмотрщика доказательств (облака изменений, помещения)
+paths:
+  /dashboard:
+    get:
+      operationId: getDashboard
+      tags: [dashboard]
+      summary: Дашборд — объекты с цветовой индикацией, плитки, сводка по разделам
+      description: |
+        Цвет объекта (08 §3.5, строгое правило): RED — есть хотя бы одно CONFIRMED_VIOLATION; YELLOW — нужно
+        действие инспектора или данные (кандидаты ожидают решения, требуется уточнение, нет обязательных
+        документов, несопоставимо, частичная загрузка); GREEN — нет ожидающих кандидатов и подтверждённых
+        нарушений, комплект полный; NONE — протокола нет. Уровень риска и подозрения ИИ цвет не меняют.
+        Плитки считаются по объектам, прошедшим фильтры (кроме фильтра по цвету).
+      x-owner: AG-08
+      x-permission: object.read
+      x-error-codes: [VALIDATION_ERROR, SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - name: q
+          in: query
+          description: Поиск по идентификатору или наименованию объекта (без учёта регистра)
+          schema: {type: string, minLength: 1, maxLength: 200}
+        - name: color
+          in: query
+          description: Цвет индикации (через запятую)
+          style: form
+          explode: false
+          schema:
+            type: array
+            maxItems: 4
+            items: {$ref: '#/components/schemas/IndicatorColor'}
+        - name: section
+          in: query
+          description: Разделы матрицы (ПЗ … СМ, ИОС1–ИОС5), через запятую — объекты с находками в этих разделах
+          style: form
+          explode: false
+          schema:
+            type: array
+            maxItems: 16
+            items: {type: string, minLength: 1, maxLength: 8}
+        - name: status
+          in: query
+          description: Решение инспектора по находкам (через запятую) — объекты с такими находками
+          style: form
+          explode: false
+          schema:
+            type: array
+            maxItems: 4
+            items: {$ref: '#/components/schemas/InspectorStatus'}
+        - name: scenario
+          in: query
+          description: Тип проверки (сценарий загрузки)
+          schema: {$ref: '#/components/schemas/LoadScenario'}
+        - name: date_from
+          in: query
+          description: Протокол сформирован не раньше даты (ГГГГ-ММ-ДД, по Москве)
+          schema: {type: string, format: date}
+        - name: date_to
+          in: query
+          description: Протокол сформирован не позже даты (ГГГГ-ММ-ДД, по Москве, включительно)
+          schema: {type: string, format: date}
+        - name: include_archived
+          in: query
+          description: Показывать и архивные объекты («Архивировать»); по умолчанию они скрыты
+          schema: {type: boolean}
+      responses:
+        '200':
+          description: Дашборд
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/Dashboard'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /objects/{object_id}/protocols:
+    get:
+      operationId: listObjectProtocols
+      tags: [protocols]
+      summary: Версии протокола объекта (по импортированным запускам, новые сверху)
+      x-owner: AG-08
+      x-permission: protocol.read
+      x-error-codes: [VALIDATION_ERROR, SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, NOT_FOUND, HIDDEN_TEST_ACCESS_DENIED, CONTRACT_VALIDATION_FAILED, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - $ref: '#/components/parameters/ObjectIdPath'
+      responses:
+        '200':
+          description: История версий протокола
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProtocolVersionList'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /objects/{object_id}/protocols/{run_id}:
+    get:
+      operationId: getObjectProtocol
+      tags: [protocols]
+      summary: Протокол (контракт protocol.schema.json) и группы находок того же запуска
+      x-owner: AG-08
+      x-permission: protocol.read
+      x-error-codes: [VALIDATION_ERROR, SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, NOT_FOUND, HIDDEN_TEST_ACCESS_DENIED, CONTRACT_VALIDATION_FAILED, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - $ref: '#/components/parameters/ObjectIdPath'
+        - $ref: '#/components/parameters/RunIdPath'
+      responses:
+        '200':
+          description: Протокол
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProtocolView'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '422': {$ref: '#/components/responses/Unprocessable'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /objects/{object_id}/protocols/{run_id}/export:
+    get:
+      operationId: exportObjectProtocol
+      tags: [protocols]
+      summary: Выгрузка протокола (DOCX и PDF формирует inspector-batch export, AG-04; JSON — канонический протокол)
+      x-owner: AG-08
+      x-permission: protocol.export
+      x-error-codes: [VALIDATION_ERROR, SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, NOT_FOUND, HIDDEN_TEST_ACCESS_DENIED, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - $ref: '#/components/parameters/ObjectIdPath'
+        - $ref: '#/components/parameters/RunIdPath'
+        - name: format
+          in: query
+          required: true
+          description: Формат файла
+          schema: {$ref: '#/components/schemas/ProtocolFileFormat'}
+      responses:
+        '200':
+          description: Файл протокола (Content-Disposition attachment, имя UTF-8)
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+            Content-Disposition:
+              description: attachment; filename*=UTF-8''Протокол_….docx
+              schema: {type: string}
+          content:
+            application/vnd.openxmlformats-officedocument.wordprocessingml.document:
+              schema: {type: string, format: binary}
+            application/pdf:
+              schema: {type: string, format: binary}
+            application/json:
+              schema: {type: string, format: binary}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /files/{file_id}/annotations:
+    get:
+      operationId: getFileAnnotations
+      tags: [pages]
+      summary: Разметка страницы из артефакта layout (AG-02B) — облака изменений и номера помещений
+      description: |
+        Для просмотрщика доказательств: облака изменений (RevisionCloud) и помещения (RoomEntry) страницы из
+        `layout/<file_id>.json` последнего импортированного запуска, где этот артефакт есть. Координаты —
+        PDF_VISIBLE_ROTATED_TL_V1 в [0;1]. Сами изображения страниц (тайлы) отдаёт сервис рендера AG-00.
+      x-owner: AG-08
+      x-permission: evidence.read
+      x-error-codes: [VALIDATION_ERROR, SESSION_STORE_UNAVAILABLE, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_EXPIRED, UNAUTHENTICATED, FILE_NOT_FOUND, HIDDEN_TEST_ACCESS_DENIED, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - $ref: '#/components/parameters/FileIdPath'
+        - name: page
+          in: query
+          required: true
+          description: Номер физической страницы PDF, с 1
+          schema: {type: integer, minimum: 1, maximum: 100000}
+      responses:
+        '200':
+          description: Разметка страницы (пустые списки, если артефакта layout нет)
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/PageAnnotations'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+components:
+  parameters:
+    RunIdPath:
+      name: run_id
+      in: path
+      required: true
+      description: Внутренний идентификатор импортированного запуска (UUID v7, поле id в /admin/batch-runs)
+      schema: {type: string, format: uuid}
+  schemas:
+    InspectorStatus:
+      type: string
+      x-contract-enum: InspectorStatus
+      enum: [PENDING, CONFIRMED_VIOLATION, NEGATIVE_VERIFIED, CLARIFICATION_REQUIRED]
+    LoadScenario:
+      type: string
+      x-contract-enum: LoadScenario
+      enum: [FULL, PD_RD_ONLY, PD_ID_ONLY, RD_ID_ONLY, SINGLE_ONLY, PARTIALLY_LOADED]
+    ProtocolStatus:
+      type: string
+      x-contract-enum: ProtocolStatus
+      enum: [IN_VERIFICATION, VERIFICATION_COMPLETED, PROTOCOL_FINALIZED, SUPERSEDED]
+    StageUploadStatusOrNull:
+      type: string
+      nullable: true
+      x-contract-enum: StageUploadStatus
+      enum: [PD_UPLOADED, PD_PARTIAL, PD_MISSING, RD_UPLOADED, RD_PARTIAL, RD_MISSING, ID_UPLOADED, ID_PARTIAL, ID_MISSING, null]
+    ProtocolFileFormat:
+      type: string
+      description: Подмножество ExportFormat, которое выгружает inspector-batch export
+      enum: [json, docx, pdf]
+    IndicatorReason:
+      type: string
+      x-contract-enum-proposed: IndicatorReason
+      description: |
+        Основание цвета индикации (08 §3.5): CONFIRMED_VIOLATIONS (RED); CANDIDATES_PENDING,
+        CLARIFICATION_REQUIRED, MISSING_EVIDENCE, NOT_COMPARABLE, PARTIAL_UPLOAD, REGISTRY_MISSING (YELLOW);
+        NO_VIOLATIONS_COMPLETE (GREEN); NO_PROTOCOL, HIDDEN_TEST_INVENTORY_ONLY (NONE).
+      enum:
+        - CONFIRMED_VIOLATIONS
+        - CANDIDATES_PENDING
+        - CLARIFICATION_REQUIRED
+        - MISSING_EVIDENCE
+        - NOT_COMPARABLE
+        - PARTIAL_UPLOAD
+        - REGISTRY_MISSING
+        - NO_VIOLATIONS_COMPLETE
+        - NO_PROTOCOL
+        - HIDDEN_TEST_INVENTORY_ONLY
+    # ── Dashboard ──
+    IndicatorReasonItem:
+      type: object
+      additionalProperties: false
+      required: [code, count, text]
+      properties:
+        code: {$ref: '#/components/schemas/IndicatorReason'}
+        count: {type: integer, minimum: 0}
+        text: {type: string, description: 'Текст для подсказки, напр. «Ожидают решения: 3 кандидата»'}
+    Indicator:
+      type: object
+      additionalProperties: false
+      required: [color, reasons]
+      properties:
+        color: {$ref: '#/components/schemas/IndicatorColor'}
+        reasons:
+          type: array
+          items: {$ref: '#/components/schemas/IndicatorReasonItem'}
+    FindingCounters:
+      type: object
+      additionalProperties: false
+      description: Счётчики по группам находок протокола (разделы 4–5 и 6, приложение А.1); подозрения ИИ в цвет не входят
+      required: [confirmed, pending, pending_high, clarification, rejected, missing_evidence, not_comparable, suspicions, suspicions_pending]
+      properties:
+        confirmed: {type: integer, minimum: 0}
+        pending: {type: integer, minimum: 0}
+        pending_high: {type: integer, minimum: 0, description: 'Из них с критичностью «Критическое»'}
+        clarification: {type: integer, minimum: 0}
+        rejected: {type: integer, minimum: 0}
+        missing_evidence: {type: integer, minimum: 0}
+        not_comparable: {type: integer, minimum: 0}
+        suspicions: {type: integer, minimum: 0}
+        suspicions_pending: {type: integer, minimum: 0}
+    UploadStatusTriple:
+      type: object
+      additionalProperties: false
+      required: [pd, rd, id]
+      properties:
+        pd: {$ref: '#/components/schemas/StageUploadStatusOrNull'}
+        rd: {$ref: '#/components/schemas/StageUploadStatusOrNull'}
+        id: {$ref: '#/components/schemas/StageUploadStatusOrNull'}
+    DashboardObject:
+      type: object
+      additionalProperties: false
+      required: [object_id, name, split, indicator, latest_protocol, counters, sections, upload_status, files_total, updated_at]
+      properties:
+        object_id: {type: string, minLength: 1, maxLength: 64}
+        name: {type: string, nullable: true}
+        split: {$ref: '#/components/schemas/ManifestSplitOrNull'}
+        indicator: {$ref: '#/components/schemas/Indicator'}
+        latest_protocol:
+          description: Последняя версия протокола; null — протокола нет
+          oneOf:
+            - {$ref: '#/components/schemas/ProtocolVersion'}
+            - {type: object, nullable: true, enum: [null]}
+        counters: {$ref: '#/components/schemas/FindingCounters'}
+        sections:
+          type: array
+          description: Разделы матрицы, в которых есть находки (section_ru)
+          items: {type: string}
+        upload_status: {$ref: '#/components/schemas/UploadStatusTriple'}
+        files_total: {type: integer, minimum: 0}
+        updated_at: {$ref: '#/components/schemas/Timestamp'}
+    DashboardTiles:
+      type: object
+      additionalProperties: false
+      required: [total, RED, YELLOW, GREEN, NONE, awaiting_decision]
+      properties:
+        total: {type: integer, minimum: 0}
+        RED: {type: integer, minimum: 0}
+        YELLOW: {type: integer, minimum: 0}
+        GREEN: {type: integer, minimum: 0}
+        NONE: {type: integer, minimum: 0}
+        awaiting_decision: {type: integer, minimum: 0, description: 'Групп находок, ожидающих решения инспектора'}
+    SectionSummary:
+      type: object
+      additionalProperties: false
+      required: [section_ru, confirmed, pending, clarification, rejected, suspicions]
+      properties:
+        section_ru: {type: string}
+        confirmed: {type: integer, minimum: 0}
+        pending: {type: integer, minimum: 0}
+        clarification: {type: integer, minimum: 0}
+        rejected: {type: integer, minimum: 0}
+        suspicions: {type: integer, minimum: 0}
+    Dashboard:
+      type: object
+      additionalProperties: false
+      required: [generated_at, tiles, items, sections]
+      properties:
+        generated_at: {$ref: '#/components/schemas/Timestamp'}
+        tiles: {$ref: '#/components/schemas/DashboardTiles'}
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/DashboardObject'}
+        sections:
+          type: array
+          description: Находки по разделам × решение инспектора (по отфильтрованным объектам)
+          items: {$ref: '#/components/schemas/SectionSummary'}
+    # ── Protocols ──
+    ProtocolCounts:
+      type: object
+      additionalProperties: false
+      required: [critical, substantial, suspicions, not_checked_no_id, cards]
+      properties:
+        critical: {type: integer, minimum: 0}
+        substantial: {type: integer, minimum: 0}
+        suspicions: {type: integer, minimum: 0}
+        not_checked_no_id: {type: integer, minimum: 0}
+        cards: {type: integer, minimum: 0}
+    ProtocolVersion:
+      type: object
+      additionalProperties: false
+      required:
+        - run_id
+        - batch_run_id
+        - object_id
+        - protocol_no
+        - version
+        - web_version
+        - is_latest
+        - generated_at
+        - status
+        - is_final
+        - scenario
+        - status_line
+        - counts
+        - formats
+        - pipeline_version
+        - matrix_version
+        - input_manifest_hash
+        - content_sha256
+      properties:
+        run_id: {type: string, format: uuid, description: 'id импортированного запуска'}
+        batch_run_id: {type: string}
+        object_id: {type: string}
+        protocol_no: {type: string}
+        version: {type: integer, minimum: 1, description: 'Версия из протокола (поле version)'}
+        web_version: {type: integer, minimum: 1, description: 'Порядковый номер в истории объекта (1 — самый ранний)'}
+        is_latest: {type: boolean}
+        generated_at: {$ref: '#/components/schemas/Timestamp'}
+        status: {$ref: '#/components/schemas/ProtocolStatus'}
+        is_final: {type: boolean}
+        scenario: {$ref: '#/components/schemas/LoadScenario'}
+        status_line: {type: string}
+        counts: {$ref: '#/components/schemas/ProtocolCounts'}
+        formats:
+          type: array
+          description: Доступные файлы выгрузки
+          items: {$ref: '#/components/schemas/ProtocolFileFormat'}
+        pipeline_version: {type: string}
+        matrix_version: {type: string, nullable: true}
+        input_manifest_hash: {$ref: '#/components/schemas/Sha256'}
+        content_sha256: {type: string, nullable: true, pattern: '^[0-9a-f]{64}$'}
+    ProtocolVersionList:
+      type: object
+      additionalProperties: false
+      required: [object_id, items]
+      properties:
+        object_id: {type: string}
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/ProtocolVersion'}
+    ContractProtocol:
+      type: object
+      description: Канонический протокол — packages/contracts/schemas/protocol.schema.json (проверяется API перед выдачей)
+      x-contract-schema: protocol
+      required: [schema_version, protocol_no, object, version, is_final, status, generated_at, scenario, versions, input_manifest_hash, header, appendix2, tz92_tables, evidence_cards, input_registry]
+      additionalProperties: true
+    ContractFindingGroup:
+      type: object
+      description: Группа находок — packages/contracts/schemas/finding_group.schema.json (проверяется API перед выдачей)
+      x-contract-schema: finding_group
+      required: [finding_group_id, object_id, matrix_scope, parameter_code, comparison_result, location_type, locations, violation_label, protocol_status, criticality, anchor_evidence, finding_ids]
+      additionalProperties: true
+    ProtocolView:
+      type: object
+      additionalProperties: false
+      required: [version, protocol, finding_groups, warnings]
+      properties:
+        version: {$ref: '#/components/schemas/ProtocolVersion'}
+        protocol: {$ref: '#/components/schemas/ContractProtocol'}
+        finding_groups:
+          type: array
+          items: {$ref: '#/components/schemas/ContractFindingGroup'}
+        warnings:
+          type: array
+          items: {$ref: '#/components/schemas/ProblemItem'}
+    # ── Page annotations (layout artifacts, AG-02B) ──
+    BBoxNorm:
+      type: array
+      minItems: 4
+      maxItems: 4
+      items: {type: number, minimum: 0, maximum: 1}
+    PageRevisionCloud:
+      type: object
+      additionalProperties: false
+      required: [bbox, source, layer, revision_label, rooms_covered]
+      properties:
+        bbox: {$ref: '#/components/schemas/BBoxNorm'}
+        source: {type: string, description: 'RevisionCloudSource (layout_artifacts.schema.json)'}
+        layer: {type: string, nullable: true, description: 'Слой САПР, напр. «ОВ-Отопление-Изм. №3»'}
+        revision_label: {type: string, nullable: true}
+        rooms_covered:
+          type: array
+          items: {type: string}
+    PageRoom:
+      type: object
+      additionalProperties: false
+      required: [room_token, bbox, name]
+      properties:
+        room_token: {type: string}
+        bbox: {$ref: '#/components/schemas/BBoxNorm'}
+        name: {type: string, nullable: true}
+    PageAnnotations:
+      type: object
+      additionalProperties: false
+      required: [file_id, page, run_id, batch_run_id, revision_clouds, rooms]
+      properties:
+        file_id: {type: string}
+        page: {type: integer, minimum: 1}
+        run_id: {type: string, nullable: true, format: uuid, description: 'Запуск, из которого взят артефакт layout'}
+        batch_run_id: {type: string, nullable: true}
+        revision_clouds:
+          type: array
+          items: {$ref: '#/components/schemas/PageRevisionCloud'}
+        rooms:
+          type: array
+          items: {$ref: '#/components/schemas/PageRoom'}

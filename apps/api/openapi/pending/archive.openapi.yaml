@@ -1,0 +1,125 @@
+# «Инспектор ИИ» — «Архивировать» (M2 backlog п. 6), owner AG-08, PENDING ADOPTION by AG-00.
+#
+# Скрывает фикстурные и устаревшие объекты, импортированные прогоны и проверки загрузки из списков и с дашборда
+# по умолчанию; данные остаются в БД, элемент можно вернуть (`archived: false`). Доступ: batch.import (ADMIN,
+# ML_ENGINEER). Аудит: HTTP_POST (отдельного кода действия в enums.yaml пока нет).
+openapi: 3.0.3
+info:
+  title: «Инспектор ИИ» — архивирование
+  version: 0.1.0-archive
+tags:
+  - name: archive
+    description: Архивирование объектов, прогонов и проверок
+paths:
+  /admin/objects/{object_id}/archive:
+    post:
+      operationId: archiveObject
+      tags: [archive]
+      summary: Архивировать объект (или вернуть из архива)
+      description: |
+        Тело необязательно: `{"archived": false}` возвращает элемент из архива. Архивные элементы скрыты из
+        списков и с дашборда по умолчанию (параметр `include_archived=true` показывает их); данные не удаляются.
+      x-owner: AG-08
+      x-permission: batch.import
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: object_id, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 512}}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ArchiveRequest'}
+      responses:
+        '200':
+          description: Новое состояние архива
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ArchiveResult'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /admin/batch-runs/{batch_run_id}/archive:
+    post:
+      operationId: archiveBatchRun
+      tags: [archive]
+      summary: Архивировать импортированный прогон (или вернуть из архива)
+      description: |
+        Тело необязательно: `{"archived": false}` возвращает элемент из архива. Архивные элементы скрыты из
+        списков и с дашборда по умолчанию (параметр `include_archived=true` показывает их); данные не удаляются.
+      x-owner: AG-08
+      x-permission: batch.import
+      x-error-codes: [VALIDATION_ERROR, NOT_FOUND, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: batch_run_id, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 512}}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ArchiveRequest'}
+      responses:
+        '200':
+          description: Новое состояние архива
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ArchiveResult'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+  /processes/{process_id}/archive:
+    post:
+      operationId: archiveProcess
+      tags: [archive]
+      summary: Архивировать проверку загрузки (или вернуть из архива)
+      description: |
+        Тело необязательно: `{"archived": false}` возвращает элемент из архива. Архивные элементы скрыты из
+        списков и с дашборда по умолчанию (параметр `include_archived=true` показывает их); данные не удаляются.
+      x-owner: AG-08
+      x-permission: batch.import
+      x-error-codes: [VALIDATION_ERROR, PROCESS_NOT_FOUND, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, DB_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: process_id, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 512}}
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/ArchiveRequest'}
+      responses:
+        '200':
+          description: Новое состояние архива
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ArchiveResult'}
+        '400': {$ref: '#/components/responses/BadRequest'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '500': {$ref: '#/components/responses/InternalError'}
+        '503': {$ref: '#/components/responses/Unavailable'}
+components:
+  schemas:
+    ArchiveRequest:
+      type: object
+      additionalProperties: false
+      properties:
+        archived: {type: boolean, description: 'true (по умолчанию) — в архив, false — вернуть'}
+    ArchiveResult:
+      type: object
+      additionalProperties: false
+      required: [kind, id, archived, archived_at]
+      properties:
+        kind: {type: string, enum: [OBJECT, BATCH_RUN, PROCESS]}
+        id: {type: string}
+        archived: {type: boolean}
+        archived_at: {type: string, nullable: true}

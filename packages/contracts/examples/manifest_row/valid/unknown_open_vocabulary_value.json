@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1.0",
+  "file_id": "F0001",
+  "object_id": "OBJ-NOVOSLOBODSKAYA",
+  "corpus": "Новослободская",
+  "dataset_role": "UNLABELED_POOL",
+  "split": "TRAIN_PUBLIC",
+  "relative_path": "Новослободская/Новослободская/Исполнительная документация/АОСР №1БТ от 17.04.2026.pdf",
+  "extension": ".pdf",
+  "size_bytes": 6237196,
+  "sha256": "ab8be6dc7a185f6d58231a1763537ac9fb6974aa9e3c6726a54862ce4741a577",
+  "stage": "ID",
+  "section": "NEW_SECTION_FROM_ORGANIZERS",
+  "pdf_pages": 18,
+  "annotation_status": "UNLABELED",
+  "exclusion_reason": null,
+  "duplicate_group": null,
+  "distribution_status": "INCLUDE",
+  "label_visibility": "PUBLIC_TRAIN"
+}

@@ -1,0 +1,55 @@
+{
+  "finding_group_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-G-IOS4-079-CFG-01",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "run_id": "m1-tyumen-e2e",
+  "matrix_scope": "MATRIX",
+  "parameter_code": "IOS4-079",
+  "parameter_id": 79,
+  "parameter_mapping_status": "PROVISIONAL_DOMAIN_MAPPING",
+  "alt_parameter_codes": [
+    "IOS4-078"
+  ],
+  "hedge_kind": "SAME_SYSTEM",
+  "title": "Несоответствие конфигурации приточных установок в венткамере 012",
+  "element_noun": "Приточная установка",
+  "axis": "PD_RD",
+  "comparison_result": "CONFIGURATION_MISMATCH",
+  "discrepancy_type": "CONFIGURATION_CHANGED",
+  "location_type": "ROOM",
+  "locations": [],
+  "pd_value": "Конфигурация приточных установок по листу 26 ПД",
+  "rd_value": "Иная конфигурация на плане ОВ1, помещение 012",
+  "id_value": null,
+  "violation_label": "VIOLATION_PRESENT",
+  "protocol_status": "CRITICAL",
+  "criticality": "Критическое (приостановка работ)",
+  "criticality_level": "CRITICAL_SUSPEND",
+  "finding_status": "CANDIDATE",
+  "confidence": 0.82,
+  "anchor_evidence": [
+    {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 104,
+      "is_anchor": true,
+      "document_sheet_number": 26
+    },
+    {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 17,
+      "is_anchor": true,
+      "document_sheet_number": 3
+    }
+  ],
+  "finding_ids": [
+    "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-079-PDRD-012"
+  ],
+  "rationale": "В ПД (лист 26) приточные установки размещены в венткамере 012; на плане ОВ1 РД конфигурация иная.",
+  "recommendation": {
+    "text": "Представить обоснование изменения конфигурации приточных установок либо откорректировать РД в соответствии с ПД.",
+    "template_id": "IOS4-079",
+    "text_origin": "AG03_DRAFT"
+  },
+  "card_no": "Б.1"
+}

@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/seed/change_matrix_map.schema.json",
+  "title": "change_matrix_map: element family × discrepancy type → parameter code (97 §2.10)",
+  "description": "Built from seed/src/change_matrix_map.yaml. A route maps each of its discrepancy types to one comparison_result (enums.yaml mappings.discrepancy_to_comparison_result). FREE routes name the topic only (FREE-<TOPIC>); the export numbers them per finding group. Owner: AG-03.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["seed", "schema_version", "matrix_version", "policy", "free_search", "counts", "sources", "element_families"],
+  "properties": {
+    "seed": {"const": "change_matrix_map"},
+    "schema_version": {"const": 1},
+    "matrix_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+    "policy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_free_groups_per_object", "hedge_min_runner_up_p", "hedge_budget_share_of_critical"],
+      "properties": {
+        "max_free_groups_per_object": {"type": "integer", "minimum": 0},
+        "hedge_min_runner_up_p": {"type": "number", "minimum": 0, "maximum": 1},
+        "hedge_budget_share_of_critical": {"type": "number", "minimum": 0, "maximum": 1}
+      }
+    },
+    "free_search": {"type": "object"},
+    "counts": {"type": "object"},
+    "sources": {"$ref": "params.schema.json#/$defs/Sources"},
+    "element_families": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/Family"}}
+  },
+  "$defs": {
+    "RouteCode": {
+      "oneOf": [
+        {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"},
+        {"type": "string", "pattern": "^FREE-(HEATING|VENTILATION|WATER|SEWER|ELECTRICAL|LIGHTING|FIRE|EVACUATION|ACCESSIBILITY|ARCHITECTURE|STRUCTURE|SITE|ROOF|FACADE|LIFT|ENERGY|OTHER)$"},
+        {"type": "null"}
+      ]
+    },
+    "Family": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["family", "label_ru", "section", "disciplines", "topic", "tag_patterns", "anchors", "routes"],
+      "properties": {
+        "family": {"type": "string", "pattern": "^[A-Z][A-Z0-9_]*$"},
+        "label_ru": {"type": "string", "minLength": 3},
+        "section": {"type": "string"},
+        "disciplines": {"type": "array", "items": {"type": "string"}},
+        "topic": {"$ref": "../schemas/enums.schema.json#/$defs/FreeTopic"},
+        "tag_patterns": {"type": "array", "items": {"type": "string"}},
+        "anchors": {"type": "array", "items": {"type": "string"}},
+        "routes": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/Route"}}
+      }
+    },
+    "Route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["discrepancy_types", "comparison_result", "parameter_code", "parameter_mapping_status", "emit", "sub_check", "hedge_codes", "basis", "reason", "value_templates"],
+      "properties": {
+        "discrepancy_types": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "../schemas/enums.schema.json#/$defs/DiscrepancyType"}},
+        "comparison_result": {"$ref": "../schemas/enums.schema.json#/$defs/ComparisonResult"},
+        "parameter_code": {"$ref": "#/$defs/RouteCode"},
+        "parameter_mapping_status": {"anyOf": [{"type": "null"}, {"$ref": "../schemas/enums.schema.json#/$defs/ParameterMappingStatus"}]},
+        "emit": {"type": "boolean"},
+        "sub_check": {"anyOf": [{"type": "null"}, {"$ref": "comparison_rule.schema.json#/$defs/SubId"}]},
+        "hedge_codes": {"type": "array", "uniqueItems": true, "items": {"$ref": "../schemas/common.schema.json#/$defs/CanonicalParameterCode"}},
+        "basis": {"type": "string", "pattern": "^(GOLD:G-TR-[0-9]{3}|MATRIX|ANALOGY|USER:Q[0-9][a-z]?|CONTEXT)$"},
+        "reason": {"type": ["string", "null"]},
+        "value_templates": {
+          "anyOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["pd", "rd", "id"],
+              "properties": {
+                "pd": {"type": ["string", "null"]},
+                "rd": {"type": ["string", "null"]},
+                "id": {"type": ["string", "null"]}
+              }
+            }
+          ]
+        }
+      },
+      "allOf": [
+        {"if": {"properties": {"emit": {"const": true}}}, "then": {"properties": {"parameter_code": {"type": "string"}, "value_templates": {"type": "object"}, "parameter_mapping_status": {"type": "string"}}}},
+        {"if": {"properties": {"emit": {"const": false}}}, "then": {"properties": {"reason": {"type": "string", "minLength": 1}}}},
+        {"if": {"properties": {"parameter_code": {"type": "string", "pattern": "^FREE-"}}, "required": ["parameter_code"]}, "then": {"properties": {"parameter_mapping_status": {"const": "MATRIX_GAP_CONFIRMED"}}}}
+      ]
+    }
+  }
+}

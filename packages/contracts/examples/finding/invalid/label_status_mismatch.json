@@ -1,0 +1,60 @@
+{
+  "finding_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED-IOS4-079-PDRD-012",
+  "finding_group_id": "G-TR-001",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "matrix_scope": "MATRIX",
+  "parameter_code": "IOS4-079",
+  "parameter_id": 79,
+  "parameter_mapping_status": "PROVISIONAL_DOMAIN_MAPPING",
+  "alt_parameter_codes": [
+    "IOS4-078"
+  ],
+  "location": "012",
+  "location_type": "ROOM",
+  "pd_value": "Конфигурация приточных установок по листу 26 ПД",
+  "rd_value": "Иная конфигурация на плане ОВ1, помещение 012",
+  "id_value": null,
+  "axis": "PD_RD",
+  "comparison_result": "CONFIGURATION_MISMATCH",
+  "discrepancy_type": "CONFIGURATION_CHANGED",
+  "completeness_status": "COMPLETE",
+  "finding_status": "CANDIDATE",
+  "violation_label": "VIOLATION_PRESENT",
+  "protocol_status": "OK",
+  "criticality": "Критическое (приостановка работ)",
+  "criticality_level": "CRITICAL_SUSPEND",
+  "review_priority": "HIGH",
+  "document_status": "PD_RD_AVAILABLE_ID_NOT_REQUIRED_FOR_PAIRWISE_CHECK",
+  "confidence": 0.82,
+  "evidence": [
+    {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 104,
+      "document_sheet_number": 26,
+      "is_anchor": true,
+      "role": "EXPECTED",
+      "page_basis": "PDF_NATIVE"
+    },
+    {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 17,
+      "document_sheet_number": 3,
+      "is_anchor": true,
+      "role": "ACTUAL",
+      "geometry": {
+        "boxes": [
+          [
+            0.41,
+            0.22,
+            0.58,
+            0.37
+          ]
+        ]
+      },
+      "geometry_space": "PDF_VISIBLE_ROTATED_TL_V1"
+    }
+  ],
+  "rationale": "Состав приточных установок в венткамере 012 по РД отличается от ПД."
+}

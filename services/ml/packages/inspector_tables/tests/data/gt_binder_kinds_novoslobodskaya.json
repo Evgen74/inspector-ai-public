@@ -1,0 +1,281 @@
+{
+ "object_id": "OBJ-NOVOSLOBODSKAYA",
+ "method": "Random sample (seed 20260928) of 48 ИД pages that the typer read (text layer or PageTokens) in run m1-ag02c-tables-novo; each labelled visually by AG-02C from a 55-dpi render of the top 45 % of the page, without looking at the prediction. Kinds are AG-03 seed doc_kind codes (CONTRACT for contract/ОССиГ pages); null = not identifiable from the render (excluded).",
+ "created": "2026-09-28",
+ "pages": [
+  {
+   "file_id": "F0083",
+   "page": 5,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0026",
+   "page": 6,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0006",
+   "page": 25,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0012",
+   "page": 5,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0007",
+   "page": 6,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0065",
+   "page": 6,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0044",
+   "page": 1,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0099",
+   "page": 7,
+   "kind": null
+  },
+  {
+   "file_id": "F0008",
+   "page": 97,
+   "kind": "LAB_OR_MEASUREMENT"
+  },
+  {
+   "file_id": "F0039",
+   "page": 1,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0080",
+   "page": 6,
+   "kind": "CONTRACT"
+  },
+  {
+   "file_id": "F0070",
+   "page": 3,
+   "kind": "ISP_GEO_SCHEME"
+  },
+  {
+   "file_id": "F0006",
+   "page": 19,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0022",
+   "page": 5,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0056",
+   "page": 3,
+   "kind": "ISP_GEO_SCHEME"
+  },
+  {
+   "file_id": "F0089",
+   "page": 2,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0080",
+   "page": 25,
+   "kind": "CONTRACT"
+  },
+  {
+   "file_id": "F0007",
+   "page": 11,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0006",
+   "page": 78,
+   "kind": null
+  },
+  {
+   "file_id": "F0008",
+   "page": 81,
+   "kind": "LAB_OR_MEASUREMENT"
+  },
+  {
+   "file_id": "F0024",
+   "page": 5,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0085",
+   "page": 1,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0006",
+   "page": 11,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0017",
+   "page": 5,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0071",
+   "page": 23,
+   "kind": "CONTRACT"
+  },
+  {
+   "file_id": "F0099",
+   "page": 16,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0092",
+   "page": 3,
+   "kind": "ISP_GEO_SCHEME"
+  },
+  {
+   "file_id": "F0028",
+   "page": 6,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0008",
+   "page": 51,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0099",
+   "page": 8,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0011",
+   "page": 1,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0008",
+   "page": 63,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0013",
+   "page": 6,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0007",
+   "page": 17,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0018",
+   "page": 2,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0008",
+   "page": 39,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0045",
+   "page": 1,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0020",
+   "page": 5,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0061",
+   "page": 3,
+   "kind": "ISP_GEO_SCHEME"
+  },
+  {
+   "file_id": "F0001",
+   "page": 2,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0004",
+   "page": 2,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0043",
+   "page": 1,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0079",
+   "page": 3,
+   "kind": "ISP_GEO_SCHEME"
+  },
+  {
+   "file_id": "F0093",
+   "page": 2,
+   "kind": "AOSR"
+  },
+  {
+   "file_id": "F0006",
+   "page": 57,
+   "kind": "QUALITY_DOCS"
+  },
+  {
+   "file_id": "F0016",
+   "page": 5,
+   "kind": "ID_REGISTRY"
+  },
+  {
+   "file_id": "F0087",
+   "page": 3,
+   "kind": "ISP_GEO_SCHEME"
+  },
+  {
+   "file_id": "F0018",
+   "page": 5,
+   "kind": "QUALITY_DOCS"
+  }
+ ],
+ "corrections": [
+  {
+   "index": 1,
+   "file_id": "F0026",
+   "page": 6,
+   "first_label": "AOSR",
+   "label": "ID_REGISTRY",
+   "evidence": "full-page review with the previous page: an e-signature-only p6 continues the signature block of the «Реестр приложений» on p5"
+  },
+  {
+   "index": 5,
+   "file_id": "F0065",
+   "page": 6,
+   "first_label": "AOSR",
+   "label": "ID_REGISTRY",
+   "evidence": "full-page review with the previous page: an e-signature-only p6 continues the signature block of the «Реестр приложений» on p5"
+  },
+  {
+   "index": 27,
+   "file_id": "F0028",
+   "page": 6,
+   "first_label": "AOSR",
+   "label": "ID_REGISTRY",
+   "evidence": "full-page review with the previous page: an e-signature-only p6 continues the signature block of the «Реестр приложений» on p5"
+  },
+  {
+   "index": 32,
+   "file_id": "F0013",
+   "page": 6,
+   "first_label": "AOSR",
+   "label": "ID_REGISTRY",
+   "evidence": "full-page review with the previous page: an e-signature-only p6 continues the signature block of the «Реестр приложений» on p5"
+  }
+ ]
+}

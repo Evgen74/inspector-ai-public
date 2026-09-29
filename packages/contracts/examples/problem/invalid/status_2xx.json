@@ -1,0 +1,11 @@
+{
+  "type": "/problems/not-found",
+  "title": "Не найдено",
+  "status": 200,
+  "detail": "x",
+  "instance": "/x#1",
+  "code": "NOT_FOUND",
+  "request_id": "1",
+  "timestamp": "2026-10-02T09:03:11Z",
+  "retryable": false
+}

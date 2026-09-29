@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/catalog_row.schema.json",
+  "title": "CatalogRow",
+  "description": "One row of the organizers' parameter_catalog_132.jsonl (Приложение 1). `parameter_code` is the canonical code (97 §2.9). Owner: AG-03 (loader in inspector_common/params.py).",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "parameter_id",
+    "parameter_code",
+    "pd_section",
+    "parameter_name",
+    "unit",
+    "source_pd",
+    "source_rd",
+    "source_id",
+    "trigger",
+    "criticality",
+    "matrix_row",
+    "mapping_status"
+  ],
+  "properties": {
+    "parameter_id": {"$ref": "common.schema.json#/$defs/ParamId"},
+    "parameter_code": {"$ref": "common.schema.json#/$defs/CanonicalParameterCode"},
+    "pd_section": {"type": "string", "minLength": 1},
+    "parameter_name": {"type": "string", "minLength": 1},
+    "unit": {"type": ["string", "null"]},
+    "source_pd": {"type": ["string", "null"]},
+    "source_rd": {"type": ["string", "null"]},
+    "source_id": {"type": ["string", "null"]},
+    "trigger": {"type": ["string", "null"]},
+    "criticality": {"enum": ["Критическое (приостановка работ)", "Существенное (предписание)"]},
+    "matrix_row": {"type": "integer", "minimum": 1},
+    "mapping_status": {"$ref": "enums.schema.json#/$defs/ParameterMappingStatus"}
+  }
+}

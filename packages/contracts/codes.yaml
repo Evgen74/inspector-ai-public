@@ -1,0 +1,53 @@
+# «Инспектор ИИ» — parameter code contract (97 §2.9, 93 §3.6–3.7).
+#
+# Maintainer: AG-00. Semantics owner: AG-03 (catalog codes, params loader).
+#
+# - The canonical external code is the catalog `parameter_code` (PZ-001 … SM-132).
+# - Aliases share the integer `param_id`: M-xxx (matrix 1.1), ТЗ/Приложение 2 short forms (KR-55, КР-55, AR-41, СПЗУ-30).
+# - The prefix must agree with the id range (M is exempt). On disagreement resolve by parameter name and warn:
+#   Приложение 2 «Ширина эвакуационных коридоров (AR-14)» is id 40 (AR-040), not PZ-014.
+# - FREE-<TOPIC>-<NNN>: TOPIC ∈ enums.FreeTopic, NNN numbered per finding group within object and topic.
+
+schema_version: 1
+
+canonical_pattern: '^(PZ|SPZU|AR|KR|IOS[1-5]|POS|POD|OOS|PPM|ODI|ZU|SM)-(\d{3})$'
+alias_pattern: '^(M|PZ|SPZU|AR|KR|IOS[1-5]|POS|POD|OOS|PPM|ODI|ZU|SM|ПЗ|СПЗУ|АР|КР|ИОС[1-5]|ПОС|ПОД|ООС|ППМ|ОДИ|ЗУ|СМ)-0*(\d{1,3})$'
+free_pattern: '^FREE-([A-Z]+)-(\d{3})$'
+param_id_range: [1, 132]
+
+# Latin prefix, Cyrillic prefix, inclusive id range, catalog pd_section.
+prefixes:
+  - {latin: PZ,   cyrillic: ПЗ,   first: 1,   last: 23,  section: "Раздел 1. ПЗ"}
+  - {latin: SPZU, cyrillic: СПЗУ, first: 24,  last: 39,  section: "Раздел 2. СПЗУ"}
+  - {latin: AR,   cyrillic: АР,   first: 40,  last: 53,  section: "Раздел 3. АР"}
+  - {latin: KR,   cyrillic: КР,   first: 54,  last: 67,  section: "Раздел 4. КР"}
+  - {latin: IOS1, cyrillic: ИОС1, first: 68,  last: 70,  section: "Раздел 5. ИОС1"}
+  - {latin: IOS2, cyrillic: ИОС2, first: 71,  last: 73,  section: "Раздел 5. ИОС2"}
+  - {latin: IOS3, cyrillic: ИОС3, first: 74,  last: 75,  section: "Раздел 5. ИОС3"}
+  - {latin: IOS4, cyrillic: ИОС4, first: 76,  last: 79,  section: "Раздел 5. ИОС4"}
+  - {latin: IOS5, cyrillic: ИОС5, first: 80,  last: 80,  section: "Раздел 5. ИОС5"}
+  - {latin: POS,  cyrillic: ПОС,  first: 81,  last: 89,  section: "Раздел 6. ПОС"}
+  - {latin: POD,  cyrillic: ПОД,  first: 90,  last: 97,  section: "Раздел 7. ПОД"}
+  - {latin: OOS,  cyrillic: ООС,  first: 98,  last: 101, section: "Раздел 8. ООС"}
+  - {latin: PPM,  cyrillic: ППМ,  first: 102, last: 114, section: "Раздел 9. ППМ"}
+  - {latin: ODI,  cyrillic: ОДИ,  first: 115, last: 123, section: "Раздел 10. ОДИ"}
+  - {latin: ZU,   cyrillic: ЗУ,   first: 124, last: 131, section: "Раздел 11. ЗУ"}
+  - {latin: SM,   cyrillic: СМ,   first: 132, last: 132, section: "Раздел 12. СМ"}
+
+# Matrix near-duplicates used for the top-2 code hedge (97 §2.10). Kept equal to the seed's hedge_groups
+# (packages/contracts/seed/params.json, AG-03; kind = enums.HedgeKind); a test pins the equality.
+hedge_pairs:
+  - [IOS4-078, IOS4-079]          # SAME_SYSTEM: ventilation changes split between 078 and 079 (organizer gold)
+  - [AR-040, PPM-104, ODI-116]    # DUPLICATE: width of corridors / passages
+  - [AR-041, PPM-105]             # DUPLICATE: width of evacuation doors
+  - [AR-043, PPM-106]             # DUPLICATE: opening direction of evacuation doors
+  - [AR-050, PPM-107]             # DUPLICATE: КМ class of finishes on evacuation routes
+  - [IOS5-080, PPM-108]           # DUPLICATE: fire alarm detectors
+  - [IOS1-069, PPM-109]           # PARTIAL_DUPLICATE: FRLS replaced by LS
+  - [PZ-021, ZU-124]              # DUPLICATE: energy efficiency class
+  - [SPZU-038, ODI-121]           # PARTIAL_DUPLICATE: places for МГН / disabled people
+  - [AR-044, ZU-128]              # PARTIAL_DUPLICATE: insulation in the roof build-up
+
+# Known wrong codes in organizer material, resolved by parameter name.
+known_alias_fixes:
+  - {alias: AR-14, resolves_to: AR-040, reason: "Приложение 2: «Ширина эвакуационных коридоров (AR-14)» is parameter 40; id 14 is PZ-014"}

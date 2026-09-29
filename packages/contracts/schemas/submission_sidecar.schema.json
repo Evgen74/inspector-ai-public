@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/submission_sidecar.schema.json",
+  "title": "Submission sidecar",
+  "description": "submission/<object_id>.sidecar.json (93 §3.9, 97 §2.5): never part of the answer. It is a RunManifest scoped to exactly one object — input_manifest_hash, config_hash (+ stage_config_hashes), versions, per-file status and page_basis, the missing-on-disk list, timings and, for the frozen hidden run, freeze_tag (the inspector-score hidden guard reads it). `files` lists only that object's files. Owner: AG-04 (writer), AG-00 (contract).",
+  "allOf": [
+    {
+      "$ref": "run_manifest.schema.json"
+    },
+    {
+      "type": "object",
+      "required": [
+        "finished_at",
+        "command"
+      ],
+      "properties": {
+        "objects": {
+          "minItems": 1,
+          "maxItems": 1
+        },
+        "finished_at": {
+          "$ref": "common.schema.json#/$defs/Timestamp"
+        }
+      }
+    }
+  ]
+}

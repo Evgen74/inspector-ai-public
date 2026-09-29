@@ -1,0 +1,41 @@
+{
+  "check_id": "TRAIN-0001",
+  "finding_group_id": "G-TR-001",
+  "object_id": "OBJ-TYUMENSKAYA-5-GOLD-SEED",
+  "split": "TRAIN_PUBLIC",
+  "visibility": "PUBLIC_TRAIN_LABEL",
+  "matrix_scope": "MATRIX",
+  "parameter_id": 79,
+  "parameter_code": "IOS4-079",
+  "location_type": "ROOMS",
+  "location": "012",
+  "pd_value": "Конфигурация приточных установок по листу 26 ПД",
+  "rd_value": "Иная конфигурация на плане ОВ1, помещение 012",
+  "id_value": null,
+  "comparison_result": "CONFIGURATION_MISMATCH",
+  "violation_label": "VIOLATION_PRESENT",
+  "protocol_status": "CRITICAL",
+  "criticality": "Критическое (приостановка работ)",
+  "document_status": "PD_RD_AVAILABLE_ID_NOT_REQUIRED_FOR_PAIRWISE_CHECK",
+  "inspector_status": "CONFIRMED",
+  "gold_status": "FINAL_GOLD_EXISTENCE",
+  "score_eligible": true,
+  "evidence": [
+    {
+      "stage": "PD",
+      "file_id": "F0171",
+      "pdf_page_number": 104,
+      "document_sheet_number": 26,
+      "rendered_image": "evidence_pages/VIO-0001_PD_sheet26_pdf104.png",
+      "localization": "PAGE_LEVEL_VISUALLY_VERIFIED"
+    },
+    {
+      "stage": "RD",
+      "file_id": "F0201",
+      "pdf_page_number": 17,
+      "document_sheet_number": 3,
+      "rendered_image": "evidence_pages/VIO-0001_RD_sheet3_pdf17.png",
+      "localization": "PAGE_LEVEL_VISUALLY_VERIFIED"
+    }
+  ]
+}

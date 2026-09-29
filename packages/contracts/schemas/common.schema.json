@@ -1,0 +1,162 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/common.schema.json",
+  "title": "Common definitions",
+  "description": "Shared building blocks for every «Инспектор ИИ» contract schema. Owner: AG-00.",
+  "$defs": {
+    "Sha256": {
+      "description": "Lowercase hex SHA-256 of the plaintext bytes, no prefix (90 §3.3.6).",
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "ManifestFileId": {
+      "description": "Manifest file id: organizer F0001…F0418, or U<8 hex of the upload>-<4 digits> for a user upload (ad-hoc registry, inspector_registry.adhoc).",
+      "type": "string",
+      "pattern": "^(F[0-9]{4}|U[0-9a-f]{8}-[0-9]{4})$"
+    },
+    "FileId": {
+      "description": "Any file id: a manifest id, a product registry id, or a virtual archive-member id «F0150!path».",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "CitableFileId": {
+      "description": "A file id that may be cited as evidence: never an archive member (no «!»).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[^!]+$"
+    },
+    "ObjectId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "CanonicalParameterCode": {
+      "description": "Catalog code (97 §2.9): PZ-001 … SM-132. Aliases (M-xxx, KR-55, КР-55) are never emitted.",
+      "type": "string",
+      "pattern": "^(PZ|SPZU|AR|KR|IOS[1-5]|POS|POD|OOS|PPM|ODI|ZU|SM)-[0-9]{3}$"
+    },
+    "FreeParameterCode": {
+      "description": "Free-search code FREE-<TOPIC>-<NNN> (TOPIC ∈ FreeTopic).",
+      "type": "string",
+      "pattern": "^FREE-(HEATING|VENTILATION|WATER|SEWER|ELECTRICAL|LIGHTING|FIRE|EVACUATION|ACCESSIBILITY|ARCHITECTURE|STRUCTURE|SITE|ROOF|FACADE|LIFT|ENERGY|OTHER)-[0-9]{3}$"
+    },
+    "SubmissionParameterCode": {
+      "description": "A code allowed in a submission: canonical catalog code or FREE-<TOPIC>-<NNN>.",
+      "type": "string",
+      "pattern": "^((PZ|SPZU|AR|KR|IOS[1-5]|POS|POD|OOS|PPM|ODI|ZU|SM)-[0-9]{3}|FREE-(HEATING|VENTILATION|WATER|SEWER|ELECTRICAL|LIGHTING|FIRE|EVACUATION|ACCESSIBILITY|ARCHITECTURE|STRUCTURE|SITE|ROOF|FACADE|LIFT|ENERGY|OTHER)-[0-9]{3})$"
+    },
+    "ParamId": {
+      "description": "Catalog parameter id, the join key for every code style.",
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 132
+    },
+    "PageNumber": {
+      "description": "1-based physical page index of the original PDF (not the printed sheet number).",
+      "type": "integer",
+      "minimum": 1
+    },
+    "SheetNumber": {
+      "description": "Printed «Лист» from the title block, kept as printed.",
+      "type": ["string", "integer", "null"]
+    },
+    "Norm01": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "BBoxNorm": {
+      "description": "[x0, y0, x1, y1] in PDF_VISIBLE_ROTATED_TL_V1 space (02 §3.14): visible area CropBox ∩ MediaBox after /Rotate, origin top-left, y down, values in [0, 1].",
+      "type": "array",
+      "items": {"$ref": "#/$defs/Norm01"},
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "PointNorm": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Norm01"},
+      "minItems": 2,
+      "maxItems": 2
+    },
+    "PolygonNorm": {
+      "description": "Vertices clockwise from the top-left vertex, same space as BBoxNorm.",
+      "type": "array",
+      "items": {"$ref": "#/$defs/PointNorm"},
+      "minItems": 3
+    },
+    "Geometry": {
+      "description": "Multi-box geometry (02 §3.14).",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "boxes": {"type": "array", "items": {"$ref": "#/$defs/BBoxNorm"}},
+        "polygons": {"type": "array", "items": {"$ref": "#/$defs/PolygonNorm"}}
+      }
+    },
+    "GeometrySpace": {
+      "const": "PDF_VISIBLE_ROTATED_TL_V1"
+    },
+    "Rotation": {
+      "description": "Multiple of 90 degrees, clockwise.",
+      "enum": [0, 90, 180, 270]
+    },
+    "Confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "Timestamp": {
+      "description": "RFC 3339 date-time, UTC.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "Location": {
+      "description": "Exact printed token («012», «1.109», «-1.05»), FLOOR/BUILDING/AXES grammar (93 §2.7), or «OBJECT».",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 200
+    },
+    "StageValue": {
+      "description": "pd_value / rd_value / id_value: rendered by the value templates (93 §3.5); null when the stage is not part of the check.",
+      "type": ["string", "number", "boolean", "null"]
+    },
+    "CriticalityString": {
+      "description": "Exact catalog criticality string; the FREE-* variant carries «— требует утверждения».",
+      "enum": [
+        "Критическое (приостановка работ)",
+        "Существенное (предписание)",
+        "Существенное (предписание) — требует утверждения",
+        null
+      ]
+    },
+    "ErrorCode": {
+      "description": "A code from packages/contracts/errors.yaml.",
+      "type": "string",
+      "pattern": "^[A-Z][A-Z0-9_]*$"
+    },
+    "Versions": {
+      "description": "Versions block (90 §3.3.6), identical in run, protocol, submission sidecar and exports.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pipeline_version"],
+      "properties": {
+        "matrix_version": {"type": ["string", "null"]},
+        "dataset_version": {"type": ["string", "null"]},
+        "model_version": {"type": ["string", "null"]},
+        "pipeline_version": {"type": "string", "minLength": 1},
+        "code_version": {"type": ["string", "null"], "description": "git commit (short or full), with «+dirty» when the tree is dirty."},
+        "contract_version": {"type": ["string", "null"]},
+        "engine_versions": {
+          "type": "object",
+          "additionalProperties": {"type": "string"}
+        }
+      }
+    },
+    "Extension": {
+      "description": "Escape hatch for experimental, non-contract data. Never read by another agent's code and never exported.",
+      "type": "object"
+    }
+  }
+}

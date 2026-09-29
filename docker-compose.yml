@@ -1,0 +1,162 @@
+# «Инспектор ИИ» in Docker: `docker compose up -d`, then http://localhost:8080 (login inspector / Demo-Inspector-2026).
+# Details, volumes, GPU and organizer-data overrides: docs/runbook/DOCKER.md.
+#
+# The native run (`make dev`, docs/runbook/LINUX.md) is unchanged; this is an additional way to start the product.
+# Compose reads a `.env` file of this directory for the ${...} values below (INSPECTOR_HTTP_PORT, INSPECTOR_DB_PASSWORD,
+# INSPECTOR_UPLOAD_WORKERS, INSPECTOR_DEMO_PASSWORD, INSPECTOR_ML_API_TOKEN). It does not pass .env into the containers.
+name: inspector-ai
+
+# One application image (API + Python engine), used by api, ml-api and migrate. The build block is repeated on every
+# service that uses the image so that `docker compose up` on a fresh machine builds it whichever service is created first.
+x-app-build: &app-build
+  context: .
+  dockerfile: docker/Dockerfile
+  target: app
+
+x-app-env: &app-env
+  INSPECTOR_APP_ENV: demo # auth required, demo endpoints on, non-Secure cookie (plain http on localhost)
+  INSPECTOR_DATABASE_URL: postgresql://inspector:${INSPECTOR_DB_PASSWORD:-inspector}@postgres:5432/inspector
+  INSPECTOR_REDIS_URL: redis://redis:6379/0
+  INSPECTOR_RABBITMQ_URL: amqp://inspector:${INSPECTOR_DB_PASSWORD:-inspector}@rabbitmq:5672
+  INSPECTOR_ML_API_URL: http://ml-api:8090
+  INSPECTOR_ML_API_TOKEN: ${INSPECTOR_ML_API_TOKEN:-inspector-internal-token}
+  INSPECTOR_RUNS_ROOT: /data/runs
+  INSPECTOR_CACHE_ROOT: /data/cache
+  INSPECTOR_LOG_FORMAT: json
+
+services:
+  postgres:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: inspector
+      POSTGRES_PASSWORD: ${INSPECTOR_DB_PASSWORD:-inspector}
+      POSTGRES_DB: inspector
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U inspector -d inspector"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 10s
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  rabbitmq:
+    # optional for the product: without it the API runs upload jobs in its own process
+    image: rabbitmq:3-management
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: inspector
+      RABBITMQ_DEFAULT_PASS: ${INSPECTOR_DB_PASSWORD:-inspector}
+    volumes:
+      - rabbitdata:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 20s
+
+  migrate:
+    # one-shot: database migrations, then the demo account (both idempotent)
+    build: *app-build
+    image: inspector-ai/app:local
+    restart: "no"
+    command: ["sh", "-c", "node dist/db/migrate.js && node dist/modules/auth/seed.js"]
+    environment:
+      <<: *app-env
+      INSPECTOR_DEMO_PASSWORD: ${INSPECTOR_DEMO_PASSWORD:-Demo-Inspector-2026}
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    build: *app-build
+    image: inspector-ai/app:local
+    restart: unless-stopped
+    init: true # the API spawns the Python pipeline: reap its children
+    environment:
+      <<: *app-env
+      INSPECTOR_API_HOST: 0.0.0.0
+      INSPECTOR_API_PORT: "3000"
+      INSPECTOR_UPLOAD_WORKERS: ${INSPECTOR_UPLOAD_WORKERS:-2}
+      INSPECTOR_WORKERS: ${INSPECTOR_UPLOAD_WORKERS:-2}
+    volumes:
+      - runs:/data/runs
+      - cache:/data/cache
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  ml-api:
+    # page renders for the evidence viewer; reads the uploaded PDFs from the shared runs volume
+    build: *app-build
+    image: inspector-ai/app:local
+    restart: unless-stopped
+    init: true
+    command: ["inspector-ml-api", "serve"]
+    environment:
+      <<: *app-env
+      INSPECTOR_ML_API_HOST: 0.0.0.0
+      INSPECTOR_ML_API_PORT: "8090"
+      INSPECTOR_ML_API_ALLOW_REMOTE: "1" # the port is reachable only on the compose network
+    volumes:
+      - runs:/data/runs
+      - cache:/data/cache
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8090/health', timeout=3).read()"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 20s
+
+  web:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      target: web
+    image: inspector-ai/web:local
+    restart: unless-stopped
+    ports:
+      - "${INSPECTOR_HTTP_PORT:-8080}:80"
+    depends_on:
+      api:
+        condition: service_healthy
+      ml-api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:80/"]
+      interval: 10s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+
+volumes:
+  pgdata:
+  redisdata:
+  rabbitdata:
+  runs: # run directories and uploaded packages (INSPECTOR_RUNS_ROOT), shared by api and ml-api
+  cache: # token / registry / page-tile cache (INSPECTOR_CACHE_ROOT)

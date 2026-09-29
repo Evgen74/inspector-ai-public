@@ -1,0 +1,119 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/page_tokens.schema.json",
+  "title": "PageTokens",
+  "description": "Recognition output for one page (97 §2.13 F0–F5): the merged text-layer and OCR tokens with provenance, in displayed-page normalized space. Cached as compressed JSON keyed by file sha256 + pipeline version. Owner: AG-02A (layout zones: AG-02B).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "file_id",
+    "file_sha256",
+    "page_no",
+    "page_basis",
+    "geometry_space",
+    "page",
+    "pipeline_version",
+    "tokens"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "file_id": {"$ref": "common.schema.json#/$defs/FileId"},
+    "file_sha256": {"$ref": "common.schema.json#/$defs/Sha256"},
+    "page_no": {"$ref": "common.schema.json#/$defs/PageNumber"},
+    "page_basis": {"$ref": "enums.schema.json#/$defs/PageBasis"},
+    "geometry_space": {"$ref": "common.schema.json#/$defs/GeometrySpace"},
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width_pt", "height_pt", "rotate"],
+      "properties": {
+        "width_pt": {"type": "number", "exclusiveMinimum": 0, "description": "Displayed width (after /Rotate) of CropBox ∩ MediaBox."},
+        "height_pt": {"type": "number", "exclusiveMinimum": 0},
+        "rotate": {"$ref": "common.schema.json#/$defs/Rotation", "description": "/Rotate of the page (normalised to 0..270)."},
+        "content_rotation": {"$ref": "common.schema.json#/$defs/Rotation", "description": "Detected orientation of the content relative to the displayed page (orientation detector)."},
+        "mediabox": {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4},
+        "cropbox": {"type": "array", "items": {"type": "number"}, "minItems": 4, "maxItems": 4},
+        "native_dpi": {"type": ["integer", "null"], "minimum": 1},
+        "render_dpi": {"type": ["integer", "null"], "minimum": 1}
+      }
+    },
+    "page_class": {"$ref": "enums.schema.json#/$defs/PageClass"},
+    "text_source": {"$ref": "enums.schema.json#/$defs/TextSource", "description": "Dominant source of the page text."},
+    "is_stamp_page": {"type": "boolean"},
+    "quality_flag": {"$ref": "enums.schema.json#/$defs/QualityFlag"},
+    "mean_conf": {"oneOf": [{"$ref": "common.schema.json#/$defs/Confidence"}, {"type": "null"}]},
+    "coverage": {"oneOf": [{"$ref": "common.schema.json#/$defs/Confidence"}, {"type": "null"}], "description": "Share of detected text boxes covered by tokens."},
+    "layers": {"type": "array", "items": {"type": "string"}, "description": "OCG (CAD layer) names present on the page."},
+    "pipeline_version": {"type": "string", "minLength": 1},
+    "engine_versions": {"type": "object", "additionalProperties": {"type": "string"}},
+    "timings_ms": {"type": "object", "additionalProperties": {"type": "number", "minimum": 0}},
+    "warnings": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/ErrorCode"}},
+    "tokens": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Token"}
+    },
+    "lines": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Line"}
+    },
+    "zones": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/Zone"}
+    },
+    "ext": {"$ref": "common.schema.json#/$defs/Extension"}
+  },
+  "$defs": {
+    "Token": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "bbox", "conf", "source"],
+      "properties": {
+        "id": {"type": "integer", "minimum": 0, "description": "Index unique within the page."},
+        "text": {"type": "string", "description": "NFC text after F5 post-correction."},
+        "text_raw": {"type": ["string", "null"], "description": "Text before post-correction, when it differs."},
+        "corrected_by": {"type": ["string", "null"], "description": "Corrector that changed the token (e.g. «code_corrector», «room_grammar»)."},
+        "bbox": {"$ref": "common.schema.json#/$defs/BBoxNorm"},
+        "polygon": {"$ref": "common.schema.json#/$defs/PolygonNorm"},
+        "conf": {"$ref": "common.schema.json#/$defs/Confidence"},
+        "source": {"$ref": "enums.schema.json#/$defs/TextSource"},
+        "angle": {"$ref": "common.schema.json#/$defs/Rotation", "description": "Reading direction relative to the displayed page."},
+        "line_id": {"type": ["integer", "null"], "minimum": 0},
+        "block_id": {"type": ["integer", "null"], "minimum": 0},
+        "layer": {"type": ["string", "null"], "description": "OCG layer the token was read from."},
+        "font": {"type": ["string", "null"]},
+        "font_size_pt": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "quality_flag": {"$ref": "enums.schema.json#/$defs/QualityFlag"}
+      }
+    },
+    "Line": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "bbox", "token_ids"],
+      "properties": {
+        "id": {"type": "integer", "minimum": 0},
+        "text": {"type": "string"},
+        "bbox": {"$ref": "common.schema.json#/$defs/BBoxNorm"},
+        "polygon": {"$ref": "common.schema.json#/$defs/PolygonNorm"},
+        "token_ids": {"type": "array", "items": {"type": "integer", "minimum": 0}},
+        "conf": {"$ref": "common.schema.json#/$defs/Confidence"},
+        "source": {"$ref": "enums.schema.json#/$defs/TextSource"},
+        "angle": {"$ref": "common.schema.json#/$defs/Rotation"}
+      }
+    },
+    "Zone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "bbox"],
+      "properties": {
+        "kind": {"$ref": "enums.schema.json#/$defs/ZoneKind"},
+        "bbox": {"$ref": "common.schema.json#/$defs/BBoxNorm"},
+        "polygon": {"$ref": "common.schema.json#/$defs/PolygonNorm"},
+        "quality_flag": {"$ref": "enums.schema.json#/$defs/QualityFlag"},
+        "conf": {"$ref": "common.schema.json#/$defs/Confidence"},
+        "source": {"$ref": "enums.schema.json#/$defs/ZoneSource"},
+        "attrs": {"type": "object"}
+      }
+    }
+  }
+}

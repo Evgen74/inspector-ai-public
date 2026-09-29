@@ -1,0 +1,209 @@
+/* Приложение 2 on screen (93 §5.2): A4 portrait sheet, Segoe UI family, #0F1115 text, 0.5 pt single borders,
+   bold «РАЗДЕЛ N…» headings, 12 pt header block. Screen scale: 1 pt ≈ 1.2 px. */
+.p2-sheet {
+  --p2-ink: #0f1115;
+  --p2-rule: #3a3f47;
+  --p2-muted: #5b6270;
+  background: #fff;
+  color: var(--p2-ink);
+  font-family: 'Segoe UI', 'Golos Text', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 44px 40px 56px 64px; /* ГОСТ 20/15/20/30 mm scaled: wider left margin */
+  box-shadow: 0 1px 2px rgba(15, 17, 21, 0.08), 0 8px 24px rgba(15, 17, 21, 0.06);
+  border-radius: 2px;
+}
+.p2-sheet h1 {
+  font-size: 19px;
+  font-weight: 700;
+  margin: 0 0 14px;
+  letter-spacing: 0.01em;
+}
+.p2-sheet h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 28px 0 10px;
+  scroll-margin-top: 72px;
+}
+.p2-sheet h3 {
+  font-size: 15.5px;
+  font-weight: 700;
+  margin: 18px 0 8px;
+  scroll-margin-top: 72px;
+}
+.p2-header {
+  font-size: 14.5px;
+  line-height: 1.6;
+  margin: 0 0 6px;
+}
+.p2-header b {
+  font-weight: 700;
+}
+.p2-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin: 0 0 6px;
+}
+.p2-table th,
+.p2-table td {
+  border: 0.75px solid var(--p2-rule);
+  padding: 5px 7px;
+  vertical-align: top;
+  text-align: left;
+}
+.p2-table th {
+  font-weight: 700;
+  background: #fff;
+}
+.p2-table td.num,
+.p2-table th.num {
+  text-align: right;
+  white-space: nowrap;
+}
+.p2-table td.center {
+  text-align: center;
+}
+.p2-table tr.p2-empty td {
+  color: var(--p2-muted);
+  text-align: center;
+  font-style: italic;
+}
+.p2-table tr.p2-clickable {
+  cursor: pointer;
+}
+.p2-table tr.p2-clickable:hover td {
+  background: #f3f6fb;
+}
+.p2-table tr.p2-active td {
+  background: #eaf1fb;
+}
+.p2-indent {
+  padding-left: 18px;
+  display: inline-block;
+}
+.p2-line {
+  margin: 6px 0 0;
+}
+.p2-footnote {
+  font-size: 12px;
+  color: var(--p2-muted);
+  margin: 4px 0 0;
+}
+.p2-banner {
+  border-left: 3px solid #d48806;
+  background: #fffbe6;
+  padding: 6px 10px;
+  margin: 0 0 8px;
+  font-size: 12.5px;
+}
+.p2-cardref {
+  color: #1f4e8c;
+  cursor: pointer;
+  white-space: nowrap;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+.p2-cardref:hover {
+  text-decoration: underline;
+}
+.p2-dec-PENDING {
+  color: #ad6800;
+  white-space: nowrap;
+}
+.p2-dec-CONFIRMED_VIOLATION {
+  color: #a8071a;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.p2-dec-NEGATIVE_VERIFIED,
+.p2-dec-DISMISSED {
+  color: #237804;
+  white-space: nowrap;
+}
+.p2-dec-CLARIFICATION_REQUIRED {
+  color: #1d39c4;
+  white-space: nowrap;
+}
+.p2-card {
+  border: 0.75px solid var(--p2-rule);
+  padding: 10px 12px 12px;
+  margin: 0 0 14px;
+  break-inside: avoid;
+  scroll-margin-top: 72px;
+}
+.p2-card.p2-active {
+  outline: 2px solid #1f4e8c;
+  outline-offset: 2px;
+}
+.p2-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: baseline;
+  margin: 0 0 8px;
+}
+.p2-kv {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  column-gap: 12px;
+  row-gap: 3px;
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.p2-kv dt {
+  color: var(--p2-muted);
+}
+.p2-kv dd {
+  margin: 0;
+}
+.p2-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+}
+.p2-hash {
+  word-break: break-all;
+  min-width: 140px;
+}
+.p2-minimap {
+  display: block;
+}
+.p2-signature {
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  font-size: 13.5px;
+}
+.p2-signature .p2-sign-line {
+  border-bottom: 0.75px solid var(--p2-rule);
+  height: 28px;
+}
+.p2-toc a {
+  display: block;
+  padding: 3px 0;
+  color: inherit;
+  font-size: 13px;
+}
+.p2-toc a:hover {
+  color: #1f4e8c;
+}
+@media print {
+  .p2-sheet {
+    box-shadow: none;
+    padding: 0;
+    max-width: none;
+  }
+}
+
+.p2-basis {
+  font-size: 11.5px;
+  color: #6b6b6b;
+  margin-top: 2px;
+}

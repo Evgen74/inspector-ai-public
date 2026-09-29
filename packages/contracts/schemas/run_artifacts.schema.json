@@ -1,0 +1,188 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/run_artifacts.schema.json",
+  "title": "RunArtifacts",
+  "description": "Index of every file in runs/<run_id>/ (`artifacts.json`, run_layout.yaml). The web import and every downstream command read paths from here, never by globbing. Rebuilt at the end of each batch command by inspector_common.runlayout.write_artifacts_index(). Paths are relative to the run directory, POSIX style, and must match the run_layout.yaml template of their kind. Owner: AG-00.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "layout_version",
+    "run_id",
+    "generated_at",
+    "artifacts"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "layout_version": {
+      "const": "1"
+    },
+    "run_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$"
+    },
+    "generated_at": {
+      "$ref": "common.schema.json#/$defs/Timestamp"
+    },
+    "objects": {
+      "type": "array",
+      "items": {
+        "$ref": "common.schema.json#/$defs/ObjectId"
+      }
+    },
+    "commands": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Batch commands that have written into this run, in order."
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Artifact"
+      }
+    },
+    "page_tokens": {
+      "type": "array",
+      "description": "PAGE_TOKENS are summarised per file (one entry per file, not per page) to keep the index small.",
+      "items": {
+        "$ref": "#/$defs/PageTokensDir"
+      }
+    },
+    "ext": {
+      "$ref": "common.schema.json#/$defs/Extension"
+    }
+  },
+  "$defs": {
+    "Artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "path",
+        "format",
+        "sha256",
+        "size_bytes"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "enums.schema.json#/$defs/ArtifactKind"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512,
+          "pattern": "^(?!/)(?!.*\\.\\.)[^\\\\]+$",
+          "description": "Relative POSIX path inside the run directory."
+        },
+        "format": {
+          "$ref": "enums.schema.json#/$defs/ArtifactFormat"
+        },
+        "schema_name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Contract schema name (e.g. «finding»); null = free-form."
+        },
+        "object_id": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/ObjectId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "file_id": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/FileId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "sha256": {
+          "$ref": "common.schema.json#/$defs/Sha256"
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "records": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0,
+          "description": "JSONL line count, or checks/tables/rows count where meaningful."
+        },
+        "producer": {
+          "$ref": "#/$defs/Producer"
+        },
+        "modified_at": {
+          "$ref": "common.schema.json#/$defs/Timestamp"
+        }
+      }
+    },
+    "PageTokensDir": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "file_id",
+        "dir",
+        "pages"
+      ],
+      "properties": {
+        "file_id": {
+          "$ref": "common.schema.json#/$defs/FileId"
+        },
+        "object_id": {
+          "oneOf": [
+            {
+              "$ref": "common.schema.json#/$defs/ObjectId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dir": {
+          "type": "string",
+          "minLength": 1,
+          "description": "tokens/<file_id>"
+        },
+        "pages": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of p<NNNNN>.json.gz files."
+        },
+        "size_bytes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "Producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "agent": {
+          "type": "string",
+          "pattern": "^AG-[0-9]{2}[A-Z]?$"
+        },
+        "command": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

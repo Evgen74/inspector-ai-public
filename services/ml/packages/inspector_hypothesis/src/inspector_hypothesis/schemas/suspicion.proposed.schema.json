@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contracts.inspector-ai.local/schemas/suspicion.schema.json",
+  "title": "Suspicion",
+  "description": "PROPOSED by AG-07 for packages/contracts (not yet adopted). One SUSPICION of the free hypothesis search (ТЗ §9.5 «Структура подозрения»): the ТЗ fields verbatim (suspicion_id … inspector_status) plus the 90 §3.3 #8 extensions. Never a violation, never a training label, never sent to РиН; only evidence-bound FREE element groups are also exported as FREE-* rows (97 §2.6). Proposed artifact: runs/<run_id>/findings/<object_id>.suspicions.jsonl (kind SUSPICIONS, producer AG-07 via compare).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "suspicion_id", "discovery_method", "confidence", "description", "pd_reference", "rd_reference",
+    "review_priority", "normative_base", "finding_status", "inspector_status",
+    "suspicion_key", "object_id", "detector", "rule_code", "rule_version", "subject_type", "subject_key",
+    "stage_cells", "evidence_bind_status", "revision_fingerprint"
+  ],
+  "properties": {
+    "suspicion_id": {"type": "integer", "minimum": 1, "description": "ТЗ §9.5 (integer, as in the example 2001); 1…n per object and run."},
+    "discovery_method": {"$ref": "enums.schema.json#/$defs/DiscoveryMethod"},
+    "confidence": {"$ref": "common.schema.json#/$defs/Confidence"},
+    "description": {"type": "string", "minLength": 1},
+    "pd_reference": {"type": ["string", "null"], "description": "«<шифр>, л.<лист>, стр.<страница>»; the file id stands in for an unknown шифр."},
+    "rd_reference": {"type": ["string", "null"]},
+    "review_priority": {"$ref": "enums.schema.json#/$defs/ReviewPriority"},
+    "normative_base": {"type": "string", "description": "«—» when none."},
+    "finding_status": {"const": "SUSPICION"},
+    "inspector_status": {"$ref": "enums.schema.json#/$defs/SuspicionInspectorStatus"},
+    "suspicion_key": {"type": "string", "pattern": "^[0-9a-f]{64}$", "description": "sha256(object_id | revision_fingerprint | rule_code | subject_key): dedup within one object and comparable revisions (§9.5)."},
+    "object_id": {"$ref": "common.schema.json#/$defs/ObjectId"},
+    "run_id": {"type": ["string", "null"]},
+    "id_reference": {"type": ["string", "null"]},
+    "detector": {"type": "string", "description": "LOGICAL_RULE, ELEMENT_INVENTORY, …"},
+    "rule_code": {"type": "string", "pattern": "^HR-(LOG|SEM|NRM|MLP|GRA)-[0-9]{3}$"},
+    "rule_version": {"type": "string"},
+    "subject_type": {"type": "string"},
+    "subject_key": {"type": "string"},
+    "expected_value": {"type": ["string", "null"]},
+    "actual_value": {"type": ["string", "null"]},
+    "stage_cells": {
+      "type": "object",
+      "description": "Приложение 2 Раздел 6 cells ПД / РД / ИД («—» when the stage is not part of the hypothesis).",
+      "additionalProperties": false,
+      "required": ["PD", "RD", "ID"],
+      "properties": {"PD": {"type": "string"}, "RD": {"type": "string"}, "ID": {"type": "string"}}
+    },
+    "evidence": {"type": "array", "items": {"$ref": "evidence_ref.schema.json"}},
+    "evidence_bind_status": {"$ref": "enums.schema.json#/$defs/EvidenceBindStatus"},
+    "parameter_code": {"oneOf": [{"$ref": "common.schema.json#/$defs/FreeParameterCode"}, {"type": "null"}]},
+    "finding_group_id": {"type": ["string", "null"]},
+    "exported": {"type": "boolean", "description": "True only for evidence-bound FREE groups exported to the submission."},
+    "not_exported_reasons": {"type": "array", "items": {"type": "string"}},
+    "overlaps_matrix_codes": {"type": "array", "items": {"$ref": "common.schema.json#/$defs/CanonicalParameterCode"}},
+    "normative_refs": {"type": "array", "items": {"type": "string"}},
+    "normative_verified": {"type": "boolean"},
+    "revision_fingerprint": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "supporting_methods": {"type": "array", "items": {"$ref": "enums.schema.json#/$defs/DiscoveryMethod"}},
+    "explanation": {"type": "object", "description": "Rule condition truth values, the facts used, confidence terms."}
+  },
+  "allOf": [
+    {"if": {"properties": {"exported": {"const": true}}, "required": ["exported"]},
+     "then": {"properties": {"parameter_code": {"$ref": "common.schema.json#/$defs/FreeParameterCode"},
+                             "evidence_bind_status": {"const": "BOUND"}},
+              "required": ["parameter_code", "finding_group_id"]}}
+  ]
+}

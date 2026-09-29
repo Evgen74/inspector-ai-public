@@ -1,0 +1,9 @@
+# pnpm workspace (owner: AG-00). apps/api and apps/web are scaffolded by AG-08.
+packages:
+  - "apps/*"
+  - "packages/*"
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  # msw (AG-08, web mocks): its postinstall only copies the service worker; apps/web/public keeps a committed copy.
+  msw: false

@@ -1,0 +1,110 @@
+# Linux proof: the whole baseline (setup, lint, tests, DB tests, CPU OCR smoke) on a stock ubuntu-latest runner.
+# No organizer data and no GPU here: organizer-data tests skip, the recognition executor resolves to CPU
+# (onnxruntime-gpu is installed on Linux x86_64 and must degrade to the CPU by itself).
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:8
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
+      rabbitmq:
+        image: rabbitmq:3.13
+        ports: ["5672:5672"]
+        options: >-
+          --health-cmd "rabbitmq-diagnostics -q ping" --health-interval 10s --health-timeout 10s --health-retries 20
+    env:
+      SKIP_MODEL_CHECK: "1" # the e5 embedder (0.5 GB) is not fetched in CI; the OCR models are, see below
+      ORT_DISABLE_TELEMETRY: "1"
+      PGHOST: localhost # psql of `make db-create`
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      INSPECTOR_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/inspector
+      INSPECTOR_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/inspector_test
+      INSPECTOR_REDIS_URL: redis://127.0.0.1:6379/0
+      INSPECTOR_TEST_REDIS_URL: redis://127.0.0.1:6379/15
+      INSPECTOR_LOG_FORMAT: console
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: System libraries (libarchive for 7z/rar inventory, bsdtar)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libarchive-tools
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: pnpm via corepack (version pinned in package.json)
+        run: corepack enable pnpm
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+          enable-cache: true
+          cache-dependency-glob: services/ml/uv.lock
+
+      - name: make setup
+        run: make setup
+
+      - name: Which onnxruntime was installed
+        working-directory: services/ml
+        run: uv run --locked python -c "import onnxruntime as o; print(o.__version__, o.get_available_providers())"
+
+      - name: make lint
+        run: make lint
+
+      - name: "OCR models (public RapidOCR release, sha256 checked against tools/models/manifest.json)"
+        id: models
+        continue-on-error: true
+        run: |
+          for attempt in 1 2 3; do
+            make fetch-models && exit 0
+            echo "attempt $attempt failed"; sleep 10
+          done
+          exit 1
+
+      - name: make test
+        run: make test
+
+      - name: "Which executor auto-detection picks on this runner (expected cpu, no GPU)"
+        if: steps.models.outcome == 'success'
+        working-directory: services/ml
+        run: uv run --locked python ../../tools/models/gpu_check.py
+
+      - name: CPU OCR smoke (one synthetic page, models fetched above)
+        if: steps.models.outcome == 'success'
+        working-directory: services/ml
+        run: |
+          uv run --locked python ../../tools/ci/ocr_smoke.py --providers cpu
+          uv run --locked python ../../tools/ci/ocr_smoke.py --providers auto
+
+      - name: OCR smoke skipped
+        if: steps.models.outcome != 'success'
+        run: echo "::warning::OCR models could not be fetched (network or mirror); OCR smoke and OCR unit tests were skipped"
+
+      - name: API integration tests on PostgreSQL and Redis
+        run: |
+          make db-create
+          make db-migrate
+          make test-db
