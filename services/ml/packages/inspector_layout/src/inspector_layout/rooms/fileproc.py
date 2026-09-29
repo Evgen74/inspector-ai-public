@@ -260,7 +260,9 @@ def process_file(
         pages = select_pages(doc, fi.pages)
     t_sel = time.perf_counter() - t0
     results: list[PageResult] = []
-    workers = max(1, min(workers, len(pages) or 1, os.cpu_count() or 1))
+    from inspector_common.resources import worker_budget
+
+    workers = max(1, min(worker_budget(1, workers), len(pages) or 1))
     tdir = str(fi.tokens_dir) if fi.tokens_dir else None
     if workers == 1:
         results = _run_pages(str(fi.path), tdir, pages, vocab)

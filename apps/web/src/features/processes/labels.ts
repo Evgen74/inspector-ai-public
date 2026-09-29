@@ -3,10 +3,19 @@ import type { FileState, ProcessState, StepState } from './api';
 export const STATUS_LABEL: Record<ProcessState, string> = {
   PENDING: 'В очереди',
   PARSING: 'Обработка',
+  PAUSED: 'На паузе',
   READY: 'Готово',
   FAILED: 'Ошибка',
+  CANCELLED: 'Отменено',
 };
-export const STATUS_COLOR: Record<ProcessState, string> = { PENDING: 'default', PARSING: 'processing', READY: 'success', FAILED: 'error' };
+export const STATUS_COLOR: Record<ProcessState, string> = {
+  PENDING: 'default',
+  PARSING: 'processing',
+  PAUSED: 'warning',
+  READY: 'success',
+  FAILED: 'error',
+  CANCELLED: 'default',
+};
 
 export const STEP_LABEL: Record<string, string> = {
   prepare: 'Подготовка реестра комплекта',

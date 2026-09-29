@@ -372,7 +372,7 @@ C4Container
 ```bash
 python -m inspector_registry.adhoc prepare --upload-dir <runs>/uploads/<pid> --object-name <имя> --object-id <OBJ-UPLOAD-…> [--registry <файл реестра>]
 ```
-затем запускает пакетный прогон (переменная окружения `INSPECTOR_WORKERS` принимает то же значение, что и `--workers`; число воркеров — `INSPECTOR_UPLOAD_WORKERS`, по умолчанию 8, в Docker-примере — 2):
+затем запускает пакетный прогон (переменная окружения `INSPECTOR_WORKERS` принимает то же значение, что и `--workers`; число воркеров — `INSPECTOR_UPLOAD_WORKERS`, по умолчанию автоматически: не больше 75 % ядер и памяти, `INSPECTOR_RESOURCE_CAP`; пауза и отмена — `POST /processes/{id}/pause|resume|cancel`):
 ```bash
 python -m inspector_batch.cli --data-root <upload-dir>/dataroot --runs-root <runs> --run-id upload-<pid[:8]> --log-format console run --object <object_id> --steps inventory,recognize,layout,tables,compare,export --workers <N>
 ```

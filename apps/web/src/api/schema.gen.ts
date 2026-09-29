@@ -843,6 +843,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/processes/{process_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Отменить обработку комплекта
+         * @description Останавливает конвейер и ставит статус CANCELLED (окончательно). Доступно в статусах PENDING, PARSING и PAUSED.
+         */
+        post: operations["cancelProcess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/processes/{process_id}/completeness": {
         parameters: {
             query?: never;
@@ -1006,6 +1026,28 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/processes/{process_id}/pause": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Приостановить обработку комплекта
+         * @description Останавливает конвейер (все его процессы) и ставит статус PAUSED. Распознанные страницы остаются в кэше:
+         *     «Продолжить» (POST …/resume) запускает обработку заново, и распознавание идёт с места остановки.
+         *     Доступно в статусах PENDING и PARSING.
+         */
+        post: operations["pauseProcess"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/processes/{process_id}/protocol": {
         parameters: {
             query?: never;
@@ -1017,6 +1059,26 @@ export type paths = {
         get: operations["getProcessProtocol"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/processes/{process_id}/resume": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Продолжить приостановленную обработку
+         * @description Ставит проверку из статуса PAUSED обратно в очередь; уже распознанные страницы берутся из кэша.
+         */
+        post: operations["resumeProcess"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2286,7 +2348,7 @@ export type components = {
             stage?: string | null;
             started_at?: string | null;
             /** @enum {string} */
-            status: "PENDING" | "PARSING" | "READY" | "FAILED";
+            status: "PENDING" | "PARSING" | "PAUSED" | "READY" | "FAILED" | "CANCELLED";
             updated_at: string;
             verification_process_id?: string | null;
         } & {
@@ -4323,6 +4385,34 @@ export interface operations {
             503: components["responses"]["Unavailable"];
         };
     };
+    cancelProcess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                process_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Проверка после действия; остановка конвейера занимает несколько секунд */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProcessDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["AccessDenied"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     getCompleteness: {
         parameters: {
             query?: never;
@@ -4612,6 +4702,34 @@ export interface operations {
             503: components["responses"]["Unavailable"];
         };
     };
+    pauseProcess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                process_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Проверка после действия; остановка конвейера занимает несколько секунд */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProcessDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["AccessDenied"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
+        };
+    };
     getProcessProtocol: {
         parameters: {
             query?: {
@@ -4642,6 +4760,34 @@ export interface operations {
             404: components["responses"]["NotFound"];
             500: components["responses"]["InternalError"];
             503: components["responses"]["Unavailable"];
+        };
+    };
+    resumeProcess: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                process_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Проверка после действия; остановка конвейера занимает несколько секунд */
+            200: {
+                headers: {
+                    "X-Request-Id": components["headers"]["XRequestId"];
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProcessDetail"];
+                };
+            };
+            401: components["responses"]["Unauthorized"];
+            403: components["responses"]["AccessDenied"];
+            404: components["responses"]["NotFound"];
+            409: components["responses"]["Conflict"];
+            500: components["responses"]["InternalError"];
         };
     };
     getRinSync: {

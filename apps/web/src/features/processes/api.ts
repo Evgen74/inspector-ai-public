@@ -2,7 +2,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiFetch } from '../../api/client';
 
-export type ProcessState = 'PENDING' | 'PARSING' | 'READY' | 'FAILED';
+export type ProcessState = 'PENDING' | 'PARSING' | 'PAUSED' | 'READY' | 'FAILED' | 'CANCELLED';
 export type StepState = 'PENDING' | 'RUNNING' | 'DONE' | 'FAILED';
 export type FileState = 'RECEIVED' | 'PREPARED' | 'PROCESSING' | 'DONE' | 'REJECTED';
 
@@ -94,6 +94,20 @@ export function useProcess(id: string) {
     queryKey: ['process', id],
     queryFn: () => apiFetch<ProcessDetail>(`/processes/${encodeURIComponent(id)}`),
     refetchInterval: (q) => (q.state.data && !isActive(q.state.data.status) ? false : 2000),
+  });
+}
+
+/** «Пауза» / «Продолжить» / «Отменить» (POST /processes/{id}/pause | resume | cancel). */
+export function useProcessControl(id: string) {
+  const client = useQueryClient();
+  return useMutation({
+    mutationFn: (action: 'pause' | 'resume' | 'cancel') =>
+      apiFetch<ProcessDetail>(`/processes/${encodeURIComponent(id)}/${action}`, { method: 'POST' }),
+    onSuccess: (p) => {
+      client.setQueryData(['process', id], p);
+      void client.invalidateQueries({ queryKey: ['process', id] });
+      void client.invalidateQueries({ queryKey: ['processes'] });
+    },
   });
 }
 

@@ -173,10 +173,14 @@ def test_engine_pools_use_the_gpu_session_in_cuda_mode() -> None:
 
 
 def test_cuda_worker_pool_is_capped(monkeypatch) -> None:
-    monkeypatch.setattr("os.cpu_count", lambda: 16)
+    from inspector_common import resources
+
+    monkeypatch.setattr(resources, "available_cpus", lambda root=None: 16)
+    monkeypatch.setattr(resources, "total_memory_bytes", lambda root=None: 64 * 1024**3)
+    monkeypatch.delenv("INSPECTOR_RESOURCE_CAP", raising=False)
     cfg = ExecutionConfig(max_gpu_workers=3)
     assert cfg.resolved_workers("cuda") == 3
-    assert cfg.resolved_workers("coreml") == 14 and cfg.resolved_workers() == 14
+    assert cfg.resolved_workers("coreml") == 12 and cfg.resolved_workers() == 12  # 75 % of 16 CPUs
     assert (
         ExecutionConfig(workers=8, max_gpu_workers=3).resolved_workers("cuda") == 3
     )  # also an explicit --workers

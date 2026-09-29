@@ -65,8 +65,8 @@ docker compose up -d --build
    docker compose exec api python /app/tools/models/gpu_check.py
    ```
 
-   С GPU можно поднять число параллельных процессов распознавания: `INSPECTOR_UPLOAD_WORKERS=4` перед командой из
-   шага 2 (по умолчанию 2).
+   Число параллельных процессов подбирается само: не больше 75 % ядер и памяти контейнера
+   (`INSPECTOR_RESOURCE_CAP`); задать явно — `INSPECTOR_UPLOAD_WORKERS=4` перед командой из шага 2.
 
 ### Что прислать, если что-то не так (или для замера скорости)
 
@@ -152,7 +152,8 @@ RabbitMQ → одноразовая задача `migrate` (миграции и 
 | `INSPECTOR_HTTP_PORT` | 8080 | порт web на хосте |
 | `INSPECTOR_DB_PASSWORD` | `inspector` | пароль PostgreSQL и RabbitMQ внутри сети compose (только буквы и цифры) |
 | `INSPECTOR_DEMO_PASSWORD` | `Demo-Inspector-2026` | пароль демо-учётки |
-| `INSPECTOR_UPLOAD_WORKERS` | 2 | число процессов распознавания при загрузке; на машине с 8+ ядрами поднимите до 4–8 |
+| `INSPECTOR_UPLOAD_WORKERS` | авто | число процессов обработки при загрузке; по умолчанию 75 % ядер контейнера |
+| `INSPECTOR_RESOURCE_CAP` | 0.75 | доля ядер и памяти контейнера, которую может занять анализ |
 | `INSPECTOR_ML_API_TOKEN` | `inspector-internal-token` | общий секрет api ↔ ml-api |
 
 ## 5. Данные организаторов (необязательно)

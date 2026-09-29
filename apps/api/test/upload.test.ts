@@ -1,4 +1,5 @@
 /** Upload vertical: multipart parsing, ТЗ §9.1 limits, ad-hoc job flow (fake engine) and process status. */
+import os from 'node:os';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -150,7 +151,8 @@ describe('POST /documents/upload → GET /processes', () => {
     expect(detail.log.length).toBeGreaterThan(3);
     const batch = engine.calls.find((c) => c.args.includes('inspector_batch.cli'));
     expect(batch?.args).toContain('--workers');
-    expect(batch?.args[batch.args.indexOf('--workers') + 1]).toBe('8');
+    // auto: 75 % of the CPUs (INSPECTOR_RESOURCE_CAP)
+    expect(batch?.args[batch.args.indexOf('--workers') + 1]).toBe(String(Math.max(1, Math.floor(os.availableParallelism() * 0.75))));
     expect(batch?.args).not.toContain('score');
     expect(batch?.args).not.toContain('--hidden-run');
 
@@ -187,6 +189,64 @@ describe('POST /documents/upload → GET /processes', () => {
     } finally {
       job.objects = original;
     }
+  });
+
+  it('pauses a running upload (the pipeline is stopped), resumes it to READY; cancel is final', async () => {
+    const job = t.app.get(UploadJob) as unknown as { commands: CommandRunner };
+    let batchStarted!: () => void;
+    const started = new Promise<void>((r) => (batchStarted = r));
+    const aborted: boolean[] = [];
+    job.commands = {
+      python: async (spec: CommandSpec, onLine: (l: string) => void) => {
+        if (!spec.args.includes('inspector_batch.cli') || aborted.length > 0) return engine.python(spec, onLine);
+        // the first batch run hangs like a long recognition until the pause stops it
+        onLine('2026 INFO inspector_batch: pipeline.step.started | run_id=x command=run step=recognize owner=AG-02A');
+        batchStarted();
+        await new Promise<void>((resolve) => spec.signal?.addEventListener('abort', () => resolve(), { once: true }));
+        aborted.push(true);
+        return 143;
+      },
+    } as unknown as CommandRunner;
+    try {
+      const id = (await post([{ name: 'files', filename: 'a.pdf', data: PDF }])).json().process_id;
+      await started;
+      const pause = await t.http.inject({ method: 'POST', url: `/api/v1/processes/${id}/pause` });
+      expect(pause.statusCode).toBe(200);
+      let detail = await waitReady(id);
+      expect(aborted).toEqual([true]); // the running pipeline was stopped
+      expect(detail.status).toBe('PAUSED');
+      expect(detail.steps.some((s: { status: string }) => s.status === 'RUNNING' || s.status === 'FAILED')).toBe(false);
+      expect(detail.log.at(-1).message).toContain('приостановлена');
+      const again = await t.http.inject({ method: 'POST', url: `/api/v1/processes/${id}/pause` });
+      expect(again.statusCode).toBe(409);
+      expect(again.json().code).toBe('PROCESS_STATE_CONFLICT');
+
+      const resume = await t.http.inject({ method: 'POST', url: `/api/v1/processes/${id}/resume` });
+      expect(resume.statusCode).toBe(200);
+      detail = await waitReady(id);
+      expect(detail.status).toBe('READY');
+
+      const done = await t.http.inject({ method: 'POST', url: `/api/v1/processes/${id}/cancel` });
+      expect(done.statusCode).toBe(409); // a finished process cannot be cancelled
+      const missing = await t.http.inject({ method: 'POST', url: '/api/v1/processes/nope/cancel' });
+      expect(missing.statusCode).toBe(404);
+    } finally {
+      job.commands = engine;
+    }
+  });
+
+  it('cancels a paused upload for good (resume is refused)', async () => {
+    const store = t.app.get(UploadJob).store;
+    const id = (await post([{ name: 'files', filename: 'a.pdf', data: PDF }])).json().process_id;
+    await waitReady(id);
+    const rec = store.get(id)!;
+    rec.status = 'PAUSED'; // as left by a pause
+    store.save(rec);
+    const cancel = await t.http.inject({ method: 'POST', url: `/api/v1/processes/${id}/cancel` });
+    expect(cancel.statusCode).toBe(200);
+    expect(cancel.json().status).toBe('CANCELLED');
+    const resume = await t.http.inject({ method: 'POST', url: `/api/v1/processes/${id}/resume` });
+    expect(resume.statusCode).toBe(409);
   });
 
   it('marks the process FAILED with a Russian message when the engine fails', async () => {
@@ -267,7 +327,12 @@ describe('POST /documents/upload → GET /processes', () => {
 
 describe('INSPECTOR_UPLOAD_WORKERS', () => {
   it('defaults to 2 and is passed to the batch run when raised', async () => {
-    expect(loadConfig({ INSPECTOR_APP_ENV: 'test' }).uploadWorkers).toBe(8);
+    const auto = Math.max(1, Math.floor(os.availableParallelism() * 0.75));
+    expect(loadConfig({ INSPECTOR_APP_ENV: 'test' }).uploadWorkers).toBe(auto); // 75 % of the CPUs
+    expect(loadConfig({ INSPECTOR_APP_ENV: 'test', INSPECTOR_UPLOAD_WORKERS: '' }).uploadWorkers).toBe(auto);
+    expect(loadConfig({ INSPECTOR_APP_ENV: 'test', INSPECTOR_RESOURCE_CAP: '0.5' }).uploadWorkers).toBe(
+      Math.max(1, Math.floor(os.availableParallelism() * 0.5)),
+    );
     expect(loadConfig({ INSPECTOR_APP_ENV: 'test', INSPECTOR_UPLOAD_WORKERS: '6' }).uploadWorkers).toBe(6);
     expect(() => loadConfig({ INSPECTOR_APP_ENV: 'test', INSPECTOR_UPLOAD_WORKERS: '0' })).toThrow(/INSPECTOR_UPLOAD_WORKERS/);
     const t = await createTestApp({ uploadWorkers: 6 });

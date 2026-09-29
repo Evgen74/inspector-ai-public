@@ -84,6 +84,16 @@ errors:
     detail_ru: "Проверка не найдена или у вас нет к ней доступа."
     hint_ru: "Откройте проверку из списка объектов."
     scenarios: [NS-A23]
+  - code: PROCESS_STATE_CONFLICT
+    http: 409
+    domain: api
+    severity: error
+    log_level: INFO
+    title_ru: "Действие недоступно"
+    detail_ru: "Проверка сейчас в статусе «{status}»: это действие для неё недоступно."
+    hint_ru: "Обновите страницу проверки: статус мог измениться."
+    details: {status: string}
+    scenarios: [NS-A23]
   - code: FILE_NOT_FOUND
     http: 404
     domain: api

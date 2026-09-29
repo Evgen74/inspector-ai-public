@@ -1,7 +1,8 @@
-/** The worker side: prepare (ad-hoc registry) → inspector-batch run → import → READY / FAILED. */
+/** The worker side: prepare (ad-hoc registry) → inspector-batch run → import → READY / FAILED; pause and cancel. */
 import { copyFileSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ApiProblem } from '../../common/problem';
 import { APP_CONFIG, type AppConfig, PACKAGE_DIR_NAME } from '../../config/config';
 import { ObjectsRepository } from '../../objects/objects.repository';
 import { RunImportService } from '../import/run-import.service';
@@ -35,6 +36,9 @@ export class UploadJob {
   readonly store: ProcessStore;
   /** Processes being run by this API process (a redelivered or re-enqueued job must not run twice at once). */
   private readonly running = new Set<string>();
+  /** Abort handle of each running process and why it was stopped (pause or cancel). */
+  private readonly aborts = new Map<string, AbortController>();
+  private readonly stops = new Map<string, 'PAUSED' | 'CANCELLED'>();
 
   constructor(
     @Inject(APP_CONFIG) private readonly config: AppConfig,
@@ -65,16 +69,75 @@ export class UploadJob {
   async run(processId: string): Promise<void> {
     if (this.running.has(processId)) return;
     this.running.add(processId);
+    this.aborts.set(processId, new AbortController());
     try {
       await this.execute(processId);
     } finally {
       this.running.delete(processId);
+      this.aborts.delete(processId);
+      this.stops.delete(processId);
     }
+  }
+
+  /**
+   * Pause (PAUSED, resumable: recognised pages stay in the token cache) or cancel (CANCELLED, final). A queued
+   * process changes at once; a running one is stopped with its whole process tree and changes when the pipeline has
+   * exited (a few seconds). The import into the database is not interrupted: a stop requested then comes too late.
+   */
+  stop(processId: string, to: 'PAUSED' | 'CANCELLED'): ProcessRecord {
+    const rec = this.store.get(processId);
+    if (!rec) throw new ApiProblem('PROCESS_NOT_FOUND', {});
+    const allowed = to === 'PAUSED' ? ['PENDING', 'PARSING'] : ['PENDING', 'PARSING', 'PAUSED'];
+    if (!allowed.includes(rec.status)) throw new ApiProblem('PROCESS_STATE_CONFLICT', { status: rec.status });
+    const abort = this.aborts.get(processId);
+    if (rec.status === 'PARSING' && abort) {
+      this.stops.set(processId, to);
+      this.note(rec, to === 'PAUSED' ? 'Запрошена пауза: обработка останавливается.' : 'Запрошена отмена: обработка останавливается.');
+      this.store.save(rec);
+      abort.abort();
+      return rec;
+    }
+    this.finishStopped(rec, to);
+    this.store.save(rec);
+    return rec;
+  }
+
+  /** PAUSED → PENDING; the caller puts it back into the queue. */
+  resume(processId: string): ProcessRecord {
+    const rec = this.store.get(processId);
+    if (!rec) throw new ApiProblem('PROCESS_NOT_FOUND', {});
+    if (rec.status !== 'PAUSED') throw new ApiProblem('PROCESS_STATE_CONFLICT', { status: rec.status });
+    rec.status = 'PENDING';
+    rec.error = null;
+    rec.finished_at = null;
+    this.note(rec, 'Обработка продолжена: уже распознанные страницы берутся из кэша.');
+    this.store.save(rec);
+    return rec;
+  }
+
+  private finishStopped(rec: ProcessRecord, to: 'PAUSED' | 'CANCELLED'): void {
+    rec.status = to;
+    rec.stage = null;
+    if (rec.progress) rec.progress.stage = null;
+    rec.finished_at = new Date().toISOString();
+    for (const s of rec.steps) {
+      if (s.status !== 'RUNNING') continue;
+      s.status = 'PENDING';
+      s.started_at = null;
+    }
+    this.note(
+      rec,
+      to === 'PAUSED'
+        ? 'Обработка приостановлена. Распознанные страницы сохранены: «Продолжить» возобновит её с того же места.'
+        : 'Обработка отменена.',
+      'warn',
+    );
   }
 
   private async execute(processId: string): Promise<void> {
     const rec = this.store.get(processId);
-    if (!rec || rec.status === 'READY') return;
+    // A paused or cancelled process left in the queue is not run.
+    if (!rec || rec.status === 'READY' || rec.status === 'PAUSED' || rec.status === 'CANCELLED') return;
     rec.status = 'PARSING';
     rec.started_at = new Date().toISOString();
     rec.error = null;
@@ -95,6 +158,12 @@ export class UploadJob {
       for (const f of rec.files) if (f.status !== 'REJECTED') f.status = 'DONE';
       this.note(rec, 'Готово: протокол сформирован и доступен для верификации.');
     } catch (err) {
+      const stopped = this.stops.get(processId);
+      if (stopped) {
+        this.finishStopped(rec, stopped);
+        this.store.save(rec);
+        return;
+      }
       const message = err instanceof Error ? err.message : String(err);
       rec.status = 'FAILED';
       rec.progress.stage = null;
@@ -127,7 +196,7 @@ export class UploadJob {
     ];
     if (rec.registry_file) args.push('--registry', path.join(dir, 'registry', rec.registry_file));
     const tail: string[] = [];
-    const code = await this.commands.python({ args }, (l) => tail.push(l));
+    const code = await this.commands.python({ args, signal: this.aborts.get(rec.process_id)?.signal }, (l) => tail.push(l));
     if (code !== 0) throw new Error(`Не удалось подготовить комплект: ${tail.slice(-3).join(' ') || `код ${code}`}`);
     const summary = JSON.parse(readFileSync(path.join(dir, 'prepare.json'), 'utf8')) as PrepareSummary;
     const rejected = rec.files.filter((f) => f.status === 'REJECTED');
@@ -179,7 +248,8 @@ export class UploadJob {
     ];
     const tail: string[] = [];
     let lastProgressSave = 0;
-    const code = await this.commands.python({ args, env: { INSPECTOR_WORKERS: String(workers) } }, (line) => {
+    const signal = this.aborts.get(rec.process_id)?.signal;
+    const code = await this.commands.python({ args, env: { INSPECTOR_WORKERS: String(workers) }, signal }, (line) => {
       tail.push(line);
       if (tail.length > 20) tail.shift();
       const prog = parseProgressLine(line);

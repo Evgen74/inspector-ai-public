@@ -135,7 +135,10 @@ def run_layout(args: argparse.Namespace, ctx: BatchContext) -> int:
         if i == n or i % max(1, n // 10) == 0:
             print(f"  {i}/{n} частей ({fid})", flush=True)
 
-    results = scan_files(tasks, registries, opts, workers=max(1, args.workers), progress=progress)
+    from inspector_common.resources import worker_budget
+
+    workers = worker_budget(max(1, args.threads), max(1, args.workers))  # capped at INSPECTOR_RESOURCE_CAP
+    results = scan_files(tasks, registries, opts, workers=workers, progress=progress)
     pipeline_version = f"layout-{__version__}"
     written = 0
     failures = 0

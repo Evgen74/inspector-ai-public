@@ -255,7 +255,10 @@ class ExecutionConfig:
 
     def resolved_workers(self, mode: str | None = None) -> int:
         """Process pool size; ``mode`` is the resolved provider mode (``cuda`` caps the pool, see above)."""
-        n = self.workers if self.workers > 0 else max(1, (os.cpu_count() or 2) - 2)
+        from inspector_common.resources import worker_budget
+
+        # At most INSPECTOR_RESOURCE_CAP (75 %) of the CPUs and memory; an explicit --workers only below that.
+        n = worker_budget(max(1, self.threads), self.workers if self.workers > 0 else None)
         if mode == "cuda":
             n = min(n, max(1, self.max_gpu_workers))
         return n

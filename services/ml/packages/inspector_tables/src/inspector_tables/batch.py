@@ -609,7 +609,9 @@ def run_tables(args: argparse.Namespace, ctx: BatchContext) -> int:
     ctx.log.info("tables.start", extra={"files": len(tasks), "workers": args.workers, "types": list(types),
                                          "problems": len(problems)})  # fmt: skip
     results: list[dict] = []
-    workers = max(1, int(args.workers))
+    from inspector_common.resources import worker_budget
+
+    workers = worker_budget(1, max(1, int(args.workers)))  # capped at INSPECTOR_RESOURCE_CAP of the machine
     if workers == 1 or len(tasks) <= 1:
         results = [process_file(t) for t in tasks]
     else:

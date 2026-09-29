@@ -1,5 +1,6 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
 import { ApiProblem } from '../../common/problem';
+import { JobQueue } from '../upload/job-queue';
 import { UploadJob } from '../upload/upload-job';
 import type { ProcessRecord } from '../upload/process-store';
 
@@ -15,9 +16,14 @@ function summary(rec: ProcessRecord) {
   };
 }
 
+const detail = (rec: ProcessRecord) => ({ ...summary(rec), steps: rec.steps, files: rec.files, log: rec.log });
+
 @Controller('processes')
 export class ProcessesController {
-  constructor(private readonly job: UploadJob) {}
+  constructor(
+    private readonly job: UploadJob,
+    private readonly queue: JobQueue,
+  ) {}
 
   @Get()
   listProcesses(@Query() query: Record<string, unknown> = {}) {
@@ -33,6 +39,27 @@ export class ProcessesController {
   getProcess(@Param('process_id') id: string) {
     const rec = this.job.store.get(id);
     if (!rec) throw new ApiProblem('PROCESS_NOT_FOUND', {});
-    return { ...summary(rec), steps: rec.steps, files: rec.files, log: rec.log };
+    return detail(rec);
+  }
+
+  /** «Пауза»: the pipeline stops; recognised pages stay in the cache for «Продолжить». */
+  @Post(':process_id/pause')
+  @HttpCode(200)
+  pauseProcess(@Param('process_id') id: string) {
+    return detail(this.job.stop(id, 'PAUSED'));
+  }
+
+  @Post(':process_id/resume')
+  @HttpCode(200)
+  resumeProcess(@Param('process_id') id: string) {
+    const rec = this.job.resume(id); // saved as PENDING before the queue may start it
+    this.queue.enqueue(id);
+    return detail(rec);
+  }
+
+  @Post(':process_id/cancel')
+  @HttpCode(200)
+  cancelProcess(@Param('process_id') id: string) {
+    return detail(this.job.stop(id, 'CANCELLED'));
   }
 }

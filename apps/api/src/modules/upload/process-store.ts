@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, writeFile
 import path from 'node:path';
 
 /** ProcessStatus of the upload vertical. `FAILED` is not in enums.yaml ProcessStatus yet (open issue for AG-00). */
-export type UploadStatus = 'PENDING' | 'PARSING' | 'READY' | 'FAILED';
+export type UploadStatus = 'PENDING' | 'PARSING' | 'PAUSED' | 'READY' | 'FAILED' | 'CANCELLED';
 
 export type FileProgress = 'RECEIVED' | 'PREPARED' | 'PROCESSING' | 'DONE' | 'REJECTED';
 

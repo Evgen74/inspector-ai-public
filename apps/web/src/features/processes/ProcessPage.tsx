@@ -1,11 +1,11 @@
 /** One process: stage list, per-file progress and the event log. */
-import { Alert, Button, Card, Descriptions, Flex, Progress, Space, Spin, Table, Tag, Timeline, Typography } from 'antd';
+import { Alert, Button, Card, Descriptions, Flex, Popconfirm, Progress, Space, Spin, Table, Tag, Timeline, Typography } from 'antd';
 import type { TableColumnsType } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CaretRightOutlined, PauseOutlined, StopOutlined } from '@ant-design/icons';
 import { Link, useParams } from 'react-router';
 import { ProblemAlert } from '../../components/ProblemAlert';
 import { formatBytes, formatDateTime, formatInt } from '../../format';
-import { type ProcessFileItem, useProcess } from './api';
+import { type ProcessFileItem, useProcess, useProcessControl } from './api';
 import { durationText, FILE_STATE_LABEL, STAGE_LABEL, STATUS_COLOR, STATUS_LABEL, STEP_STATE_LABEL, recognitionProgressText, stepLabel } from './labels';
 
 const STEP_COLOR = { PENDING: 'gray', RUNNING: 'blue', DONE: 'green', FAILED: 'red' } as const;
@@ -15,6 +15,8 @@ export function ProcessPage() {
   const { processId = '' } = useParams();
   const query = useProcess(processId);
   const p = query.data;
+  const control = useProcessControl(processId);
+  const stopping = p?.status === 'PARSING' && p.log.at(-1)?.message.startsWith('Запрошен');
   const fileColumns: TableColumnsType<ProcessFileItem> = [
     { title: 'Файл', dataIndex: 'name', ellipsis: true, render: (n: string, f) => (
       <Flex vertical>
@@ -45,8 +47,32 @@ export function ProcessPage() {
               <Typography.Title level={3} style={{ margin: 0 }}>{p.object_name}</Typography.Title>
               <Typography.Text type="secondary">{p.object_id} · {p.process_id}</Typography.Text>
             </div>
-            <Space>
+            <Space wrap>
               <Tag color={STATUS_COLOR[p.status]} style={{ fontSize: 14, padding: '2px 10px' }}>{STATUS_LABEL[p.status]}</Tag>
+              {(p.status === 'PENDING' || p.status === 'PARSING') && (
+                <Button icon={<PauseOutlined />} loading={control.isPending || stopping} onClick={() => control.mutate('pause')}>
+                  {stopping ? 'Останавливается…' : 'Пауза'}
+                </Button>
+              )}
+              {p.status === 'PAUSED' && (
+                <Button type="primary" icon={<CaretRightOutlined />} loading={control.isPending} onClick={() => control.mutate('resume')}>
+                  Продолжить
+                </Button>
+              )}
+              {(p.status === 'PENDING' || p.status === 'PARSING' || p.status === 'PAUSED') && (
+                <Popconfirm
+                  title="Отменить обработку?"
+                  description="Отменённую проверку нельзя продолжить — только загрузить комплект заново."
+                  okText="Отменить обработку"
+                  cancelText="Нет"
+                  okButtonProps={{ danger: true }}
+                  onConfirm={() => control.mutate('cancel')}
+                >
+                  <Button danger icon={<StopOutlined />} disabled={control.isPending}>
+                    Отменить
+                  </Button>
+                </Popconfirm>
+              )}
               {p.status === 'READY' && p.protocol && (
                 <Link to={`/objects/${encodeURIComponent(p.protocol.object_id)}/protocols/${p.protocol.run_id}`}><Button type="primary">Открыть протокол</Button></Link>
               )}
@@ -55,7 +81,11 @@ export function ProcessPage() {
               )}
             </Space>
           </Flex>
+          {control.isError && <ProblemAlert error={control.error} />}
           {p.status === 'FAILED' && <Alert type="error" showIcon title="Обработка не завершена" description={p.error ?? 'Причина не указана.'} />}
+          {p.status === 'PAUSED' && (
+            <Alert type="warning" showIcon title="Обработка на паузе" description="Распознанные страницы сохранены: «Продолжить» возобновит обработку с того же места." />
+          )}
           <Card>
             <Progress percent={p.progress.percent} status={p.status === 'FAILED' ? 'exception' : p.status === 'READY' ? 'success' : 'active'} />
             {p.status === 'PARSING' && recognitionProgressText(p.progress.stage) && (

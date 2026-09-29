@@ -4,6 +4,7 @@
  * Local-only runtime: the API talks to the local PostgreSQL and reads run directories from disk.
  * Paths default to the monorepo layout, like `inspector_common.settings` on the Python side.
  */
+import os from 'node:os';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { z } from 'zod';
@@ -88,8 +89,10 @@ const EnvSchema = z.object({
     .default('http://127.0.0.1:8090'),
   INSPECTOR_ML_API_TOKEN: z.string().min(1).optional(),
   INSPECTOR_ML_API_TIMEOUT_MS: z.coerce.number().int().min(100).max(300_000).default(30_000),
-  // `--workers` of the batch run started for an uploaded package (raise after the frozen hidden run).
-  INSPECTOR_UPLOAD_WORKERS: z.coerce.number().int().min(1).max(12).default(8),
+  // `--workers` of the batch run started for an uploaded package; unset/empty = auto (the resource cap below).
+  INSPECTOR_UPLOAD_WORKERS: z.preprocess((v) => (v === '' ? undefined : v), z.coerce.number().int().min(1).max(64).optional()),
+  // Share of the machine an analysis may load (CPUs and memory); the Python pipeline applies the same cap.
+  INSPECTOR_RESOURCE_CAP: z.coerce.number().min(0.05).max(1).default(0.75),
 });
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'silent';
@@ -195,7 +198,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env, overrides: Part
     mlApiUrl: e.INSPECTOR_ML_API_URL.replace(/\/+$/, ''),
     mlApiToken: e.INSPECTOR_ML_API_TOKEN ?? null,
     mlApiTimeoutMs: e.INSPECTOR_ML_API_TIMEOUT_MS,
-    uploadWorkers: e.INSPECTOR_UPLOAD_WORKERS,
+    uploadWorkers: e.INSPECTOR_UPLOAD_WORKERS ?? Math.max(1, Math.floor(os.availableParallelism() * e.INSPECTOR_RESOURCE_CAP)),
     ...overrides,
   };
   return Object.freeze(config);

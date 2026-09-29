@@ -203,7 +203,7 @@ components:
       required: [process_id, status, object_id, object_name, created_at, updated_at, progress, files_total, files_rejected, pages_total]
       properties:
         process_id: {type: string}
-        status: {type: string, enum: [PENDING, PARSING, READY, FAILED], x-contract-enum-proposed: ProcessStatus}
+        status: {type: string, enum: [PENDING, PARSING, PAUSED, READY, FAILED, CANCELLED], x-contract-enum-proposed: ProcessStatus}
         stage: {type: string, nullable: true}
         object_id: {type: string}
         object_name: {type: string}

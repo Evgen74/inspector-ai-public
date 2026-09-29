@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 import time
 from pathlib import Path
@@ -77,7 +76,11 @@ def run_inventory(args: argparse.Namespace, ctx: BatchContext) -> int:
         return int(ExitCode.USAGE)
 
     cache = RegistryCache(None) if args.no_cache else RegistryCache.at(ctx.settings.cache_root)
-    workers = ctx.settings.workers or max(1, (os.cpu_count() or 4) - 2)
+    from inspector_common.resources import worker_budget
+
+    workers = worker_budget(
+        1, ctx.settings.workers or None
+    )  # capped at INSPECTOR_RESOURCE_CAP of the machine
     resolver = PathResolver(registry, paths, cache, hash_workers=min(8, workers))
     options = InventoryOptions(
         verify_sha256=bool(args.verify_sha256), hash_workers=min(8, workers), probe_workers=min(8, workers)

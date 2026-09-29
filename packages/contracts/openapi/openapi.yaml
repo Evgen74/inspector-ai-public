@@ -1342,6 +1342,81 @@ paths:
         '403': {$ref: '#/components/responses/AccessDenied'}
         '404': {$ref: '#/components/responses/NotFound'}
         '500': {$ref: '#/components/responses/InternalError'}
+  /processes/{process_id}/pause:
+    post:
+      operationId: pauseProcess
+      tags: [upload]
+      summary: Приостановить обработку комплекта
+      description: |
+        Останавливает конвейер (все его процессы) и ставит статус PAUSED. Распознанные страницы остаются в кэше:
+        «Продолжить» (POST …/resume) запускает обработку заново, и распознавание идёт с места остановки.
+        Доступно в статусах PENDING и PARSING.
+      x-owner: AG-08
+      x-permission: documents.upload
+      x-error-codes: [PROCESS_NOT_FOUND, PROCESS_STATE_CONFLICT, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: process_id, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 64}}
+      responses:
+        '200':
+          description: Проверка после действия; остановка конвейера занимает несколько секунд
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProcessDetail'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '500': {$ref: '#/components/responses/InternalError'}
+  /processes/{process_id}/resume:
+    post:
+      operationId: resumeProcess
+      tags: [upload]
+      summary: Продолжить приостановленную обработку
+      description: Ставит проверку из статуса PAUSED обратно в очередь; уже распознанные страницы берутся из кэша.
+      x-owner: AG-08
+      x-permission: documents.upload
+      x-error-codes: [PROCESS_NOT_FOUND, PROCESS_STATE_CONFLICT, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: process_id, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 64}}
+      responses:
+        '200':
+          description: Проверка после действия; остановка конвейера занимает несколько секунд
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProcessDetail'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '500': {$ref: '#/components/responses/InternalError'}
+  /processes/{process_id}/cancel:
+    post:
+      operationId: cancelProcess
+      tags: [upload]
+      summary: Отменить обработку комплекта
+      description: Останавливает конвейер и ставит статус CANCELLED (окончательно). Доступно в статусах PENDING, PARSING и PAUSED.
+      x-owner: AG-08
+      x-permission: documents.upload
+      x-error-codes: [PROCESS_NOT_FOUND, PROCESS_STATE_CONFLICT, CSRF_TOKEN_INVALID, UNAUTHENTICATED, SESSION_EXPIRED, FORBIDDEN, PASSWORD_CHANGE_REQUIRED, SESSION_STORE_UNAVAILABLE, INTERNAL_ERROR]
+      parameters:
+        - {name: process_id, in: path, required: true, schema: {type: string, minLength: 1, maxLength: 64}}
+      responses:
+        '200':
+          description: Проверка после действия; остановка конвейера занимает несколько секунд
+          headers:
+            X-Request-Id: {$ref: '#/components/headers/XRequestId'}
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ProcessDetail'}
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '403': {$ref: '#/components/responses/AccessDenied'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Conflict'}
+        '500': {$ref: '#/components/responses/InternalError'}
   /objects/{object_id}/verification:
     get:
       operationId: getObjectVerification
@@ -3241,7 +3316,7 @@ components:
       required: [process_id, status, object_id, object_name, created_at, updated_at, progress, files_total, files_rejected, pages_total]
       properties:
         process_id: {type: string}
-        status: {type: string, enum: [PENDING, PARSING, READY, FAILED], x-contract-enum-proposed: ProcessStatus}
+        status: {type: string, enum: [PENDING, PARSING, PAUSED, READY, FAILED, CANCELLED], x-contract-enum-proposed: ProcessStatus}
         stage: {type: string, nullable: true}
         object_id: {type: string}
         object_name: {type: string}

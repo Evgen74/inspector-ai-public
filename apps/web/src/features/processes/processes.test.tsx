@@ -134,6 +134,26 @@ describe('Проверки', () => {
     expect(el.textContent).toMatch(/^Распознавание: 1\s287 из 3\s169 страниц · 80 стр\/мин · осталось ≈ 24 мин$/);
   });
 
+  it('pauses a running check and offers «Продолжить» once it is paused', async () => {
+    const busy: ProcessDetail = { ...detail, status: 'PARSING', error: null, stage: 'recognize' };
+    const paused: ProcessDetail = { ...busy, status: 'PAUSED', stage: null };
+    let current = busy;
+    const { calls } = mockApi({
+      [`/api/v1/processes/${busy.process_id}`]: () => ({ body: current }),
+      [`POST /api/v1/processes/${busy.process_id}/pause`]: () => {
+        current = paused;
+        return { body: paused };
+      },
+    });
+    const user = userEvent.setup();
+    renderAt(`/processes/${busy.process_id}`);
+    await user.click(await screen.findByRole('button', { name: /Пауза/ }));
+    expect(await screen.findByRole('button', { name: /Продолжить/ })).toBeInTheDocument();
+    expect(screen.getByText('На паузе')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Отменить/ })).toBeInTheDocument();
+    expect(calls.some((c) => c.method === 'POST' && c.url === `/api/v1/processes/${busy.process_id}/pause`)).toBe(true);
+  });
+
   it('shows the process page: failure reason, stages and per-file state', async () => {
     mockApi({ [`/api/v1/processes/${detail.process_id}`]: () => ({ body: detail }) });
     renderAt(`/processes/${detail.process_id}`);

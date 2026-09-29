@@ -90,8 +90,9 @@ services:
       <<: *app-env
       INSPECTOR_API_HOST: 0.0.0.0
       INSPECTOR_API_PORT: "3000"
-      INSPECTOR_UPLOAD_WORKERS: ${INSPECTOR_UPLOAD_WORKERS:-2}
-      INSPECTOR_WORKERS: ${INSPECTOR_UPLOAD_WORKERS:-2}
+      # empty = auto: 75 % of the container's CPUs (INSPECTOR_RESOURCE_CAP), memory-checked by the pipeline
+      INSPECTOR_UPLOAD_WORKERS: ${INSPECTOR_UPLOAD_WORKERS:-}
+      INSPECTOR_RESOURCE_CAP: ${INSPECTOR_RESOURCE_CAP:-0.75}
     volumes:
       - runs:/data/runs
       - cache:/data/cache
