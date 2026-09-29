@@ -15,7 +15,7 @@ import {
 } from '@ant-design/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Link, Outlet, useLocation } from 'react-router';
-import { apiFetch } from '../api/client';
+import { apiFetch, setCsrfToken } from '../api/client';
 import { enumLabel } from '../contracts/enums';
 import { hasPermission, useAuthSession, vKeys } from '../features/verification/api';
 import { LoginPanel } from '../features/verification/Dialogs';
@@ -53,6 +53,7 @@ export function UserMenu() {
     } catch {
       /* the session is dropped locally either way */
     } finally {
+      setCsrfToken(null);
       client.setQueryData(vKeys.me, null);
       void client.invalidateQueries();
       setBusy(false);

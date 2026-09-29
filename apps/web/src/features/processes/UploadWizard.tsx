@@ -1,14 +1,42 @@
-/** Upload wizard: files (drag-and-drop) → object and optional registry → result. Limits of ТЗ §9.1 are shown up front. */
+/** Upload wizard: files, archives or a whole folder (drag-and-drop or pickers) → object and optional registry → result.
+ * Limits of ТЗ §9.1 are shown up front. A folder keeps its relative paths, so the stage comes from the ПД / РД / ИД
+ * folder names exactly as inside an archive. */
 import { useMemo, useState } from 'react';
 import { Alert, Button, Descriptions, Flex, Form, Input, List, Modal, Steps, Tag, Typography, Upload } from 'antd';
 import type { UploadFile } from 'antd';
-import { InboxOutlined } from '@ant-design/icons';
+import { FileAddOutlined, FolderOpenOutlined, InboxOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router';
 import { ProblemAlert } from '../../components/ProblemAlert';
 import { formatBytes, formatInt, pluralRu } from '../../format';
 import { DEFAULT_LIMITS, useUploadDocuments, useUploadLimits, type UploadResult, validateClientFiles } from './api';
 
 const REGISTRY_EXT = ['.csv', '.xlsx', '.json'];
+// Hidden and OS files of a picked folder («.DS_Store», «Thumbs.db», «__MACOSX/…»): never documents.
+const SYSTEM_PATH = /(^|\/)(\.[^/]*|thumbs\.db|desktop\.ini|__macosx)(\/|$)/i;
+
+/** Path inside a picked or dropped folder («Объект/ПД/АР.pdf»); '' for a file chosen on its own. */
+export const folderPath = (f: File | undefined): string => {
+  const rel = (f as (File & { webkitRelativePath?: string }) | undefined)?.webkitRelativePath ?? '';
+  return rel.includes('/') ? rel : '';
+};
+
+const extOf = (name: string) => {
+  const dot = name.lastIndexOf('.');
+  return dot < 0 ? '' : name.slice(dot).toLowerCase();
+};
+
+/** «.dwg — 3, .xlsx — 1, системные — 2» */
+function skippedSummary(paths: string[]): string {
+  const by = new Map<string, number>();
+  for (const p of paths) {
+    const key = SYSTEM_PATH.test(p) ? 'системные' : extOf(p) || 'без расширения';
+    by.set(key, (by.get(key) ?? 0) + 1);
+  }
+  return [...by.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([k, n]) => `${k} — ${formatInt(n)}`)
+    .join(', ');
+}
 
 export function UploadWizard({ open, onClose }: { open: boolean; onClose: () => void }) {
   const navigate = useNavigate();
@@ -18,6 +46,8 @@ export function UploadWizard({ open, onClose }: { open: boolean; onClose: () => 
   const [step, setStep] = useState(0);
   const [files, setFiles] = useState<UploadFile[]>([]);
   const [registry, setRegistry] = useState<UploadFile[]>([]);
+  // Files of a folder that are not documents (formats the product does not read, OS files): left out, summarised.
+  const [skipped, setSkipped] = useState<string[]>([]);
   const [objectName, setObjectName] = useState('');
   const [address, setAddress] = useState('');
   const [result, setResult] = useState<UploadResult | null>(null);
@@ -38,6 +68,7 @@ export function UploadWizard({ open, onClose }: { open: boolean; onClose: () => 
     setStep(0);
     setFiles([]);
     setRegistry([]);
+    setSkipped([]);
     setObjectName('');
     setAddress('');
     setResult(null);
@@ -61,6 +92,25 @@ export function UploadWizard({ open, onClose }: { open: boolean; onClose: () => 
       setResult(res);
       setStep(2);
     }
+  };
+
+  // A file of a folder that is not a document is left out (with a summary); a file chosen on its own stays in the list,
+  // with the reason, so the user sees why it is refused.
+  const beforeUpload = (file: File) => {
+    const rel = folderPath(file);
+    if (rel && (SYSTEM_PATH.test(rel) || !limits.extensions.includes(extOf(file.name)))) {
+      setSkipped((s) => [...s, rel]);
+      return Upload.LIST_IGNORE;
+    }
+    return false;
+  };
+  const picker = {
+    multiple: true,
+    fileList: files,
+    beforeUpload,
+    // Folder files are listed by their path inside the folder: «ПД/АР.pdf» and «РД/АР.pdf» are different documents.
+    onChange: (info: { fileList: UploadFile[] }) =>
+      setFiles(info.fileList.map((f) => (folderPath(f.originFileObj) ? { ...f, name: folderPath(f.originFileObj) } : f))),
   };
 
   const footer =
@@ -117,32 +167,52 @@ export function UploadWizard({ open, onClose }: { open: boolean; onClose: () => 
                 limits.max_package_bytes,
               )} на весь пакет. Стадия (ПД, РД, ИД) определяется по реестру, а без него — по названиям папок и файлов.`}
             />
-            <Upload.Dragger
-              multiple
-              fileList={files}
-              beforeUpload={() => false}
-              onChange={(info) => setFiles(info.fileList)}
-              // No `accept`: unsupported files must stay in the list with a Russian reason instead of being dropped silently.
-              itemRender={(node, file) => {
-                const err = check.errors.get(file.name);
-                return (
-                  <div>
-                    {node}
-                    {err && <Typography.Text type="danger">{err}</Typography.Text>}
-                  </div>
-                );
-              }}
-            >
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="ant-upload-text">Перетащите файлы сюда или нажмите для выбора</p>
-              <p className="ant-upload-hint">Можно выбрать несколько файлов сразу</p>
-            </Upload.Dragger>
+            <div className="upload-files">
+              <Upload.Dragger
+                {...picker}
+                // Dropped folders are walked with their relative paths; a click does nothing (the two buttons choose).
+                directory
+                openFileDialogOnClick={false}
+                // No `accept`: unsupported files must stay in the list with a Russian reason instead of being dropped silently.
+                itemRender={(node, file) => {
+                  const err = check.errors.get(file.name);
+                  return (
+                    <div>
+                      {node}
+                      {err && <Typography.Text type="danger">{err}</Typography.Text>}
+                    </div>
+                  );
+                }}
+              >
+                <p className="ant-upload-drag-icon">
+                  <InboxOutlined />
+                </p>
+                <p className="ant-upload-text">Перетащите сюда файлы, архивы или папку комплекта</p>
+                <p className="ant-upload-hint">
+                  В папке документы могут лежать в подпапках ПД, РД, ИД — стадия определится по их названиям, как в архиве
+                </p>
+                <Flex gap={8} justify="center" wrap onClick={(e) => e.stopPropagation()}>
+                  <Upload {...picker} showUploadList={false}>
+                    <Button icon={<FileAddOutlined />}>Выбрать файлы или архивы</Button>
+                  </Upload>
+                  <Upload {...picker} directory showUploadList={false}>
+                    <Button icon={<FolderOpenOutlined />}>Выбрать папку</Button>
+                  </Upload>
+                </Flex>
+              </Upload.Dragger>
+            </div>
             <Typography.Text type="secondary">
               Выбрано: {formatInt(files.length)} {pluralRu(files.length, ['файл', 'файла', 'файлов'])}, {formatBytes(check.totalBytes)} из{' '}
               {formatBytes(limits.max_package_bytes)}
             </Typography.Text>
+            {skipped.length > 0 && (
+              <Alert
+                type="warning"
+                showIcon
+                title={`Из папки не взято ${formatInt(skipped.length)} ${pluralRu(skipped.length, ['файл', 'файла', 'файлов'])}: форматы, которые не читаются, и системные файлы`}
+                description={skippedSummary(skipped)}
+              />
+            )}
             {check.packageError && <Alert type="error" showIcon title={check.packageError} />}
             {check.errors.size > 0 && (
               <Alert

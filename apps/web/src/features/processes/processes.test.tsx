@@ -191,4 +191,34 @@ describe('Мастер загрузки', () => {
     expect(form.get('object_name')).toBe('Дом 7');
     expect((form.getAll('files')[0] as File).name).toBe('a.pdf');
   }, 20_000);
+
+  it('takes a whole folder: keeps the paths (stage from ПД/РД folders) and leaves out non-documents', async () => {
+    const { calls } = mockApi(uploadRoutes());
+    const user = userEvent.setup();
+    renderAt('/processes');
+    await user.click(await screen.findByRole('button', { name: /Загрузить комплект/ }));
+    const inFolder = (body: string, rel: string) => {
+      const f = new File([body], rel.split('/').pop()!, { type: 'application/pdf' });
+      Object.defineProperty(f, 'webkitRelativePath', { value: rel });
+      return f;
+    };
+    const folderInput = [...document.querySelectorAll('input[type="file"]')].at(-1) as HTMLInputElement;
+    expect(folderInput).toHaveAttribute('webkitdirectory');
+    await user.upload(folderInput, [
+      inFolder('%PDF-1.4', 'Полярная/ПД/АР.pdf'),
+      inFolder('%PDF-1.4', 'Полярная/РД/АР.pdf'),
+      inFolder('x', 'Полярная/РД/план.dwg'),
+      inFolder('x', 'Полярная/.DS_Store'),
+    ]);
+    expect(await screen.findByText('Полярная/ПД/АР.pdf')).toBeInTheDocument();
+    expect(screen.getByText('Полярная/РД/АР.pdf')).toBeInTheDocument();
+    expect(screen.getByText(/Из папки не взято 2 файла/)).toBeInTheDocument();
+    expect(screen.getByText(/\.dwg — 1/)).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Далее' })).toBeEnabled());
+    await user.click(screen.getByRole('button', { name: 'Далее' }));
+    await user.click(screen.getByRole('button', { name: 'Загрузить и проверить' }));
+    expect(await screen.findByText('Комплект принят, проверка поставлена в очередь')).toBeInTheDocument();
+    const form = calls.find((c) => c.method === 'POST')?.body as unknown as FormData;
+    expect(form.getAll('files').map((f) => (f as File).name)).toEqual(['Полярная/ПД/АР.pdf', 'Полярная/РД/АР.pdf']);
+  }, 20_000);
 });

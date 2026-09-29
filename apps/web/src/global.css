@@ -18,3 +18,9 @@ body {
   white-space: nowrap;
   border: 0;
 }
+
+/* Upload wizard: a whole folder can add hundreds of files — the list scrolls inside the dialog. */
+.upload-files .ant-upload-list {
+  max-height: 280px;
+  overflow-y: auto;
+}

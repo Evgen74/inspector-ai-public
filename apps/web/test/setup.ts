@@ -1,6 +1,7 @@
 import '@testing-library/jest-dom/vitest';
 import { cleanup, configure } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
+import { setCsrfToken } from '../src/api/client';
 
 // OpenSeadragon needs a canvas; jsdom has none. UI tests get the recording fake (test/osd-fake.ts).
 vi.mock('openseadragon', async () => await import('./osd-fake'));
@@ -41,4 +42,5 @@ if (hasWindow) {
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  setCsrfToken(null); // the session token is module state: no test inherits another's session
 });

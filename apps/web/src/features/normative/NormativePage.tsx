@@ -29,7 +29,9 @@ function RefTags({ refs }: { refs: NormRef[] }) {
         const st = REF_STATUS[r.status ?? ''];
         return (
           <Tooltip key={i} title={[r.clause, r.edition].filter(Boolean).join(' · ')}>
-            <Tag color={st?.color} data-code={r.status ?? undefined}>
+            {/* Long designations («ПП Москвы от 23.12.2015 № 945-ПП «Об утверждении…») wrap inside the column instead
+                of running under the fixed «Активен» column (a tag is nowrap by default). */}
+            <Tag color={st?.color} data-code={r.status ?? undefined} style={{ whiteSpace: 'normal', overflowWrap: 'anywhere', maxWidth: '100%', marginInlineEnd: 0 }}>
               {r.designation}
               {r.status ? ` · ${st?.label ?? r.status}` : ''}
               {r.confidence ? ` · уверенность: ${confidenceLabel(r.confidence).toLowerCase()}` : ''}
@@ -37,7 +39,11 @@ function RefTags({ refs }: { refs: NormRef[] }) {
           </Tooltip>
         );
       })}
-      {refs.length > 3 && <Tag>+{refs.length - 3}</Tag>}
+      {refs.length > 3 && (
+        <Tooltip title={refs.slice(3).map((r) => r.designation).join('; ')}>
+          <Tag>+{refs.length - 3}</Tag>
+        </Tooltip>
+      )}
     </Flex>
   );
 }
@@ -88,8 +94,8 @@ function ParamsTab({ canEdit, csrf }: { canEdit: boolean; csrf: string | null | 
   const query = useNormParams({ q, section, criticality, active });
   const data = query.data;
   const columns: TableColumnsType<NormParam> = [
-    { title: 'Код', dataIndex: 'code', width: 130, render: (c: string) => <Typography.Text code style={{ whiteSpace: 'nowrap' }}>{c}</Typography.Text> },
-    { title: 'Параметр', dataIndex: 'name', width: 240 },
+    { title: 'Код', dataIndex: 'code', width: 110, render: (c: string) => <Typography.Text code style={{ whiteSpace: 'nowrap' }}>{c}</Typography.Text> },
+    { title: 'Параметр', dataIndex: 'name', width: 220 },
     { title: 'Раздел', dataIndex: 'section', width: 80 },
     {
       title: 'Критичность',
@@ -117,10 +123,11 @@ function ParamsTab({ canEdit, csrf }: { canEdit: boolean; csrf: string | null | 
         </span>
       ),
     },
-    { title: 'Нормативные ссылки', width: 320, render: (_: unknown, r) => <RefTags refs={r.refs} /> },
-    { title: 'Активен', dataIndex: 'is_active', width: 90, fixed: 'right' as const, render: (a: boolean) => <Tag color={a ? 'green' : 'default'}>{a ? 'да' : 'нет'}</Tag> },
+    // No width: the references take the rest of the row (their tags wrap), so the table fits without a horizontal scroll.
+    { title: 'Нормативные ссылки', render: (_: unknown, r) => <RefTags refs={r.refs} /> },
+    { title: 'Активен', dataIndex: 'is_active', width: 84, fixed: 'right' as const, render: (a: boolean) => <Tag color={a ? 'green' : 'default'}>{a ? 'да' : 'нет'}</Tag> },
     ...(canEdit
-      ? [{ title: '', width: 60, fixed: 'right' as const, render: (_: unknown, r: NormParam) => <Button size="small" icon={<EditOutlined />} aria-label={`Изменить ${r.code}`} onClick={() => setEditing(r)} /> }]
+      ? [{ title: '', width: 52, fixed: 'right' as const, render: (_: unknown, r: NormParam) => <Button size="small" icon={<EditOutlined />} aria-label={`Изменить ${r.code}`} onClick={() => setEditing(r)} /> }]
       : []),
   ];
   return (
@@ -153,7 +160,8 @@ function ParamsTab({ canEdit, csrf }: { canEdit: boolean; csrf: string | null | 
           dataSource={data?.items ?? []}
           columns={columns}
           pagination={{ pageSize: 25, showSizeChanger: false }}
-          scroll={{ x: 1350 }}
+          // Scrolls sideways only on a narrow screen (the fixed columns then stay in view).
+          scroll={{ x: 1100 }}
           expandable={{
             expandedRowRender: (r) => (
               <Descriptions size="small" column={1}>

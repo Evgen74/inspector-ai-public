@@ -4,7 +4,7 @@
  * summary) and `X-CSRF-Token` (from the session of GET /auth/me).
  */
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
-import { apiFetch, ApiError } from '../../api/client';
+import { apiFetch, ApiError, setCsrfToken } from '../../api/client';
 import type {
   AuthSession,
   CompletenessView,
@@ -62,9 +62,14 @@ export function useAuthSession() {
     queryKey: vKeys.me,
     queryFn: async () => {
       try {
-        return await apiFetch<AuthSession>('/auth/me');
+        const session = await apiFetch<AuthSession>('/auth/me');
+        setCsrfToken(session.csrf_token);
+        return session;
       } catch (err) {
-        if (err instanceof ApiError && err.status === 401) return null;
+        if (err instanceof ApiError && err.status === 401) {
+          setCsrfToken(null);
+          return null;
+        }
         throw err;
       }
     },
@@ -82,6 +87,7 @@ export function useLogin() {
   return useMutation({
     mutationFn: (v: { login: string; password: string }) => apiFetch<AuthSession>('/auth/login', { method: 'POST', body: JSON.stringify(v) }),
     onSuccess: (session) => {
+      setCsrfToken(session.csrf_token);
       client.setQueryData(vKeys.me, session);
       void client.invalidateQueries({ queryKey: ['verification'] });
     },

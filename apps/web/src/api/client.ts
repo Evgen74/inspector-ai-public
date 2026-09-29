@@ -33,6 +33,15 @@ export function apiUrl(path: string): string {
   return origin && origin !== 'null' ? new URL(`${API_BASE}${path}`, origin).toString() : `${API_BASE}${path}`;
 }
 
+// CSRF token of the current session (GET /auth/me, POST /auth/login). Every unsafe request carries it, so a feature
+// cannot forget it (an upload without it is refused with CSRF_TOKEN_INVALID once the user is signed in).
+let csrfToken: string | null = null;
+const SAFE_METHODS = new Set(['GET', 'HEAD', 'OPTIONS']);
+
+export function setCsrfToken(token: string | null | undefined): void {
+  csrfToken = token ?? null;
+}
+
 function newRequestId(): string {
   return typeof crypto !== 'undefined' && 'randomUUID' in crypto
     ? crypto.randomUUID()
@@ -44,6 +53,9 @@ export async function apiFetch<T>(path: string, init: RequestInit = {}): Promise
   const headers = new Headers(init.headers);
   headers.set('Accept', 'application/json, application/problem+json');
   headers.set('X-Request-Id', requestId);
+  if (csrfToken && !SAFE_METHODS.has((init.method ?? 'GET').toUpperCase()) && !headers.has('X-CSRF-Token')) {
+    headers.set('X-CSRF-Token', csrfToken);
+  }
   // FormData: the browser sets multipart/form-data with its boundary.
   if (init.body !== undefined && !headers.has('Content-Type') && !(init.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
